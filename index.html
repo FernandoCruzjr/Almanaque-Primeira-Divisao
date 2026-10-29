@@ -287,6 +287,43 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:14px}
 .seg button{border:0;border-radius:10px;padding:11px;font-weight:600;color:var(--muted);background:transparent}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* apps da tripulação */
+.appcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center;padding:20px;border-radius:24px;border:1px solid var(--glass-b);overflow:hidden}
+.appcard.hi{background:radial-gradient(420px 260px at 0% 0%,rgba(61,220,151,.25),transparent 70%),linear-gradient(135deg,#0F7A4A,#0A3F2A)}
+.appcard.desf{background:radial-gradient(420px 260px at 0% 0%,rgba(56,200,230,.22),transparent 70%),linear-gradient(135deg,#123247,#0A1A28)}
+.app-phones{display:flex;gap:12px}
+.app-phones figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.app-phones figcaption{font-size:12px;font-weight:600;color:rgba(255,255,255,.8)}
+.phone{width:132px;aspect-ratio:420/700;border-radius:20px;border:5px solid #06090D;overflow:hidden;background:#06090D;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.app-info{display:flex;flex-direction:column;gap:12px;min-width:0}
+.app-info p{color:rgba(255,255,255,.85);font-size:14.5px;line-height:1.55}
+.app-head{display:flex;align-items:center;gap:12px}
+.app-head b{display:block;font-family:var(--f-display);font-size:21px;font-weight:800;color:#fff}
+.app-icon{width:52px;height:52px;border-radius:14px;box-shadow:0 6px 16px rgba(0,0,0,.35);flex:none}
+.app-tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#FFD66B}
+.appcard a.btn{text-decoration:none}
+.sec-title .btn{white-space:nowrap}
+.btn.app-go{background:#fff;color:#0A2A1C;border-color:transparent;font-weight:700}
+.desf .btn.app-go{background:linear-gradient(90deg,#3DDC97,#38C8E6);color:#06202A}
+.btn.app-go2{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
+.btn.app-go svg,.btn.app-go2 svg{width:16px;height:16px}
+.app-soon{font-size:13px;color:rgba(255,255,255,.75);font-weight:600}
+.app-edit{color:#fff}
+.apps-home{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.apps-home .appcard{padding:16px;gap:14px}
+.apps-home .phone{width:96px;border-width:4px;border-radius:16px}
+.apps-home .app-info p{font-size:13.5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:820px){.apps-home{grid-template-columns:1fr}}
+@media (max-width:560px){
+  .appcard{grid-template-columns:1fr;padding:18px}
+  .appcard .app-phones{justify-content:center;order:2}
+  .apps-home .appcard{grid-template-columns:auto minmax(0,1fr);gap:12px}
+  .apps-home .app-phones{order:0}
+  .apps-home .phone{width:84px}
+  .apps-home .app-head b{font-size:18px}
+  .apps-home .app-icon{width:40px;height:40px;border-radius:11px}
+}
 /* calculadoras */
 .seg4{display:flex;overflow-x:auto;scrollbar-width:none}
 .seg4::-webkit-scrollbar{display:none}
@@ -363,6 +400,7 @@ const ICONS = {
   calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8v4H8zM8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
   roller:'<rect x="3" y="3" width="15" height="6" rx="1.5"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
   money:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
@@ -545,7 +583,7 @@ function showApp(){
 
 /* ======================= TELAS ======================= */
 function tabs(){
-  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["calc","Calcular","calc"]];
+  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["calc","Calcular","calc"],["apps","Apps","grid"]];
   if (isAdmin()) t.push(["incumbencias","Incumbências","clip"],["equipe","Equipe","users"]);
   t.push(["conta","Conta","user"]);
   return t;
@@ -555,8 +593,8 @@ function render(){
   if (!tabs().some(t => t[0] === S.tab)) S.tab = "inicio";
   const navHtml = tabs().map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
   $("#nav").innerHTML = navHtml;
-  /* No celular a conta abre pelo avatar no topo, então a barra de baixo fica com no máximo cinco botões. */
-  $("#tabbar").innerHTML = tabs().filter(t => t[0] !== "conta").map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
+  /* No celular a conta abre pelo avatar no topo e a equipe pelo Início, então a barra de baixo fica com no máximo cinco botões. */
+  $("#tabbar").innerHTML = tabs().filter(t => t[0] !== "conta" && t[0] !== "equipe").map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
   setSync(S.sync);
   const nome = (S.member && S.member.nome) || "";
   const top = `<div class="topbar"><div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
@@ -564,7 +602,7 @@ function render(){
     <span class="pill netpill" id="netpill" hidden></span><button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${nome ? esc(nome[0].toUpperCase()) : ic("user").replace('<svg','<svg width="20" height="20"')}</button></div>`;
   let body;
   if (!isMember()) body = viewPending();
-  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
+  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, apps:viewApps, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
   if (S.tab === "conta" && !isMember()) body = viewConta();
   $("#view").innerHTML = top + body;
 }
@@ -639,6 +677,8 @@ function viewHome(){
     </section>
     <div class="sec-title"><h2>Guia de chegada</h2><button class="btn ghost sm" data-act="tab" data-arg="bemvindo">Ver tudo${ic("chev")}</button></div>
     <div class="grid">${guia(mods).map(modTile).join("")}</div>
+    <div class="sec-title"><h2>Qualidade de vida</h2><button class="btn ghost sm" data-act="tab" data-arg="apps">Ver apps${ic("chev")}</button></div>
+    <div class="apps-home">${APPS.map(a => appCard(a, false)).join("")}</div>
     ${maisBordo(mods).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(mods).map(modTile).join("")}</div>` : ""}
     <div class="sec-title"><h2>Ferramentas</h2></div>
     <div class="grid mini">${calcTiles()}</div>
@@ -1115,6 +1155,36 @@ const selF = (name, label, opts, val) => `<div class="field"><label for="c-${nam
 const rl = (k, v, cls = "") => `<div class="rl ${cls}"><span>${k}</span><b class="num">${v}</b></div>`;
 function formVals(f){ const o = {}; f.querySelectorAll("[name]").forEach(el => o[el.name] = el.type === "checkbox" ? el.checked : el.value); return o; }
 
+/* ---------- apps da tripulação ---------- */
+/* Prévia de cada app: foto da página inicial (icons/apps) e o ícone. O link pode ser trocado pelo encarregado. */
+const APPS = [
+  {id:"desfrangolizador", nome:"Desfrangolizador", tag:"Qualidade de vida", cor:"desf", resumo:"Treino de hipertrofia, dieta flexível e evolução do corpo em um só app. Para aguentar a rotina de bordo com saúde.",
+    url:"https://fernandocruzjr.github.io/Desfrangolizador/", telas:[{img:"desfrangolizador.jpg", t:"Página inicial"}]},
+  {id:"hifamily", nome:"Hi Family", tag:"Inglês", cor:"hi", resumo:"Inglês para toda a família, com lições curtas, áudio e quiz. Tem a área Inglês Naval: vocabulário de bordo, rádio, manobra e cerimonial.",
+    url:"", telas:[{img:"hifamily.jpg", t:"Página inicial"}, {img:"hifamily-naval.jpg", t:"Inglês Naval", path:"#/marinha"}]}
+];
+const appUrl = a => ((S.content.apps && S.content.apps.data && S.content.apps.data.urls) || {})[a.id] || a.url;
+const appLink = (a, path) => { const u = appUrl(a); return u ? u.replace(/\/?(#.*)?$/, "/") + (path || "") : ""; };
+const phone = (src, alt) => `<div class="phone"><img src="icons/apps/${src}" alt="${esc(alt)}" loading="lazy"></div>`;
+function appCard(a, full){
+  const u = appUrl(a);
+  const btn = (path, label, cls) => u ? `<a class="btn ${cls}" href="${esc(appLink(a, path))}" target="_blank" rel="noopener">${label}${ic("external")}</a>` : "";
+  const telas = full ? a.telas : a.telas.slice(0, 1);
+  return `<article class="appcard ${a.cor}">
+    <div class="app-phones">${telas.map(t => `<figure>${phone(t.img, a.nome + " · " + t.t)}${full ? `<figcaption>${esc(t.t)}</figcaption>` : ""}</figure>`).join("")}</div>
+    <div class="app-info">
+      <div class="app-head"><img class="app-icon" src="icons/apps/${a.id}-icon.png" alt=""><div><span class="app-tag">${esc(a.tag)}</span><b>${esc(a.nome)}</b></div></div>
+      <p>${esc(a.resumo)}</p>
+      <div class="row" style="flex-wrap:wrap;gap:8px">${btn("", full ? "Abrir " + esc(a.nome) : "Abrir", "app-go")}${full ? a.telas.filter(t => t.path).map(t => btn(t.path, esc(t.t), "app-go2")).join("") : ""}
+        ${!u ? (isAdmin() ? `<button class="btn app-go" data-act="appUrl" data-arg="${a.id}">${ic("plus")}Colocar o link</button>` : `<span class="app-soon">Link em breve</span>`) : ""}
+        ${u && isAdmin() && full ? `<button class="btn sm ghost app-edit" data-act="appUrl" data-arg="${a.id}">${ic("edit")}Link</button>` : ""}</div>
+    </div></article>`;
+}
+function viewApps(){
+  return `<div class="page-h"><span class="eyebrow">Fora do horário</span><h1>Apps da tripulação</h1><p class="sub" style="font-size:15px">Apps feitos para cuidar do corpo e estudar. Cada um abre no navegador e pode ser instalado no celular.</p></div>
+    <div class="col" style="gap:16px">${APPS.map(a => appCard(a, true)).join("")}</div>`;
+}
+
 function viewCalc(){
   if (S.tool === "tinta") return viewTinta();
   if (S.tool === "fin") return viewFin();
@@ -1376,6 +1446,11 @@ const ACT = {
   tool(a){ S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
   toolBack(){ S.tool = null; render(); scrollTo(0, 0); },
   tintaModo(a){ const f = $("[data-calc=tinta]"); calcSet("tinta", Object.assign(formVals(f), {modo:a})); render(); },
+  appUrl(a){ const app = APPS.find(x => x.id === a); const v = prompt(`Endereço do ${app.nome} (começa com https://)`, appUrl(app)); if (v == null) return; const u = v.trim();
+    if (u && !/^https:\/\/[^\s]+$/.test(u)) { toast("O endereço precisa começar com https://"); return; }
+    if (!S.content.apps) S.content.apps = {key:"apps", audience:"todos", data:{urls:{}}};
+    S.content.apps.data.urls = S.content.apps.data.urls || {}; if (u) S.content.apps.data.urls[a] = u; else delete S.content.apps.data.urls[a];
+    putContent("apps"); render(); toast("Link salvo"); },
   finTab(a){ S.finTab = a; render(); },
   finEdit(){ finModal(); },
   finReset(){ if (!confirm("Voltar todos os valores aos da planilha de 2026?")) return; S.content.financeiro = {key:"financeiro", audience:"todos", data:clone(FIN_PADRAO)}; putContent("financeiro"); closeModal(); render(); toast("Valores da planilha restaurados"); },
