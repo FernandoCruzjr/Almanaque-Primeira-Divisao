@@ -519,6 +519,12 @@ document.addEventListener("toggle", ev => {
   const i = +d.dataset.sec, o = openSecs(S.mod).filter(x => x !== i);
   OPEN[S.mod] = d.open ? [...o, i] : o;
 }, true);
+/* Listas de verificação dos locais: lembra quais estão abertas. */
+let OPEN_CHK = [];
+document.addEventListener("toggle", ev => {
+  const d = ev.target; if (!d.matches || !d.matches("details[data-chk]")) return;
+  const id = d.dataset.chk; OPEN_CHK = OPEN_CHK.filter(x => x !== id); if (d.open) OPEN_CHK.push(id);
+}, true);
 function blk(b){
   const t = b.titulo ? `<div class="blk-t">${esc(b.titulo)}</div>` : "";
   switch (b.tipo) {
@@ -565,7 +571,8 @@ function itemRow(l, it, showLocal){
 function viewLocal(l){
   const s = incStats(l);
   return `<button class="back" data-act="localBack">${ic("left")}Incumbências</button>
-    <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1><p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
+    <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1>${l.descricao ? `<p class="sub" style="font-size:15px">${esc(l.descricao)}</p>` : ""}<p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
+    ${(l.checklists || []).map(c => `<details class="sec" data-chk="${esc(c.id)}" ${OPEN_CHK.includes(c.id) ? "open" : ""}><summary><span class="sec-n">${ic("check").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(c.titulo)}</b><span class="pill">${stepsDone(c.id).length}/${c.itens.length}</span>${ic("down")}</summary><div class="sec-body">${blk({tipo:"passos", id:c.id, itens:c.itens})}</div></details>`).join("")}
     <div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button></div>
     <div class="items">${l.itens.map(it => itemRow(l, it)).join("") || `<div class="empty">Nenhum item.</div>`}</div>`;
 }
