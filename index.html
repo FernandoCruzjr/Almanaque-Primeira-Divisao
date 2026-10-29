@@ -149,8 +149,8 @@ textarea.input{min-height:96px;resize:vertical;line-height:1.45}
 .sec>summary::-webkit-details-marker{display:none}
 .sec-n{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);font-family:var(--f-mono);font-weight:600;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}
 .sec>summary b{font-family:var(--f-display);font-weight:700;font-size:15.5px;flex:1;line-height:1.25}
-.sec>summary svg{width:18px;height:18px;color:var(--faint);transition:transform .2s}
-.sec[open]>summary svg{transform:rotate(180deg)}
+.sec>summary>svg{width:18px;height:18px;color:var(--faint);transition:transform .2s;flex:none}
+.sec[open]>summary>svg:last-child{transform:rotate(180deg)}
 .sec-body{padding:0 16px 18px;display:flex;flex-direction:column;gap:14px}
 .blk-t{font-weight:700;font-size:14px;color:var(--accent-ink);margin-bottom:6px}
 .prose{white-space:pre-line;line-height:1.6;font-size:14.5px}
@@ -293,7 +293,7 @@ const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localSt
 const uid = () => Math.random().toString(36).slice(2, 9);
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
+function toast(msg){ document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
 function openModal(html){ $("#modal").innerHTML = `<div class="scrim" data-scrim><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; const f = $("#modal .sheet input, #modal .sheet textarea"); if (f && matchMedia("(min-width:821px)").matches) f.focus(); }
 function closeModal(){ $("#modal").innerHTML = ""; }
 const sheetHead = (t, s) => `<div class="sheet-h"><div><h3>${esc(t)}</h3>${s ? `<div class="sub">${esc(s)}</div>` : ""}</div><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>`;
@@ -497,8 +497,9 @@ function viewPending(){
 
 const bem = () => (S.content.bemvindo && S.content.bemvindo.data) || {modulos:[]};
 const inc = () => (S.content.incumbencias && S.content.incumbencias.data) || null;
-/* Cada item usa os campos do local, a menos que tenha os seus próprios (it.colunas). */
-const itemCols = (l, it) => it.colunas || l.colunas;
+/* Campos de um item: os próprios dele (it.colunas), senão os da pasta (l.pastaCols), senão os do local. */
+const baseCols = (l, pasta) => (pasta && l.pastaCols && l.pastaCols[pasta]) || l.colunas;
+const itemCols = (l, it) => it.colunas || baseCols(l, it.pasta);
 function incStats(l){ let total = 0, f = 0; l.itens.forEach(it => { const cs = itemCols(l, it); total += cs.length; cs.forEach(c => { if (String((it.campos || {})[c] || "").trim()) f++; }); }); return {f, total, pct: total ? Math.round(f / total * 100) : 0}; }
 
 function viewHome(){
@@ -607,7 +608,7 @@ function viewLocal(l){
     ${S.sel ? `<div class="note">${ic("folder")}<span>Toque nos itens que quer juntar e depois em <b>Mover para pasta</b>.</span></div>`
       : `<div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="organize">${ic("folder")}Organizar em pastas</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button></div>`}
     ${pastasDe(l).map(pa => { const its = l.itens.filter(it => it.pasta === pa), open = S.sel || OPEN_PASTA.includes(l.id + "/" + pa);
-      return `<details class="sec folder" data-pasta="${esc(l.id + "/" + pa)}" ${open ? "open" : ""}><summary><span class="sec-n">${ic("folder").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(pa)}</b><span class="pill">${its.length}</span>${S.sel ? "" : `<span class="iconbtn sm" role="button" tabindex="0" data-act="pastaEdit" data-arg="${esc(pa)}" aria-label="Renomear pasta">${ic("edit")}</span>`}${ic("down")}</summary><div class="sec-body"><div class="items">${its.map(it => itemRow(l, it)).join("")}</div></div></details>`; }).join("")}
+      return `<details class="sec folder" data-pasta="${esc(l.id + "/" + pa)}" ${open ? "open" : ""}><summary><span class="sec-n">${ic("folder").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(pa)}</b><span class="pill">${its.length}</span>${S.sel ? "" : `<span class="iconbtn sm" role="button" tabindex="0" data-act="pastaEdit" data-arg="${esc(pa)}" aria-label="Editar pasta e campos">${ic("edit")}</span>`}${ic("down")}</summary><div class="sec-body"><div class="items">${its.map(it => itemRow(l, it)).join("")}</div></div></details>`; }).join("")}
     <div class="items">${l.itens.filter(it => !it.pasta).map(it => itemRow(l, it)).join("") || (l.itens.length ? "" : `<div class="empty">Nenhum item.</div>`)}</div>
     ${S.sel ? `<div class="selbar"><span><b class="num">${S.sel.length}</b> ${S.sel.length === 1 ? "item" : "itens"}</span><button class="btn sm ghost" data-act="organizeEnd">Cancelar</button><button class="btn sm primary" data-act="moveOpen" ${S.sel.length ? "" : "disabled"}>${ic("folder")}Mover para pasta</button></div>` : ""}`;
 }
@@ -635,9 +636,11 @@ function moveTo(pasta){
   S.sel = null; putContent("incumbencias"); closeModal(); render(); toast(pasta ? `Movido para ${pasta}` : "Tirado da pasta");
 }
 function pastaModal(pa){
+  const l = curLocal();
   openModal(`${sheetHead("Pasta", "Apagar a pasta não apaga os itens: eles voltam para a lista do local.")}
     <form class="col" data-form="pasta" data-old="${esc(pa)}">
       <div class="field"><label for="f-pn">Nome da pasta</label><input id="f-pn" name="nome" class="input" maxlength="40" value="${esc(pa)}"></div>
+      <div class="field"><label for="f-pc">Campos dos itens desta pasta (um por linha)</label><span class="sub" style="font-size:12.5px">Vale para todos os itens da pasta. Ex.: tire "m² por balde" das espias.</span><textarea id="f-pc" name="cols" class="input" style="min-height:160px">${esc(baseCols(l, pa).join("\n"))}</textarea></div>
       <div class="row sheet-foot" style="flex-wrap:wrap"><button type="button" class="btn ghost danger sm" data-act="pastaDel" data-arg="${esc(pa)}">${ic("trash")}Apagar pasta</button><button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
     </form>`);
 }
@@ -649,7 +652,7 @@ function itemModal(lid, iid){
       <div class="field"><label for="f-nome">Nome do item</label><input id="f-nome" name="nome" class="input" required maxlength="80" value="${esc(it.nome)}"></div>
       <div class="fields2" id="f-fields">${itemCols(l, it).map(c => fieldRow(c, (it.campos || {})[c])).join("")}</div>
       <div class="addfield"><input id="f-newcol" class="input" maxlength="40" placeholder="Novo campo só deste item (ex.: Bitola)"><button type="button" class="btn sm" data-act="fieldAdd">${ic("plus")}Campo</button></div>
-      ${it.colunas ? `<button type="button" class="btn ghost sm" data-act="fieldReset" data-arg="${esc(lid)}" style="align-self:flex-start">${ic("reset")}Voltar aos campos do local</button>` : ""}
+      ${it.colunas ? `<button type="button" class="btn ghost sm" data-act="fieldReset" data-arg="${esc(lid)}" data-i="${esc(it.pasta || "")}" style="align-self:flex-start">${ic("reset")}Voltar aos campos ${it.pasta ? "da pasta" : "do local"}</button>` : ""}
       <div class="field"><label for="f-obs">Observações</label><textarea id="f-obs" name="obs" class="input" maxlength="2000">${esc(it.obs || "")}</textarea></div>
       <div class="field"><label for="f-ip">Pasta (opcional)</label><input id="f-ip" name="pasta" class="input" maxlength="40" list="dl-pastas" value="${esc(it.pasta || "")}" placeholder="Sem pasta"><datalist id="dl-pastas">${pastasDe(l).map(p => `<option value="${esc(p)}">`).join("")}</datalist></div>
       <div class="row sheet-foot" style="flex-wrap:wrap">${iid ? `<button type="button" class="btn ghost danger sm" data-act="itemDel" data-arg="${esc(lid)}" data-i="${esc(iid)}">${ic("trash")}Apagar</button>` : ""}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
@@ -675,7 +678,7 @@ document.addEventListener("submit", ev => {
     const l = I.locais.find(x => x.id === f.dataset.l); if (!l) return;
     const nome = String(fd.get("nome") || "").trim(); if (!nome) { toast("Dê um nome ao item"); return; }
     const campos = {}, cols = []; for (const [k, v] of fd.entries()) if (k.startsWith("c:")) { cols.push(k.slice(2)); if (String(v).trim()) campos[k.slice(2)] = String(v).trim(); }
-    const own = cols.join("\n") !== l.colunas.join("\n");
+    const own = cols.join("\n") !== baseCols(l, String(fd.get("pasta") || "").trim().slice(0, 40)).join("\n");
     const obs = String(fd.get("obs") || "").trim(), pasta = String(fd.get("pasta") || "").trim().slice(0, 40);
     const it = f.dataset.i ? Object.assign(l.itens.find(x => x.id === f.dataset.i), {nome, campos, obs}) : {id:l.id + "-" + uid(), nome, campos, obs};
     if (pasta) it.pasta = pasta; else delete it.pasta;
@@ -684,7 +687,11 @@ document.addEventListener("submit", ev => {
   } else if (kind === "move") { moveTo(fd.get("pasta")); return;
   } else if (kind === "pasta") {
     const nv = String(fd.get("nome") || "").trim().slice(0, 40); if (!nv) { toast("Dê um nome à pasta"); return; }
-    curLocal().itens.forEach(it => { if (it.pasta === f.dataset.old) it.pasta = nv; });
+    const l = curLocal(), old = f.dataset.old;
+    const cols = [...new Set(String(fd.get("cols") || "").split("\n").map(x => x.trim()).filter(Boolean))];
+    l.itens.forEach(it => { if (it.pasta === old) it.pasta = nv; });
+    l.pastaCols = l.pastaCols || {}; delete l.pastaCols[old];
+    if (cols.length && cols.join("\n") !== l.colunas.join("\n")) l.pastaCols[nv] = cols;
     OPEN_PASTA.push(S.local + "/" + nv);
   } else if (kind === "local") {
     const nome = String(fd.get("nome") || "").trim(); if (!nome) { toast("Dê um nome ao local"); return; }
@@ -742,13 +749,13 @@ const ACT = {
     if ([...document.querySelectorAll("#f-fields [name]")].some(x => x.name === "c:" + c)) { toast("Esse campo já existe"); return; }
     $("#f-fields").insertAdjacentHTML("beforeend", fieldRow(c, "")); i.value = ""; $("#f-fields .frow:last-child input").focus();
   },
-  fieldReset(a){ const l = inc().locais.find(x => x.id === a); $("#f-fields").innerHTML = l.colunas.map(c => fieldRow(c, (document.querySelector(`#f-fields [name="c:${CSS.escape(c)}"]`) || {}).value)).join(""); },
+  fieldReset(a, el){ const l = inc().locais.find(x => x.id === a); $("#f-fields").innerHTML = baseCols(l, el.dataset.i).map(c => fieldRow(c, (document.querySelector(`#f-fields [name="c:${CSS.escape(c)}"]`) || {}).value)).join(""); },
   organizeEnd(){ S.sel = null; render(); },
   pick(a){ S.sel = S.sel.includes(a) ? S.sel.filter(x => x !== a) : [...S.sel, a]; const y = scrollY; render(); scrollTo(0, y); },
   moveOpen(){ if (S.sel && S.sel.length) moveModal(); },
   moveTo(a){ moveTo(a); },
   pastaEdit(a){ pastaModal(a); },
-  pastaDel(a){ curLocal().itens.forEach(it => { if (it.pasta === a) delete it.pasta; }); putContent("incumbencias"); closeModal(); render(); toast("Pasta apagada"); },
+  pastaDel(a){ const l = curLocal(); l.itens.forEach(it => { if (it.pasta === a) delete it.pasta; }); if (l.pastaCols) delete l.pastaCols[a]; putContent("incumbencias"); closeModal(); render(); toast("Pasta apagada"); },
   item(a, el){ itemModal(a, el.dataset.i); },
   itemNew(a){ itemModal(a); },
   itemDel(a, el){ if (!confirm("Apagar este item?")) return; const l = inc().locais.find(x => x.id === a); l.itens = l.itens.filter(x => x.id !== el.dataset.i); putContent("incumbencias"); closeModal(); render(); },
