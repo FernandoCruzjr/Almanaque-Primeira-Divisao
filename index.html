@@ -288,8 +288,12 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .seg button{border:0;border-radius:10px;padding:11px;font-weight:600;color:var(--muted);background:transparent}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
 /* calculadoras */
-.seg4{grid-template-columns:repeat(4,1fr)}
-.seg4 button{padding:10px 4px;font-size:13.5px}
+.seg4{display:flex;overflow-x:auto;scrollbar-width:none}
+.seg4::-webkit-scrollbar{display:none}
+.seg4 button{flex:1 0 auto;padding:10px 14px;font-size:13.5px;white-space:nowrap}
+.ter-g{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:10px;align-items:center}
+.ter-g label{font-size:14px;font-weight:600}
+.ter-g .est{font-size:11.5px;color:var(--muted);display:block;font-weight:500}
 .calc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
 .calc-out{position:sticky;top:16px;gap:16px}
 .fields3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -1160,10 +1164,10 @@ function tintaOut(v){
 }
 
 /* Financeira: replica as abas Simulador, Por graduação, Carreira e Educação financeira da planilha. */
-const FIN_TABS = [["sim", "Simulador"], ["grad", "Por graduação"], ["car", "Carreira"], ["inv", "Investir"]];
+const FIN_TABS = [["sim", "Simulador"], ["grad", "Por graduação"], ["car", "Carreira"], ["inv", "Investir"], ["ter", "Quanto deveria ter"]];
 function viewFin(){
   const F = fin(), t = S.finTab || "sim";
-  const body = {sim:finSim, grad:finGrad, car:finCar, inv:finInv}[t](F);
+  const body = {sim:finSim, grad:finGrad, car:finCar, inv:finInv, ter:finTer}[t](F);
   return `<button class="back" data-act="toolBack">${ic("left")}Calculadoras</button>
     <div class="page-h"><span class="eyebrow">Ferramentas · Praças da Marinha</span><h1>Calculadora financeira</h1><p class="sub" style="font-size:15px">${esc(F.vigencia || "")}</p></div>
     ${isAdmin() ? `<div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="finEdit">${ic("edit")}Atualizar valores (reajuste)</button></div>` : ""}
@@ -1226,17 +1230,69 @@ function invOut(F, v){
   const ps = [v.p1, v.p2, v.p3].map(pnum), taxa = pnum(v.taxa), anos = pnum(v.renda);
   const R = invest(F, ps, taxa, anos);
   const sens = [3, 5, 7].map(t => ({t, r:invest(F, ps, t, anos)}));
-  const linhas = [["Aporte no começo (por mês)", "ini"], ["Aporte no fim (por mês)", "fim"], ["Guardado do bolso, sem render", "guard"], ["Patrimônio na reserva", "pat"], ["Quanto disso é rendimento", "rend"], ["Renda mensal vivendo só dos rendimentos", "renda"], ["Renda mensal gastando o patrimônio em " + nf(anos, 0) + " anos", "pmt"]];
+  const fs = fases(F), linhas = [["Guardado por mês como " + fs[0].g, "ini"], ["Guardado por mês como " + fs[fs.length - 1].g, "fim"], ["Guardado do bolso, sem render", "guard"], ["Patrimônio na reserva", "pat"], ["Quanto disso é rendimento", "rend"], ["Renda mensal vivendo só dos rendimentos", "renda"], ["Renda mensal gastando o patrimônio em " + nf(anos, 0) + " anos", "pmt"]];
   return `<div class="tbl-wrap sm3"><table><thead><tr><th>Na reserva</th>${R.map(r => `<th>${pct(r.p)} do soldo</th>`).join("")}</tr></thead><tbody>${linhas.map(([n, k]) => `<tr><td>${n}</td>${R.map(r => `<td data-l="${pct(r.p)}" class="${k === "pat" || k === "renda" ? "hl" : ""}">${brl(r[k])}</td>`).join("")}</tr>`).join("")}<tr><td>Complemento sobre o líquido de Suboficial</td>${R.map(r => `<td data-l="${pct(r.p)}">+${pct(r.comp)}</td>`).join("")}</tr></tbody></table></div>
     <div class="note">${ic("info")}<span>Vivendo só dos rendimentos, o patrimônio não diminui e pode ficar de herança. Gastando o patrimônio, a renda é maior, mas acaba no fim do prazo.</span></div>
     <div class="sec-title"><h2>E se o retorno for outro?</h2></div>
     <div class="tbl-wrap sm3"><table><thead><tr><th>Renda vivendo dos rendimentos</th>${R.map(r => `<th>${pct(r.p)} do soldo</th>`).join("")}</tr></thead><tbody>${sens.map(s => `<tr><td>${pct(s.t)} ao ano</td>${s.r.map(r => `<td data-l="${pct(r.p)}">${brl(r.renda)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+/* Quanto deveria ter: mês a mês desde a entrada, guardando um % do soldo da graduação de cada época (soldos de hoje). */
+const mIdx = v => { const m = /^(\d{4})-(\d{2})$/.exec(v || ""); return m ? +m[1] * 12 + +m[2] - 1 : null; };
+const mTxt = i => String(i % 12 + 1).padStart(2, "0") + "/" + Math.floor(i / 12);
+const mVal = i => Math.floor(i / 12) + "-" + String(i % 12 + 1).padStart(2, "0");
+const hoje = () => { const d = new Date(); return d.getFullYear() * 12 + d.getMonth(); };
+function terDatas(F, v){
+  const fs = fases(F), n = Math.max(1, fs.findIndex(f => f.g === v.atual) + 1 || fs.length);
+  const ent = mIdx(v.ent) == null ? hoje() - 12 * 15 : mIdx(v.ent), d = [];
+  for (let k = 0; k < n; k++) {
+    const dig = k === 0 ? ent : mIdx(v["p" + k]);
+    let est = k === 0 ? ent : d[k - 1].ini + fs[k - 1].meses;
+    for (let j = k + 1; j < n; j++) { const x = mIdx(v["p" + j]); if (x != null) { est = Math.min(est, x); break; } }
+    d.push({g:fs[k].g, ini:dig != null ? dig : Math.min(est, hoje()), est:dig == null});
+  }
+  return d;
+}
+function finTer(F){
+  const fs = fases(F), v = Object.assign({ent:"", atual:fs[Math.min(4, fs.length - 1)].g, pct:"15", taxa:"5"}, calcGet("ter"));
+  const d = terDatas(F, v);
+  return `<p class="sub">Quanto você teria hoje se tivesse guardado uma parte do soldo todo mês desde que entrou. Informe quando entrou e quando foi promovido. O que ficar em branco é estimado pelo tempo mínimo de cada graduação.</p>
+    <div class="calc-grid">
+      <form class="card col" data-calc="ter" onsubmit="return false">
+        ${selF("atual", "Sua graduação hoje", fs.map(f => f.g), v.atual)}
+        <div class="ter-g"><label for="c-ent">Entrou na Marinha<span class="est">mês e ano</span></label><input id="c-ent" class="input" type="month" name="ent" value="${esc(v.ent || mVal(d[0].ini))}"></div>
+        ${d.slice(1).map((x, k) => `<div class="ter-g"><label for="c-p${k + 1}">Virou ${esc(x.g)}${x.est ? `<span class="est">estimado: ${mTxt(x.ini)}</span>` : ""}</label><input id="c-p${k + 1}" class="input" type="month" name="p${k + 1}" value="${esc(v["p" + (k + 1)] || "")}"></div>`).join("")}
+        <div class="fields2">${inF("pct", "Guardando do soldo", v.pct, {suf:"%"})}${inF("taxa", "Rendimento acima da inflação", v.taxa, {suf:"% a.a."})}</div>
+      </form>
+      <div class="card col calc-out" id="calc-out">${terOut(F, v)}</div>
+    </div>`;
+}
+function terCalc(F, d, p, taxa){
+  const i = Math.pow(1 + taxa / 100, 1 / 12) - 1, fim = hoje();
+  let pat = 0, guard = 0; const por = d.map(x => ({g:x.g, ini:x.ini, meses:0, mes:0, guard:0}));
+  for (let m = d[0].ini; m < fim; m++) {
+    let k = 0; d.forEach((x, j) => { if (x.ini <= m) k = j; });
+    const g = F.grads.find(a => a.nome === d[k].g), dep = p / 100 * (g ? g.soldo : 0);
+    pat = pat * (1 + i) + dep; guard += dep; por[k].meses++; por[k].mes = dep; por[k].guard += dep;
+  }
+  return {pat, guard, por};
+}
+function terOut(F, v){
+  const d = terDatas(F, v), p = pnum(v.pct), taxa = pnum(v.taxa), R = terCalc(F, d, p, taxa);
+  if (!R.por.some(x => x.meses)) return `<div class="big-res"><small>Você deveria ter hoje</small><span>—</span><em>Confira a data de entrada.</em></div>`;
+  const anos = Math.floor((hoje() - d[0].ini) / 12);
+  return `<div class="big-res"><small>Guardando ${pct(p)} do soldo desde ${mTxt(d[0].ini)}, você teria hoje</small><span>${brl(R.pat)}</span><em>${brl(R.guard)} saíram do seu bolso e ${brl(R.pat - R.guard)} vieram do rendimento, em ${anos} ${anos === 1 ? "ano" : "anos"} de serviço.</em></div>
+    <div class="col" style="gap:0"><div class="rl-h">Graduação por graduação</div>
+      ${R.por.filter(x => x.meses).map(x => `<div class="rl" style="flex-direction:column;gap:2px"><span style="color:var(--ink);font-weight:700">${esc(x.g)}</span><span style="font-size:13px">${mTxt(x.ini)} a ${mTxt(x.ini + x.meses - 1)} · ${anosTxt(x.meses / 12)} · guardava ${brl(x.mes)} por mês</span><b class="num" style="align-self:flex-end">${brl(x.guard)} guardados</b></div>`).join("")}</div>
+    <div class="chips">${[10, 15, 20].filter(x => x !== p).map(x => `<div class="chip-v"><small>Guardando ${x}%</small><span>${brl(terCalc(F, d, x, taxa).pat)}</span></div>`).join("")}</div>
+    <p class="sub" style="font-size:12.5px">Usa o soldo de hoje de cada graduação, então o valor já está em dinheiro de hoje. O rendimento é o real, acima da inflação.</p>`;
 }
 function calcUpdate(f){
   const k = f.dataset.calc, v = formVals(f), out = $("#calc-out"); calcSet(k, v); if (!out) return;
   if (k === "tinta") out.innerHTML = tintaOut(v);
   else if (k === "sim") out.innerHTML = simOut(fin(), v);
   else if (k === "inv") out.innerHTML = invOut(fin(), v);
+  else if (k === "ter") out.innerHTML = terOut(fin(), v);
 }
 
 /* Editor dos valores (só o encarregado). */
@@ -1395,6 +1451,7 @@ document.addEventListener("keydown", ev => {
 });
 document.addEventListener("input", ev => {
   const cf = ev.target.closest("[data-calc]");
+  if (cf && cf.dataset.calc === "ter" && /^(atual|ent|p\d+)$/.test(ev.target.name)) { calcSet("ter", formVals(cf)); const y = scrollY; render(); scrollTo(0, y); return; }
   if (cf) { if (ev.target.name === "grad") { const g = fin().grads.find(x => x.nome === ev.target.value); if (g) cf.curso.value = g.curso; } calcUpdate(cf); return; }
   if (ev.target.id === "inc-q") { S.q = ev.target.value; const pos = ev.target.selectionStart; render(); const i = $("#inc-q"); if (i) { i.focus(); i.setSelectionRange(pos, pos); } }
 });
