@@ -287,6 +287,33 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:14px}
 .seg button{border:0;border-radius:10px;padding:11px;font-weight:600;color:var(--muted);background:transparent}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* calculadoras */
+.seg4{grid-template-columns:repeat(4,1fr)}
+.seg4 button{padding:10px 4px;font-size:13.5px}
+.calc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.calc-out{position:sticky;top:16px;gap:16px}
+.fields3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.inwrap{position:relative}
+.inwrap .suf{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.inwrap .input{padding-right:44px}
+.cks{display:flex;flex-wrap:wrap;gap:8px}
+.ck{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid var(--glass-b);background:rgba(0,0,0,.2);font-size:14.5px;font-weight:600;cursor:pointer}
+.ck input{width:18px;height:18px;accent-color:var(--accent)}
+.big-res{display:flex;flex-direction:column;gap:2px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(227,181,74,.16),rgba(255,255,255,.02));border:1px solid rgba(227,181,74,.35)}
+.big-res small{font-size:12.5px;font-weight:600;color:var(--muted)}
+.big-res span{font-family:var(--f-mono);font-weight:700;font-size:clamp(28px,5vw,36px);color:var(--accent-ink);line-height:1.15}
+.big-res em{font-style:normal;font-size:13px;color:var(--muted)}
+.rl{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.rl span{color:var(--muted)}
+.rl.tot span{color:var(--ink);font-weight:700}
+.rl.tot b{color:var(--accent-ink)}
+.rl-h{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin-bottom:2px}
+td.hl{color:var(--accent-ink);font-weight:700}
+.ed-h{font-family:var(--f-display);font-weight:800;font-size:15px;margin-top:8px;color:var(--accent-ink)}
+.ed-card{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;border:1px solid var(--glass-b);background:rgba(0,0,0,.18)}
+@media (max-width:820px){.calc-grid{grid-template-columns:1fr}.calc-out{position:static}}
+@media (max-width:600px){.tbl-wrap.sm3 td{font-size:12.5px;letter-spacing:-.02em}}
+@media (max-width:420px){.fields3 .inwrap .input{padding-right:30px}.fields3 .inwrap .suf{right:9px}}
 .gate-foot{font-size:12.5px;color:var(--faint);margin-top:12px;line-height:1.5}
 @media (max-width:820px){.gate{align-items:flex-start}.gate-in{grid-template-columns:1fr;gap:20px}.gate-hero{text-align:center}.gate-hero img{margin:0 auto;width:72px;height:72px}.gate-hero p{font-size:15px}}
 .boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
@@ -329,6 +356,9 @@ const ICONS = {
   cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   up:'<path d="M6 15l6-6 6 6"/>',
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8v4H8zM8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
+  roller:'<rect x="3" y="3" width="15" height="6" rx="1.5"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
+  money:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
@@ -511,7 +541,7 @@ function showApp(){
 
 /* ======================= TELAS ======================= */
 function tabs(){
-  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"]];
+  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["calc","Calcular","calc"]];
   if (isAdmin()) t.push(["incumbencias","Incumbências","clip"],["equipe","Equipe","users"]);
   t.push(["conta","Conta","user"]);
   return t;
@@ -520,7 +550,9 @@ function render(){
   if (!S.user) return;
   if (!tabs().some(t => t[0] === S.tab)) S.tab = "inicio";
   const navHtml = tabs().map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
-  $("#nav").innerHTML = navHtml; $("#tabbar").innerHTML = navHtml;
+  $("#nav").innerHTML = navHtml;
+  /* No celular a conta abre pelo avatar no topo, então a barra de baixo fica com no máximo cinco botões. */
+  $("#tabbar").innerHTML = tabs().filter(t => t[0] !== "conta").map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
   setSync(S.sync);
   const nome = (S.member && S.member.nome) || "";
   const top = `<div class="topbar"><div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
@@ -528,7 +560,7 @@ function render(){
     <span class="pill netpill" id="netpill" hidden></span><button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${nome ? esc(nome[0].toUpperCase()) : ic("user").replace('<svg','<svg width="20" height="20"')}</button></div>`;
   let body;
   if (!isMember()) body = viewPending();
-  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
+  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
   if (S.tab === "conta" && !isMember()) body = viewConta();
   $("#view").innerHTML = top + body;
 }
@@ -604,6 +636,8 @@ function viewHome(){
     <div class="sec-title"><h2>Guia de chegada</h2><button class="btn ghost sm" data-act="tab" data-arg="bemvindo">Ver tudo${ic("chev")}</button></div>
     <div class="grid">${guia(mods).map(modTile).join("")}</div>
     ${maisBordo(mods).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(mods).map(modTile).join("")}</div>` : ""}
+    <div class="sec-title"><h2>Ferramentas</h2></div>
+    <div class="grid mini">${calcTiles()}</div>
     <div class="sec-title"><h2>Nossos símbolos</h2></div>
     <div class="emblems">
       <div class="emblem"><div class="emblem-art">${ART.dragon}</div><div><span class="eyebrow">Mascote do navio</span><b>O Dragão</b><p class="sub">O símbolo do A140. Quem embarca passa a ser parte da Alma do Dragão: uma tripulação só, de proa a popa.</p></div></div>
@@ -867,6 +901,7 @@ function localModal(lid){
 document.addEventListener("submit", ev => {
   const f = ev.target, kind = f.dataset.form; if (!kind) return;
   ev.preventDefault();
+  if (kind === "fin") { saveFin(new FormData(f)); return; }
   const I = inc(), fd = new FormData(f);
   if (kind === "item") {
     const l = I.locais.find(x => x.id === f.dataset.l); if (!l) return;
@@ -1001,6 +1036,249 @@ async function gerarPDF(lid){
   if (navigator.canShare && navigator.canShare({files:[file]}) && matchMedia("(pointer:coarse)").matches) { try { await navigator.share({files:[file], title:nome}); return; } catch (e) { if (e && e.name === "AbortError") return; } }
   doc.save(nome);
 }
+/* ---------- calculadoras ---------- */
+/* O que cada um digita fica só no aparelho dele. Os valores da tabela de remuneração ficam no banco e o encarregado atualiza quando sai reajuste. */
+const CALC = "alm-calc";
+const calcGet = k => lsGet(CALC, {})[k] || {};
+const calcSet = (k, v) => { const c = lsGet(CALC, {}); c[k] = v; lsSet(CALC, c); };
+const pnum = s => { s = String(s == null ? "" : s).trim().replace(/\s/g, ""); if (s.includes(",")) s = s.replace(/\./g, "").replace(",", "."); const v = parseFloat(s); return isFinite(v) ? v : 0; };
+const brl = v => (isFinite(v) ? v : 0).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+const nf = (v, d = 2) => (isFinite(v) ? v : 0).toLocaleString("pt-BR", {maximumFractionDigits:d});
+const pct = v => nf(v, 2) + "%";
+const clone = o => JSON.parse(JSON.stringify(o));
+
+/* Padrão: planilha Remuneracao_Pracas_Marinha_2026 (aba Tabelas). Percentuais guardados como número de % (13 = 13%). */
+const FIN_PADRAO = {
+  vigencia:"Soldo a partir de 01/01/2026 (Lei 15.167/2025)",
+  grads:[
+    {nome:"Aprendiz-Marinheiro", soldo:1207, am:13, acdm:5, curso:"Nenhum"},
+    {nome:"Marinheiro (não especializado)", soldo:1927, am:13, acdm:5, curso:"Formação"},
+    {nome:"Marinheiro (especializado/engajado)", soldo:2103, am:13, acdm:5, curso:"Formação"},
+    {nome:"Cabo (engajado)", soldo:2869, am:13, acdm:6, curso:"Especialização"},
+    {nome:"Terceiro-Sargento", soldo:4177, am:16, acdm:6, curso:"Especialização"},
+    {nome:"Segundo-Sargento", soldo:5209, am:16, acdm:12, curso:"Aperfeiçoamento"},
+    {nome:"Primeiro-Sargento", soldo:5988, am:16, acdm:20, curso:"Aperfeiçoamento"},
+    {nome:"Suboficial", soldo:6737, am:16, acdm:32, curso:"Aperfeiçoamento"}],
+  cursos:[{nome:"Nenhum", pct:0}, {nome:"Formação", pct:12}, {nome:"Especialização", pct:27}, {nome:"Aperfeiçoamento", pct:45}, {nome:"Altos Estudos II", pct:68}, {nome:"Altos Estudos I", pct:73}],
+  param:{pensao:10.5, fusma:3.5, fusmaDep:0.3, irDep:189.59, irSimpl:607.2, redLim:5000, redMax:312.89, redFim:7350, redK:978.62, redF:0.133145},
+  ir:[[2428.8, 0, 0], [2826.65, 7.5, 182.16], [3751.05, 15, 394.16], [4664.68, 22.5, 675.49], [null, 27.5, 908.73]],
+  carreira:{total:35, fases:[{g:"Aprendiz-Marinheiro", meses:12}, {g:"Marinheiro (especializado/engajado)", meses:48}, {g:"Cabo (engajado)", meses:77}, {g:"Terceiro-Sargento", meses:72}, {g:"Segundo-Sargento", meses:72}, {g:"Primeiro-Sargento", meses:72}, {g:"Suboficial", meses:null}]}
+};
+const fin = () => (S.content.financeiro && S.content.financeiro.data) || FIN_PADRAO;
+
+const irTabela = (T, b) => { const f = T.find(r => r[0] == null || r[0] === "" || b <= r[0]) || T[T.length - 1]; return Math.max(0, b * f[1] / 100 - f[2]); };
+function remCalc(F, x){
+  const g = F.grads.find(a => a.nome === x.grad) || F.grads[0];
+  const c = F.cursos.find(a => a.nome === (x.curso || g.curso)) || {nome:"Nenhum", pct:0};
+  const P = F.param, s = g.soldo, acdm = Math.max(x.acdm || 0, g.acdm, x.ats || 0);
+  const L = [["Soldo", s], ["Adicional Militar (" + pct(g.am) + ")", s * g.am / 100], ["Adicional de Habilitação (" + pct(c.pct) + ")", s * c.pct / 100], [((x.ats || 0) > Math.max(x.acdm || 0, g.acdm) ? "Adicional de Tempo de Serviço" : "Adic. Compensação Disponibilidade") + " (" + pct(acdm) + ")", s * acdm / 100]];
+  if (x.loc) L.push(["Gratificação de localidade especial (" + pct(x.loc) + ")", s * x.loc / 100]);
+  if (x.org) L.push(["Adicional de compensação orgânica (" + pct(x.org) + ")", s * x.org / 100]);
+  const bruta = L.reduce((a, l) => a + l[1], 0), aux = (x.pre || 0) + (x.transp || 0);
+  const pensao = bruta * P.pensao / 100, fusma = bruta * (P.fusma + P.fusmaDep * (x.depF || 0)) / 100;
+  const base = Math.max(0, bruta - Math.max(pensao + (x.depIR || 0) * P.irDep, P.irSimpl));
+  const irT = irTabela(F.ir, base);
+  const red = bruta <= P.redLim ? Math.min(irT, P.redMax) : bruta <= P.redFim ? Math.max(0, P.redK - P.redF * bruta) : 0;
+  const ir = Math.max(0, irT - red), desc = pensao + fusma + ir;
+  return {g, c, L, bruta, aux, pensao, fusma, base, irT, red, ir, desc, liq:bruta + aux - desc, d13:bruta, ferias:bruta / 3, ano:bruta * 12 + bruta + bruta / 3 + aux * 12};
+}
+/* Fases da carreira com o Suboficial ficando com o resto do tempo até a reserva. */
+function fases(F){
+  const C = F.carreira, tot = C.total * 12, fs = C.fases.map(f => ({...f}));
+  const usado = fs.filter(f => f.meses != null).reduce((a, f) => a + f.meses, 0);
+  fs.forEach(f => { if (f.meses == null) f.meses = Math.max(0, tot - usado); });
+  let ini = 0; fs.forEach(f => { f.ini = ini / 12; ini += f.meses; f.fim = ini / 12; f.anos = f.meses / 12; });
+  return fs;
+}
+function invest(F, pcts, taxa, anosRenda){
+  const fs = fases(F), N = Math.round(F.carreira.total), r = taxa / 100, i = Math.pow(1 + r, 1 / 12) - 1;
+  const fat = i ? (Math.pow(1 + i, 12) - 1) / i : 12;
+  const soldoAno = y => { const f = [...fs].reverse().find(f => f.ini <= y - 1) || fs[0]; const g = F.grads.find(a => a.nome === f.g); return g ? g.soldo : 0; };
+  const anos = []; for (let y = 1; y <= N; y++) anos.push(soldoAno(y));
+  const so = remCalc(F, {grad:fs[fs.length - 1].g});
+  return pcts.map(p => {
+    let pat = 0; anos.forEach(s => { pat = pat * (1 + r) + p / 100 * s * fat; });
+    const guard = p / 100 * anos.reduce((a, s) => a + s, 0) * 12, n = anosRenda * 12;
+    const renda = pat * i, pmt = n ? (i ? pat * i / (1 - Math.pow(1 + i, -n)) : pat / n) : 0;
+    return {p, ini:p / 100 * anos[0], fim:p / 100 * anos[anos.length - 1], guard, pat, rend:pat - guard, renda, pmt, comp:so.liq ? renda / so.liq * 100 : 0};
+  });
+}
+
+function inF(name, label, val, o = {}){
+  return `<div class="field"><label for="c-${name}">${label}</label><div class="inwrap"><input id="c-${name}" class="input" name="${name}" inputmode="decimal" autocomplete="off" value="${esc(val == null ? "" : val)}" placeholder="${esc(o.ph || "")}">${o.suf ? `<span class="suf">${o.suf}</span>` : ""}</div>${o.hint ? `<span class="sub" style="font-size:12.5px">${o.hint}</span>` : ""}</div>`;
+}
+const selF = (name, label, opts, val) => `<div class="field"><label for="c-${name}">${label}</label><select id="c-${name}" class="input" name="${name}">${opts.map(o => `<option ${o === val ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></div>`;
+const rl = (k, v, cls = "") => `<div class="rl ${cls}"><span>${k}</span><b class="num">${v}</b></div>`;
+function formVals(f){ const o = {}; f.querySelectorAll("[name]").forEach(el => o[el.name] = el.type === "checkbox" ? el.checked : el.value); return o; }
+
+function viewCalc(){
+  if (S.tool === "tinta") return viewTinta();
+  if (S.tool === "fin") return viewFin();
+  return `<div class="page-h"><span class="eyebrow">Ferramentas</span><h1>Calculadoras</h1><p class="sub" style="font-size:15px">Contas rápidas do dia a dia de bordo. O que você digita fica guardado só no seu aparelho.</p></div>
+    <div class="grid">${calcTiles()}</div>`;
+}
+const calcTiles = () => `<button class="tile" data-act="tool" data-arg="tinta"><div class="tile-i">${ic("roller")}</div><b>Calculadora de tinta</b><div class="sub">Quantos baldes você vai usar para pintar um compartimento.</div></button>
+  <button class="tile" data-act="tool" data-arg="fin"><div class="tile-i">${ic("money")}</div><b>Calculadora financeira</b><div class="sub">Remuneração de praças: simulador, graduações, carreira e investimento.</div></button>`;
+
+/* Tinta: área das superfícies escolhidas, menos o que não leva tinta, vezes as demãos, com uma margem de perda. */
+function viewTinta(){
+  const v = Object.assign({modo:"medidas", c:"", l:"", h:"", ant:true, teto:true, conves:false, area:"", desc:"", demaos:"2", rend:"", perda:"10"}, calcGet("tinta"));
+  const med = v.modo !== "area";
+  const chk = (n, t) => `<label class="ck"><input type="checkbox" name="${n}" ${v[n] ? "checked" : ""}><span>${t}</span></label>`;
+  return `<button class="back" data-act="toolBack">${ic("left")}Calculadoras</button>
+    <div class="page-h"><span class="eyebrow">Ferramentas</span><h1>Calculadora de tinta</h1><p class="sub" style="font-size:15px">Informe o compartimento e o rendimento da tinta. O resultado sai arredondado para cima, em baldes inteiros.</p></div>
+    <div class="calc-grid">
+      <form class="card col" data-calc="tinta" onsubmit="return false">
+        <input type="hidden" name="modo" value="${med ? "medidas" : "area"}">
+        <div class="seg"><button type="button" data-act="tintaModo" data-arg="medidas" aria-pressed="${med}">Pelas medidas</button><button type="button" data-act="tintaModo" data-arg="area" aria-pressed="${!med}">Já sei a área</button></div>
+        ${med ? `<div class="fields3">${inF("c", "Comprimento", v.c, {suf:"m"})}${inF("l", "Largura", v.l, {suf:"m"})}${inF("h", "Altura", v.h, {suf:"m"})}</div>
+          <div class="field"><label>O que vai ser pintado</label><div class="cks">${chk("ant", "Anteparas")}${chk("teto", "Teto")}${chk("conves", "Convés")}</div></div>`
+        : inF("area", "Área a pintar", v.area, {suf:"m²"})}
+        ${inF("desc", "Descontar (portas, escotilhas, equipamentos)", v.desc, {suf:"m²", ph:"0", hint:"Ex.: uma porta de 0,8 × 1,9 m tem 1,52 m²."})}
+        <div class="fields2">${inF("demaos", "Demãos", v.demaos)}${inF("perda", "Margem de perda", v.perda, {suf:"%"})}</div>
+        ${inF("rend", "Rendimento de um balde, por demão", v.rend, {suf:"m²", ph:"veja na lata", hint:"Está no rótulo ou na ficha técnica da tinta (\"rende até … m² por demão\")."})}
+      </form>
+      <div class="card col calc-out" id="calc-out">${tintaOut(v)}</div>
+    </div>`;
+}
+function tintaOut(v){
+  const c = pnum(v.c), l = pnum(v.l), h = pnum(v.h);
+  const partes = v.modo === "area" ? [["Área informada", pnum(v.area)]] : [v.ant && ["Anteparas", 2 * (c + l) * h], v.teto && ["Teto", c * l], v.conves && ["Convés", c * l]].filter(Boolean);
+  const bruta = partes.reduce((a, p) => a + p[1], 0), desc = pnum(v.desc), area = Math.max(0, bruta - desc);
+  const dem = Math.max(1, Math.round(pnum(v.demaos)) || 1), perda = pnum(v.perda), rend = pnum(v.rend);
+  const total = area * dem * (1 + perda / 100), baldes = rend ? total / rend : 0;
+  const head = !area ? `<div class="big-res"><small>Baldes</small><span>—</span><em>Preencha as medidas do compartimento.</em></div>`
+    : !rend ? `<div class="big-res"><small>Baldes</small><span>—</span><em>Falta o rendimento do balde.</em></div>`
+    : `<div class="big-res"><small>Você vai precisar de</small><span>${Math.ceil(baldes - 1e-9)} ${Math.ceil(baldes - 1e-9) === 1 ? "balde" : "baldes"}</span><em>${nf(baldes, 2)} baldes pela conta exata</em></div>`;
+  return `${head}
+    <div class="col" style="gap:0">${partes.map(p => rl(p[0], nf(p[1]) + " m²")).join("")}
+      ${desc ? rl("Descontos", "− " + nf(desc) + " m²") : ""}
+      ${rl("Área a pintar", nf(area) + " m²", "tot")}
+      ${rl(`${dem} ${dem === 1 ? "demão" : "demãos"}${perda ? ` + ${nf(perda)}% de perda` : ""}`, nf(total) + " m²")}
+      ${rend ? rl("Rendimento por balde", nf(rend) + " m²") : ""}</div>
+    ${v.modo !== "area" && v.ant ? `<p class="sub" style="font-size:12.5px">Anteparas: perímetro (2 × comprimento + 2 × largura) × altura.</p>` : ""}`;
+}
+
+/* Financeira: replica as abas Simulador, Por graduação, Carreira e Educação financeira da planilha. */
+const FIN_TABS = [["sim", "Simulador"], ["grad", "Por graduação"], ["car", "Carreira"], ["inv", "Investir"]];
+function viewFin(){
+  const F = fin(), t = S.finTab || "sim";
+  const body = {sim:finSim, grad:finGrad, car:finCar, inv:finInv}[t](F);
+  return `<button class="back" data-act="toolBack">${ic("left")}Calculadoras</button>
+    <div class="page-h"><span class="eyebrow">Ferramentas · Praças da Marinha</span><h1>Calculadora financeira</h1><p class="sub" style="font-size:15px">${esc(F.vigencia || "")}</p></div>
+    ${isAdmin() ? `<div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="finEdit">${ic("edit")}Atualizar valores (reajuste)</button></div>` : ""}
+    <div class="seg seg4" role="tablist">${FIN_TABS.map(([id, n]) => `<button type="button" data-act="finTab" data-arg="${id}" aria-pressed="${t === id}">${n}</button>`).join("")}</div>
+    ${body}
+    <div class="note">${ic("info")}<span>Estimativa. O contracheque real pode ter consignações, PNR, pensão alimentícia e outras parcelas que não estão aqui. O IR mensal não considera deduções anuais (saúde, educação).</span></div>`;
+}
+function finSim(F){
+  const v = Object.assign({grad:"Cabo (engajado)", curso:"", acdm:"", ats:"0", loc:"0", org:"0", depIR:"0", depF:"0", pre:"0", transp:"0"}, calcGet("sim"));
+  if (!F.grads.some(g => g.nome === v.grad)) v.grad = F.grads[0].nome;
+  if (!v.curso || !F.cursos.some(c => c.nome === v.curso)) v.curso = (F.grads.find(g => g.nome === v.grad) || {}).curso || F.cursos[0].nome;
+  return `<div class="calc-grid">
+      <form class="card col" data-calc="sim" onsubmit="return false">
+        ${selF("grad", "Graduação", F.grads.map(g => g.nome), v.grad)}
+        ${selF("curso", "Maior curso concluído", F.cursos.map(c => c.nome), v.curso)}
+        ${inF("acdm", "Maior % de Adic. Disponibilidade já alcançado", v.acdm, {suf:"%", ph:"o da graduação", hint:"Deixe vazio para usar o da graduação. O ACDM é irredutível: fica o maior % já alcançado."})}
+        <div class="fields2">${inF("ats", "Adic. Tempo de Serviço", v.ats, {suf:"%", hint:"Só quem tinha ATS até 29/12/2000."})}${inF("loc", "Localidade especial", v.loc, {suf:"%"})}</div>
+        ${inF("org", "Adic. de compensação orgânica", v.org, {suf:"%", hint:"Mergulho, submarino, paraquedas, voo."})}
+        <div class="fields2">${inF("depIR", "Dependentes no IR", v.depIR)}${inF("depF", "Dependentes no FUSMA", v.depF)}</div>
+        <div class="fields2">${inF("pre", "Assistência pré-escolar", v.pre, {suf:"R$"})}${inF("transp", "Auxílio-transporte", v.transp, {suf:"R$"})}</div>
+      </form>
+      <div class="card col calc-out" id="calc-out">${simOut(F, v)}</div>
+    </div>`;
+}
+const simIn = v => ({grad:v.grad, curso:v.curso, acdm:pnum(v.acdm), ats:pnum(v.ats), loc:pnum(v.loc), org:pnum(v.org), depIR:Math.max(0, Math.round(pnum(v.depIR))), depF:Math.max(0, Math.round(pnum(v.depF))), pre:pnum(v.pre), transp:pnum(v.transp)});
+function simOut(F, v){
+  const R = remCalc(F, simIn(v));
+  return `<div class="big-res"><small>Líquido mensal estimado</small><span>${brl(R.liq)}</span><em>Bruto ${brl(R.bruta)} · descontos ${brl(R.desc)}</em></div>
+    <div class="col" style="gap:0"><div class="rl-h">Remuneração</div>${R.L.map(l => rl(esc(l[0]), brl(l[1]))).join("")}${rl("Remuneração bruta", brl(R.bruta), "tot")}${R.aux ? rl("Auxílios (isentos de IR)", brl(R.aux)) : ""}</div>
+    <div class="col" style="gap:0"><div class="rl-h">Descontos</div>${rl("Pensão militar (" + pct(F.param.pensao) + ")", "− " + brl(R.pensao))}${rl("FUSMA", "− " + brl(R.fusma))}${rl("Imposto de Renda", "− " + brl(R.ir))}
+      <p class="sub" style="font-size:12.5px;margin-top:4px">Base do IR ${brl(R.base)} · IR pela tabela ${brl(R.irT)} · redutor da Lei 15.270 ${brl(R.red)}</p></div>
+    <div class="col" style="gap:0"><div class="rl-h">No ano</div>${rl("13º (adicional natalino)", brl(R.d13))}${rl("1/3 de férias", brl(R.ferias))}${rl("Total bruto no ano", brl(R.ano), "tot")}</div>`;
+}
+function finGrad(F){
+  const rows = F.grads.map(g => ({g, R:remCalc(F, {grad:g.nome, curso:g.curso})}));
+  const cols = ["Graduação", "Curso", "Soldo", "Bruto", "Descontos", "Líquido", "Bruto no ano"];
+  return `<p class="sub">Sem dependentes, FUSMA no teto e o curso típico de cada graduação. Para um caso específico, use o Simulador.</p>
+    <div class="tbl-wrap"><table><thead><tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map(({g, R}) => `<tr><td>${esc(g.nome)}</td><td data-l="Curso" style="font-family:var(--f-body)">${esc(R.c.nome)}</td><td data-l="Soldo">${brl(g.soldo)}</td><td data-l="Bruto">${brl(R.bruta)}</td><td data-l="Descontos">${brl(R.desc)}</td><td data-l="Líquido" class="hl">${brl(R.liq)}</td><td data-l="Bruto no ano">${brl(R.ano)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+const anosTxt = a => { const y = Math.floor(a + 1e-9), m = Math.round((a - y) * 12); return (y ? y + (y === 1 ? " ano" : " anos") : "") + (m ? (y ? " e " : "") + m + (m === 1 ? " mês" : " meses") : "") || "0"; };
+function finCar(F){
+  const fs = fases(F); let tb = 0, tl = 0;
+  const rows = fs.map(f => { const R = remCalc(F, {grad:f.g}); const fb = R.ano * f.anos, fl = R.liq * (12 + 1 + 1 / 3) * f.anos; tb += fb; tl += fl; return {f, R, fb, fl}; });
+  const cols = ["Graduação", "Tempo", "Anos de serviço", "Bruto mensal", "Líquido mensal", "Bruto na fase", "Líquido na fase"];
+  return `<p class="sub">Interstícios de planejamento do PCPM, com ${nf(F.carreira.total, 0)} anos de serviço até a reserva. Valores em R$ de hoje, sem reajustes futuros.</p>
+    <div class="tbl-wrap"><table><thead><tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map(({f, R, fb, fl}) => `<tr><td>${esc(f.g)}</td><td data-l="Tempo" style="font-family:var(--f-body)">${anosTxt(f.anos)}</td><td data-l="Anos de serviço">${nf(f.ini, 1)} a ${nf(f.fim, 1)}</td><td data-l="Bruto mensal">${brl(R.bruta)}</td><td data-l="Líquido mensal">${brl(R.liq)}</td><td data-l="Bruto na fase">${brl(fb)}</td><td data-l="Líquido na fase" class="hl">${brl(fl)}</td></tr>`).join("")}</tbody></table></div>
+    <div class="chips"><div class="chip-v"><small>Bruto na carreira</small><span>${brl(tb)}</span></div><div class="chip-v blue"><small>Líquido na carreira (aprox.)</small><span>${brl(tl)}</span></div></div>
+    <ul class="ul sub"><li>Os interstícios são o tempo mínimo planejado. Podem ser reajustados e não garantem promoção na data.</li><li>O líquido na fase aplica o líquido mensal também ao 13º e ao 1/3 de férias (aproximação).</li><li>Não entram auxílios eventuais, cursos acima do típico nem ACDM levado do círculo anterior.</li></ul>`;
+}
+function finInv(F){
+  const v = Object.assign({p1:"10", p2:"15", p3:"20", taxa:"5", renda:"30"}, calcGet("inv"));
+  return `<p class="sub">Quanto junta quem separa uma parte do soldo todo mês, da formação até a reserva, e quanto isso pode render por mês depois. Tudo em dinheiro de hoje.</p>
+    <form class="card col" data-calc="inv" onsubmit="return false">
+      <div class="fields3">${inF("p1", "Separar", v.p1, {suf:"%"})}${inF("p2", "ou", v.p2, {suf:"%"})}${inF("p3", "ou", v.p3, {suf:"%"})}</div>
+      <div class="fields2">${inF("taxa", "Rentabilidade real ao ano", v.taxa, {suf:"%", hint:"Acima da inflação. Tesouro IPCA+ tem pago na faixa de 5% a 7%."})}${inF("renda", "Anos recebendo a renda", v.renda, {suf:"anos", hint:"Se for gastar o patrimônio. Ex.: da reserva aos 85."})}</div>
+    </form>
+    <div class="col" id="calc-out">${invOut(F, v)}</div>`;
+}
+function invOut(F, v){
+  const ps = [v.p1, v.p2, v.p3].map(pnum), taxa = pnum(v.taxa), anos = pnum(v.renda);
+  const R = invest(F, ps, taxa, anos);
+  const sens = [3, 5, 7].map(t => ({t, r:invest(F, ps, t, anos)}));
+  const linhas = [["Aporte no começo (por mês)", "ini"], ["Aporte no fim (por mês)", "fim"], ["Guardado do bolso, sem render", "guard"], ["Patrimônio na reserva", "pat"], ["Quanto disso é rendimento", "rend"], ["Renda mensal vivendo só dos rendimentos", "renda"], ["Renda mensal gastando o patrimônio em " + nf(anos, 0) + " anos", "pmt"]];
+  return `<div class="tbl-wrap sm3"><table><thead><tr><th>Na reserva</th>${R.map(r => `<th>${pct(r.p)} do soldo</th>`).join("")}</tr></thead><tbody>${linhas.map(([n, k]) => `<tr><td>${n}</td>${R.map(r => `<td data-l="${pct(r.p)}" class="${k === "pat" || k === "renda" ? "hl" : ""}">${brl(r[k])}</td>`).join("")}</tr>`).join("")}<tr><td>Complemento sobre o líquido de Suboficial</td>${R.map(r => `<td data-l="${pct(r.p)}">+${pct(r.comp)}</td>`).join("")}</tr></tbody></table></div>
+    <div class="note">${ic("info")}<span>Vivendo só dos rendimentos, o patrimônio não diminui e pode ficar de herança. Gastando o patrimônio, a renda é maior, mas acaba no fim do prazo.</span></div>
+    <div class="sec-title"><h2>E se o retorno for outro?</h2></div>
+    <div class="tbl-wrap sm3"><table><thead><tr><th>Renda vivendo dos rendimentos</th>${R.map(r => `<th>${pct(r.p)} do soldo</th>`).join("")}</tr></thead><tbody>${sens.map(s => `<tr><td>${pct(s.t)} ao ano</td>${s.r.map(r => `<td data-l="${pct(r.p)}">${brl(r.renda)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function calcUpdate(f){
+  const k = f.dataset.calc, v = formVals(f), out = $("#calc-out"); calcSet(k, v); if (!out) return;
+  if (k === "tinta") out.innerHTML = tintaOut(v);
+  else if (k === "sim") out.innerHTML = simOut(fin(), v);
+  else if (k === "inv") out.innerHTML = invOut(fin(), v);
+}
+
+/* Editor dos valores (só o encarregado). */
+function finModal(){
+  const F = fin(), P = F.param;
+  const n = (name, val, suf, w) => `<div class="inwrap"${w ? ` style="min-width:${w}px"` : ""}><input class="input" name="${name}" inputmode="decimal" value="${esc(val == null ? "" : String(val).replace(".", ","))}" aria-label="${esc(name)}">${suf ? `<span class="suf">${suf}</span>` : ""}</div>`;
+  const pf = (name, label, val, suf) => `<div class="field"><label>${label}</label>${n(name, val, suf)}</div>`;
+  const fs = F.carreira.fases;
+  openModal(`${sheetHead("Valores da calculadora", "Quando sair reajuste, mude aqui. Vale para todos os militares.")}
+    <form class="col" data-form="fin">
+      <div class="field"><label for="f-vig">Vigência (aparece no topo)</label><input id="f-vig" class="input" name="vigencia" maxlength="90" value="${esc(F.vigencia || "")}"></div>
+      <div class="ed-h">Soldo e adicionais por graduação</div>
+      ${F.grads.map((g, i) => `<div class="ed-card"><b>${esc(g.nome)}</b><div class="fields2">${pf("g" + i + ".soldo", "Soldo", g.soldo, "R$")}${pf("g" + i + ".am", "Adicional Militar", g.am, "%")}${pf("g" + i + ".acdm", "Adic. Disponibilidade", g.acdm, "%")}<div class="field"><label>Curso típico</label><select class="input" name="g${i}.curso">${F.cursos.map(c => `<option ${c.nome === g.curso ? "selected" : ""}>${esc(c.nome)}</option>`).join("")}</select></div></div></div>`).join("")}
+      <div class="ed-h">Adicional de Habilitação (% sobre o soldo)</div>
+      <div class="fields2">${F.cursos.map((c, i) => pf("c" + i, esc(c.nome), c.pct, "%")).join("")}</div>
+      <div class="ed-h">Descontos</div>
+      <div class="fields2">${pf("pensao", "Pensão militar", P.pensao, "%")}${pf("fusma", "FUSMA (titular)", P.fusma, "%")}${pf("fusmaDep", "FUSMA por dependente", P.fusmaDep, "%")}${pf("irDep", "IR: dedução por dependente", P.irDep, "R$")}${pf("irSimpl", "IR: desconto simplificado", P.irSimpl, "R$")}</div>
+      <div class="ed-h">Redutor do IR (Lei 15.270/2025)</div>
+      <div class="fields2">${pf("redLim", "Isenção total até", P.redLim, "R$")}${pf("redMax", "Redutor máximo", P.redMax, "R$")}${pf("redFim", "Redução parcial até", P.redFim, "R$")}${pf("redK", "Constante do redutor", P.redK, "R$")}${pf("redF", "Fator do redutor", P.redF, "")}</div>
+      <p class="sub" style="font-size:12.5px">Redutor parcial = constante − fator × rendimento bruto.</p>
+      <div class="ed-h">Tabela mensal do IR</div>
+      ${F.ir.map((r, i) => `<div class="fields3">${r[0] == null ? `<div class="field"><label>Base acima de</label><input class="input" disabled value="${esc(nf(F.ir[i - 1] ? F.ir[i - 1][0] : 0))}"></div>` : pf("ir" + i + ".0", "Base até", r[0], "R$")}${pf("ir" + i + ".1", "Alíquota", r[1], "%")}${pf("ir" + i + ".2", "Dedução", r[2], "R$")}</div>`).join("")}
+      <div class="ed-h">Carreira</div>
+      ${pf("total", "Tempo de serviço até a reserva", F.carreira.total, "anos")}
+      ${fs.map((f, i) => f.meses == null ? `<p class="sub" style="font-size:12.5px">${esc(f.g)}: o tempo que sobrar até a reserva.</p>` : `<div class="fields2"><div class="field"><label>${esc(f.g)}: anos</label>${n("f" + i + ".a", Math.floor(f.meses / 12))}</div><div class="field"><label>e meses</label>${n("f" + i + ".m", f.meses % 12)}</div></div>`).join("")}
+      <div class="row sheet-foot" style="flex-wrap:wrap"><button type="button" class="btn ghost sm" data-act="finReset">${ic("reset")}Voltar aos valores da planilha</button><button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
+}
+function saveFin(fd){
+  const F = clone(fin()), g = k => pnum(fd.get(k));
+  F.vigencia = String(fd.get("vigencia") || "").trim();
+  F.grads.forEach((x, i) => { x.soldo = g("g" + i + ".soldo"); x.am = g("g" + i + ".am"); x.acdm = g("g" + i + ".acdm"); x.curso = fd.get("g" + i + ".curso") || x.curso; });
+  F.cursos.forEach((c, i) => c.pct = g("c" + i));
+  Object.keys(F.param).forEach(k => F.param[k] = g(k));
+  F.ir.forEach((r, i) => { if (r[0] != null) r[0] = g("ir" + i + ".0"); r[1] = g("ir" + i + ".1"); r[2] = g("ir" + i + ".2"); });
+  F.carreira.total = g("total") || 35;
+  F.carreira.fases.forEach((f, i) => { if (f.meses != null) f.meses = Math.round(g("f" + i + ".a")) * 12 + Math.round(g("f" + i + ".m")); });
+  if (F.grads.some(x => !x.soldo)) { toast("Preencha o soldo de todas as graduações"); return; }
+  S.content.financeiro = {key:"financeiro", audience:"todos", data:F};
+  putContent("financeiro"); closeModal(); render(); toast("Valores atualizados");
+}
+
 const START = [];
 
 /* ---------- equipe (admin) ---------- */
@@ -1038,7 +1316,13 @@ function viewConta(){
 let INSTALL_EVT = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL_EVT = e; });
 const ACT = {
-  tab(a){ S.tab = a; S.mod = null; S.local = null; S.sel = null; S.q = ""; render(); scrollTo(0, 0); },
+  tab(a){ S.tab = a; S.mod = null; S.local = null; S.sel = null; S.q = ""; S.tool = null; render(); scrollTo(0, 0); },
+  tool(a){ S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
+  toolBack(){ S.tool = null; render(); scrollTo(0, 0); },
+  tintaModo(a){ const f = $("[data-calc=tinta]"); calcSet("tinta", Object.assign(formVals(f), {modo:a})); render(); },
+  finTab(a){ S.finTab = a; render(); },
+  finEdit(){ finModal(); },
+  finReset(){ if (!confirm("Voltar todos os valores aos da planilha de 2026?")) return; S.content.financeiro = {key:"financeiro", audience:"todos", data:clone(FIN_PADRAO)}; putContent("financeiro"); closeModal(); render(); toast("Valores da planilha restaurados"); },
   mod(a){ S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
   modBack(){ S.mod = null; render(); },
   local(a){ S.local = a; render(); scrollTo(0, 0); },
@@ -1110,6 +1394,8 @@ document.addEventListener("keydown", ev => {
   if (ev.key === "Enter" && ev.target.id === "f-newcol") { ev.preventDefault(); ACT.fieldAdd(); }
 });
 document.addEventListener("input", ev => {
+  const cf = ev.target.closest("[data-calc]");
+  if (cf) { if (ev.target.name === "grad") { const g = fin().grads.find(x => x.nome === ev.target.value); if (g) cf.curso.value = g.curso; } calcUpdate(cf); return; }
   if (ev.target.id === "inc-q") { S.q = ev.target.value; const pos = ev.target.selectionStart; render(); const i = $("#inc-q"); if (i) { i.focus(); i.setSelectionRange(pos, pos); } }
 });
 
