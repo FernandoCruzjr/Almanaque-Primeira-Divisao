@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Almanaque da Primeira Divisão: incumbências e guia de chegada para militares recém-embarcados.">
+<meta name="theme-color" content="#071420">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Almanaque">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script>window.ALM_SUPA = {url:"https://qltlueioiuuilpecmgzx.supabase.co", key:"sb_publishable_RscXCitP5KA0YkM_r76HAg_XUTcqk5I"};</script>
+<script src="vendor/supabase.js"></script>
+<title>Almanaque da Primeira Divisão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Mesmo esqueleto do Desfrangolizador (barra lateral no desktop, barra inferior no celular, cartões de vidro), em azul-marinho com detalhes em latão. Tema único escuro. */
+:root{
+  color-scheme:dark;
+  --bg:#071420; --bg-glow1:rgba(40,110,190,.22); --bg-glow2:rgba(210,165,70,.10);
+  --surface:#0E1F30; --surface2:#15293D; --surface3:#1C344B; --glass:rgba(255,255,255,.045); --glass-b:rgba(255,255,255,.09);
+  --ink:#EDF2F7; --muted:#9AAEC2; --faint:#62788E; --line:#1F3650;
+  --accent:#E3B54A; --accent-ink:#F0CB73; --accent-soft:rgba(227,181,74,.14); --on-accent:#1E1503;
+  --blue:#4FA3F7; --good:#3DDC97; --warn:#F2B14A; --bad:#F06A5C;
+  --brass:linear-gradient(135deg,#F0CB73,#C98F2A);
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --f-display:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:18px; --r-sm:11px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg) radial-gradient(1200px 700px at 85% -10%,var(--bg-glow1),transparent 60%) fixed,radial-gradient(900px 600px at -10% 110%,var(--bg-glow2),transparent 60%) fixed;color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{display:block}
+a{color:var(--accent-ink)}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+[hidden]{display:none!important}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;padding:22px 16px;border-right:1px solid var(--glass-b);background:rgba(7,20,32,.6);backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;align-items:center;gap:11px;padding:0 6px}
+.brand img{width:42px;height:42px;flex:none;border-radius:11px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.brand-name{font-family:var(--f-display);font-weight:800;font-size:16px;letter-spacing:-.01em;line-height:1.1}
+.brand-sub{font-size:11px;color:var(--accent-ink);font-weight:600;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;align-items:center;gap:12px;border:0;background:none;padding:11px 12px;border-radius:12px;color:var(--muted);font-weight:600;text-align:left}
+.nav button svg{width:21px;height:21px;flex:none}
+.nav button:hover{background:var(--glass);color:var(--ink)}
+.nav button[aria-current="page"]{background:var(--accent-soft);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(227,181,74,.25)}
+.nav button[aria-current="page"] svg{color:var(--accent)}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--faint)}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--faint);display:inline-block}
+.sync.ok i{background:var(--good);box-shadow:0 0 8px var(--good)} .sync.err i{background:var(--bad)} .sync.saving i{background:var(--warn)}
+
+.main{min-width:0;padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.topbar{display:flex;align-items:center;gap:12px}
+.topbar .brand{display:none;padding:0}
+.hello{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.15}
+.hello-sub{color:var(--muted);font-size:13.5px}
+.avatar{margin-left:auto;width:42px;height:42px;border-radius:50%;background:var(--brass);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:800;font-size:16px;flex:none;border:2px solid rgba(255,255,255,.15)}
+
+.tabbar{display:none}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .topbar .brand{display:flex}
+  .topbar .brand img{width:36px;height:36px}
+  .topbar .hello-wrap{display:none}
+  .main{padding-top:max(14px,env(safe-area-inset-top,0px));padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  .tabbar{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(8,20,32,.92);backdrop-filter:blur(14px);border-top:1px solid var(--glass-b);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{border:0;background:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;font-size:11px;font-weight:600;border-radius:12px}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button[aria-current="page"]{color:var(--accent-ink)}
+}
+
+/* ---------- peças ---------- */
+.card{background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.02));border:1px solid var(--glass-b);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.card-h h2{font-family:var(--f-display);font-size:17px;font-weight:700}
+.sub{color:var(--muted);font-size:13.5px}
+.row{display:flex;align-items:center;gap:10px}
+.col{display:flex;flex-direction:column;gap:12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:700}
+.page-h{display:flex;flex-direction:column;gap:6px}
+.page-h h1{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,4vw,32px);letter-spacing:-.01em;line-height:1.1}
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--muted);font-weight:600;padding:4px 0;font-size:14px;align-self:flex-start}
+.back svg{width:18px;height:18px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--glass-b);background:var(--surface2);color:var(--ink);padding:10px 16px;border-radius:12px;font-weight:600;min-height:44px}
+.btn svg{width:18px;height:18px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--brass);border-color:transparent;color:var(--on-accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:7px 12px;min-height:36px;font-size:13.5px}
+.btn[disabled]{opacity:.55;cursor:default}
+.iconbtn{border:1px solid var(--glass-b);background:var(--surface2);width:40px;height:40px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);flex:none}
+.iconbtn svg{width:19px;height:19px}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.input{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--glass-b);border-radius:12px;padding:11px 13px;min-height:46px;font-size:16px}
+.input:focus{outline:none;border-color:var(--accent)}
+textarea.input{min-height:96px;resize:vertical;line-height:1.45}
+.search{position:relative}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--faint)}
+.search .input{padding-left:40px}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--glass);border:1px solid var(--glass-b);color:var(--muted);white-space:nowrap}
+.pill.good{color:var(--good);border-color:rgba(61,220,151,.3)}
+.pill.warn{color:var(--warn);border-color:rgba(242,177,74,.35)}
+.pill.accent{color:var(--accent-ink);border-color:rgba(227,181,74,.35)}
+
+.note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:14px;line-height:1.5}
+.note svg{width:19px;height:19px;flex:none;margin-top:1px;color:var(--accent)}
+.note.warn{background:rgba(242,177,74,.08);border-color:rgba(242,177,74,.3)} .note.warn svg{color:var(--warn)}
+.note.bad{background:rgba(240,106,92,.09);border-color:rgba(240,106,92,.35)} .note.bad svg{color:var(--bad)}
+.note.good{background:rgba(61,220,151,.08);border-color:rgba(61,220,151,.3)} .note.good svg{color:var(--good)}
+
+/* tiles clicáveis */
+.tile{display:flex;flex-direction:column;gap:10px;text-align:left;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));border-radius:var(--r);padding:16px;color:var(--ink);min-height:120px}
+.tile:hover{border-color:rgba(227,181,74,.35);background:var(--surface)}
+.tile-i{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.tile-i svg{width:22px;height:22px}
+.tile b{font-family:var(--f-display);font-size:15.5px;font-weight:700;line-height:1.2}
+.tile .foot{margin-top:auto;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.bar{height:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;flex:1}
+.bar i{display:block;height:100%;background:var(--brass);border-radius:99px}
+
+/* conteúdo do Bem-vindo */
+.sec{border:1px solid var(--glass-b);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));overflow:hidden}
+.sec>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer}
+.sec>summary::-webkit-details-marker{display:none}
+.sec-n{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);font-family:var(--f-mono);font-weight:600;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}
+.sec>summary b{font-family:var(--f-display);font-weight:700;font-size:15.5px;flex:1;line-height:1.25}
+.sec>summary svg{width:18px;height:18px;color:var(--faint);transition:transform .2s}
+.sec[open]>summary svg{transform:rotate(180deg)}
+.sec-body{padding:0 16px 18px;display:flex;flex-direction:column;gap:14px}
+.blk-t{font-weight:700;font-size:14px;color:var(--accent-ink);margin-bottom:6px}
+.prose{white-space:pre-line;line-height:1.6;font-size:14.5px}
+.ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.55;font-size:14.5px}
+.ul li::marker{color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip-v{display:flex;flex-direction:column;padding:9px 14px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid var(--glass-b);min-width:88px}
+.chip-v small{font-size:11.5px;color:var(--muted);font-weight:600}
+.chip-v span{font-family:var(--f-mono);font-weight:600;font-size:18px}
+.chip-v.bad{border-color:rgba(240,106,92,.45)} .chip-v.bad span{color:var(--bad)}
+.chip-v.blue{border-color:rgba(79,163,247,.45)} .chip-v.blue span{color:var(--blue)}
+.chip-v.warn{border-color:rgba(242,177,74,.45)} .chip-v.warn span{color:var(--warn)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--glass-b);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,0,0,.2)}
+tr:last-child td{border-bottom:0}
+td:last-child{font-family:var(--f-mono)}
+.mcards{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.mcard{padding:14px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--glass-b);display:flex;flex-direction:column;gap:6px}
+.mcard b{font-family:var(--f-display);font-size:14.5px}
+.mcard p{font-size:14px;color:var(--muted);line-height:1.5}
+.steps{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.step{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--glass-b);cursor:pointer;text-align:left;width:100%;color:var(--ink)}
+.step .n{width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:600;font-size:13px;flex:none}
+.step span{line-height:1.5;font-size:14.5px;padding-top:2px}
+.step.done{border-color:rgba(61,220,151,.35)}
+.step.done .n{background:var(--good);border-color:var(--good);color:#04241A}
+.step.done span{color:var(--muted)}
+
+/* incumbências */
+.items{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:12px;text-align:left;width:100%;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));border-radius:14px;padding:13px 14px;color:var(--ink)}
+.item:hover{border-color:rgba(227,181,74,.35)}
+.item-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.item-main b{font-weight:700;font-size:15px}
+.kv{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--muted)}
+.kv em{font-style:normal;color:var(--ink);font-family:var(--f-mono);font-size:12.5px}
+.item>svg{width:18px;height:18px;color:var(--faint);flex:none}
+.empty{color:var(--faint);font-size:13px}
+.ring{width:42px;height:42px;flex:none}
+
+/* modal */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(2,8,14,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
+.sheet{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;background:linear-gradient(180deg,#132A40,#0D1F31);border:1px solid var(--glass-b);border-radius:22px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.sheet-h{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.sheet-h h3{font-family:var(--f-display);font-size:19px;font-weight:800;line-height:1.2}
+.sheet-h .iconbtn{margin-left:auto}
+.fields2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:820px){.scrim{align-items:flex-end;padding:0}.sheet{border-radius:22px 22px 0 0;max-height:92vh;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:340px){.fields2{grid-template-columns:1fr}}
+.sheet-foot{position:sticky;bottom:-20px;margin:0 -20px -20px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:#0D1F31;border-top:1px solid var(--glass-b)}
+/* Tabelas viram cartões no celular: cada linha mostra o rótulo ao lado do valor. */
+@media (max-width:600px){
+  .tbl-wrap{border:0;overflow:visible}
+  .tbl-wrap thead{display:none}
+  .tbl-wrap tbody{display:grid;gap:8px}
+  .tbl-wrap tr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px;padding:12px 14px;border:1px solid var(--glass-b);border-radius:12px;background:rgba(0,0,0,.2)}
+  .tbl-wrap td{border:0;padding:0;white-space:normal;display:flex;flex-direction:column;font-family:var(--f-mono);font-size:14px}
+  .tbl-wrap td::before{content:attr(data-l);font-family:var(--f-body);font-size:11px;color:var(--muted);font-weight:600}
+  .tbl-wrap td:first-child{grid-column:1/-1;font-family:var(--f-display);font-weight:700;font-size:15px;color:var(--accent-ink)}
+  .tbl-wrap td:first-child::before{display:none}
+}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:80;background:#1E3A54;border:1px solid var(--glass-b);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow)}
+@media (min-width:821px){.toast{bottom:28px}}
+
+/* entrada */
+.gate{position:fixed;inset:0;z-index:90;overflow:auto;background:radial-gradient(900px 600px at 15% -10%,var(--bg-glow1),transparent 60%),radial-gradient(800px 600px at 110% 10%,var(--bg-glow2),transparent 60%),var(--bg);display:flex;align-items:center;justify-content:center;padding:max(24px,env(safe-area-inset-top,0px)) 16px max(24px,env(safe-area-inset-bottom,0px))}
+.gate-in{width:min(940px,100%);display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.gate-hero img{width:84px;height:84px;border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.gate-hero h1{font-family:var(--f-display);font-weight:900;font-size:clamp(28px,4.2vw,44px);line-height:1.05;margin:16px 0 12px;letter-spacing:-.02em}
+.gate-hero h1 span{background:var(--brass);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gate-hero p{color:var(--muted);font-size:16px;line-height:1.55}
+.gate-card{background:linear-gradient(180deg,#132A40,#0D1F31);border:1px solid var(--glass-b);border-radius:22px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.gate-card h2{margin:0 0 4px;font-family:var(--f-display);font-size:22px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:14px}
+.seg button{border:0;border-radius:10px;padding:11px;font-weight:600;color:var(--muted);background:transparent}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.gate-foot{font-size:12.5px;color:var(--faint);margin-top:12px;line-height:1.5}
+@media (max-width:820px){.gate{align-items:flex-start}.gate-in{grid-template-columns:1fr;gap:20px}.gate-hero{text-align:center}.gate-hero img{margin:0 auto;width:72px;height:72px}.gate-hero p{font-size:15px}}
+.boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="boot" id="boot">Carregando…</div>
+<div class="gate" id="gate" hidden></div>
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot"><span class="sync" id="sync"><i></i><span>—</span></span><span>Conteúdo de uso interno. Não compartilhe.</span></div>
+  </aside>
+  <main class="main"><div class="wrap" id="view"></div></main>
+  <nav class="tabbar" id="tabbar"></nav>
+</div>
+<div id="modal"></div>
+<script>
+/* ======================= BASE ======================= */
+const ICONS = {
+  home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  anchor:'<circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 11h8M5 14a7 7 0 0 0 14 0M5 14H3m16 0h2"/>',
+  clip:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h4"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  fire:'<path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-3 3-5 5.5-5 8.5C5 19.3 8 22 12 22z"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>', down:'<path d="M6 9l6 6 6-6"/>', left:'<path d="M15 6l-6 6 6 6"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>', check:'<path d="M5 12l5 5 9-10"/>', info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>', edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', reset:'<path d="M4 4v6h6"/><path d="M4.5 15a8 8 0 1 0 1.9-8.4L4 10"/>',
+  logout:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', book:'<path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+  columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
+};
+const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $ = s => document.querySelector(s);
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
+const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const uid = () => Math.random().toString(36).slice(2, 9);
+const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
+function openModal(html){ $("#modal").innerHTML = `<div class="scrim" data-scrim><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; const f = $("#modal .sheet input, #modal .sheet textarea"); if (f && matchMedia("(min-width:821px)").matches) f.focus(); }
+function closeModal(){ $("#modal").innerHTML = ""; }
+const sheetHead = (t, s) => `<div class="sheet-h"><div><h3>${esc(t)}</h3>${s ? `<div class="sub">${esc(s)}</div>` : ""}</div><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>`;
+
+/* ======================= ESTADO ======================= */
+const CFG = window.ALM_SUPA;
+const sb = window.supabase.createClient(CFG.url, CFG.key, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}});
+const S = {user:null, member:null, content:{}, members:[], tab:"inicio", mod:null, local:null, q:"", sync:"", offline:false};
+const CACHE = id => "alm-cache:" + id, PEND = "alm-pending", LAST = "alm-lastuser", STEPS = "alm-steps";
+const isAdmin = () => !!(S.member && S.member.approved && S.member.role === "admin");
+const isMember = () => !!(S.member && S.member.approved);
+
+function setSync(st){
+  S.sync = st;
+  const el = $("#sync"); if (!el) return;
+  el.className = "sync " + st;
+  el.lastElementChild.textContent = {ok:"Sincronizado", saving:"Salvando…", err:"Sem conexão: salvo no aparelho", "":"—"}[st] || "—";
+}
+function saveCache(){ if (S.user) lsSet(CACHE(S.user.id), {member:S.member, content:S.content, at:Date.now()}); }
+function loadCache(id){ const c = lsGet(CACHE(id), null); if (c) { S.member = c.member; S.content = c.content || {}; } return !!c; }
+
+async function fetchAll(){
+  const m = await sb.from("alm_members").select("*").eq("user_id", S.user.id).maybeSingle();
+  if (m.error) throw m.error;
+  S.member = m.data;
+  if (!S.member) {
+    const nome = (S.user.user_metadata && S.user.user_metadata.name) || "";
+    const ins = await sb.from("alm_members").insert({user_id:S.user.id, email:S.user.email, nome}).select().single();
+    if (ins.error) throw ins.error;
+    S.member = ins.data;
+  }
+  if (isMember()) {
+    const pend = lsGet(PEND, {});
+    const r = await sb.from("alm_content").select("key,audience,data,updated_at");
+    if (r.error) throw r.error;
+    const remote = {}; (r.data || []).forEach(x => remote[x.key] = x);
+    for (const k in pend) if (pend[k] && S.content[k]) remote[k] = S.content[k]; // edição feita sem internet vence
+    S.content = remote;
+    if (isAdmin()) await loadMembers();
+    await flushPending();
+  }
+  saveCache();
+}
+async function loadMembers(){
+  const r = await sb.from("alm_members").select("*").order("created_at");
+  if (!r.error) S.members = r.data || [];
+}
+
+/* Salvar conteúdo (só admin): guarda no aparelho na hora e envia quando houver conexão. */
+let saveTimer = null;
+function putContent(key){
+  S.content[key].updated_at = new Date().toISOString();
+  const pend = lsGet(PEND, {}); pend[key] = true; lsSet(PEND, pend);
+  saveCache(); setSync("saving");
+  clearTimeout(saveTimer); saveTimer = setTimeout(flushPending, 600);
+}
+async function flushPending(){
+  const pend = lsGet(PEND, {}), keys = Object.keys(pend).filter(k => pend[k]);
+  if (!keys.length) { setSync(S.offline ? "err" : "ok"); return; }
+  if (!navigator.onLine || !S.user || S.offline) { setSync("err"); return; }
+  setSync("saving");
+  try {
+    for (const k of keys) {
+      const c = S.content[k]; if (!c) { delete pend[k]; continue; }
+      const r = await sb.from("alm_content").upsert({key:k, audience:c.audience || "admin", data:c.data});
+      if (r.error) throw r.error;
+      delete pend[k]; lsSet(PEND, pend);
+    }
+    setSync("ok");
+  } catch (e) { console.warn(e); setSync("err"); }
+}
+window.addEventListener("online", () => { if (S.offline) resumeOnline(); else flushPending(); });
+
+/* ======================= CONTA ======================= */
+const hasToken = () => { try { return Object.keys(localStorage).some(k => /^sb-.*-auth-token$/.test(k)); } catch (e) { return false; } };
+async function onSession(session){
+  const u = session && session.user;
+  if (!u) {
+    const lu = lsGet(LAST, null);
+    if (lu && hasToken() && loadCache(lu.id)) { S.user = lu; S.offline = true; showApp(); setSync("err"); return; }
+    S.user = null; S.member = null; S.content = {}; showGate(); return;
+  }
+  if (S.user && S.user.id === u.id && !S.offline && S.member) return;
+  S.user = u; S.offline = false;
+  lsSet(LAST, {id:u.id, email:u.email, user_metadata:u.user_metadata || {}});
+  const cached = loadCache(u.id);
+  if (cached) showApp();
+  try { await fetchAll(); setSync("ok"); }
+  catch (e) { console.warn(e); setSync("err"); if (!cached) { AUTH.msg = "Não foi possível carregar agora. Verifique a conexão e tente de novo."; showGate(); return; } }
+  showApp();
+}
+async function resumeOnline(){
+  try { const r = await sb.auth.getSession(); if (r.data && r.data.session) { S.offline = false; S.user = null; await onSession(r.data.session); } } catch (e) {}
+}
+sb.auth.onAuthStateChange((ev, session) => setTimeout(() => {
+  if (ev === "PASSWORD_RECOVERY") { AUTH.mode = "nova"; showGate(); return; }
+  if (ev === "TOKEN_REFRESHED" || ev === "USER_UPDATED") return;
+  onSession(session);
+}, 0));
+
+let AUTH = {mode:"entrar", msg:"", ok:"", email:"", busy:false};
+const AUTH_ERR = [
+  [/invalid login credentials/i, "E-mail ou senha incorretos."],
+  [/email not confirmed/i, "Falta confirmar o e-mail. Abra o link que enviamos e tente de novo."],
+  [/already registered|already exists/i, "Esse e-mail já tem conta. Use Entrar."],
+  [/rate limit|too many|security purposes/i, "Muitas tentativas seguidas. Espere alguns minutos e tente de novo."],
+  [/password should be at least|weak/i, "A senha precisa ter pelo menos 6 caracteres."],
+  [/invalid.*email|unable to validate email/i, "Esse e-mail não parece válido."],
+  [/fetch|network/i, "Sem conexão com a internet agora."]
+];
+const authMsg = e => { const m = (e && (e.message || e.msg)) || ""; const hit = AUTH_ERR.find(([r]) => r.test(m)); return hit ? hit[1] : "Não deu certo agora. Tente de novo em instantes."; };
+
+function showGate(){
+  $("#boot").hidden = true; $("#app").hidden = true; closeModal();
+  const g = $("#gate"); g.hidden = false;
+  const m = AUTH.mode;
+  const title = {entrar:"Entrar", criar:"Criar conta", senha:"Recuperar senha", nova:"Nova senha"}[m];
+  const sub = {entrar:"Use seu e-mail e senha.", criar:"Depois de criar, seu acesso é liberado pelo encarregado.", senha:"Enviamos um link para criar uma nova senha.", nova:"Escolha a nova senha da sua conta."}[m];
+  g.innerHTML = `<div class="gate-in">
+    <div class="gate-hero"><img src="icons/icon-512.png" alt="Almanaque da Primeira Divisão">
+      <h1>Almanaque da <span>Primeira Divisão</span></h1>
+      <p>Incumbências da divisão e o guia Bem-vindo a Bordo para quem acabou de chegar. Acesso restrito aos militares liberados pelo encarregado.</p></div>
+    <div class="gate-card"><h2>${title}</h2><div class="sub" style="margin-bottom:14px">${sub}</div>
+      <form class="col" data-auth novalidate>
+        ${m === "entrar" || m === "criar" ? `<div class="seg" role="group" aria-label="Entrar ou criar conta"><button type="button" data-act="authMode" data-arg="entrar" aria-pressed="${m === "entrar"}">Entrar</button><button type="button" data-act="authMode" data-arg="criar" aria-pressed="${m === "criar"}">Criar conta</button></div>` : ""}
+        ${m === "criar" ? `<div class="field"><label for="au-name">Nome de guerra</label><input id="au-name" class="input" maxlength="40" autocomplete="nickname" placeholder="Ex.: Cruz"></div>` : ""}
+        ${m !== "nova" ? `<div class="field"><label for="au-email">E-mail</label><input id="au-email" class="input" type="email" inputmode="email" autocomplete="email" value="${esc(AUTH.email)}" placeholder="voce@email.com"></div>` : ""}
+        ${m !== "senha" ? `<div class="field"><label for="au-pass">${m === "nova" ? "Nova senha" : "Senha"}</label><input id="au-pass" class="input" type="password" minlength="6" autocomplete="${m === "entrar" ? "current-password" : "new-password"}" placeholder="Mínimo de 6 caracteres"></div>` : ""}
+        ${AUTH.msg ? `<div class="note warn">${ic("alert")}<span>${esc(AUTH.msg)}</span></div>` : ""}
+        ${AUTH.ok ? `<div class="note good">${ic("check")}<span>${AUTH.ok}</span></div>` : ""}
+        <button class="btn primary" type="submit" ${AUTH.busy ? "disabled" : ""}>${AUTH.busy ? "Aguarde…" : {entrar:"Entrar", criar:"Criar conta", senha:"Enviar link", nova:"Salvar nova senha"}[m]}</button>
+        ${m === "entrar" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="senha">Esqueci minha senha</button>` : ""}
+        ${m === "senha" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="entrar">Voltar para Entrar</button>` : ""}
+      </form>
+      <div class="gate-foot">Quem já usa o Desfrangolizador entra com o mesmo e-mail e senha. Conteúdo de uso interno da divisão.</div></div>
+  </div>`;
+}
+document.addEventListener("submit", async ev => {
+  if (!ev.target.matches("[data-auth]")) return;
+  ev.preventDefault(); if (AUTH.busy) return;
+  const email = (($("#au-email") || {}).value || "").trim(), pass = ($("#au-pass") || {}).value || "", name = (($("#au-name") || {}).value || "").trim();
+  const m = AUTH.mode; AUTH.email = email; AUTH.msg = ""; AUTH.ok = "";
+  if (m !== "nova" && !/^\S+@\S+\.\S+$/.test(email)) { AUTH.msg = "Digite um e-mail válido."; showGate(); return; }
+  if (m !== "senha" && pass.length < 6) { AUTH.msg = "A senha precisa ter pelo menos 6 caracteres."; showGate(); return; }
+  AUTH.busy = true; showGate();
+  const back = location.origin + location.pathname;
+  try {
+    if (m === "entrar") { const r = await sb.auth.signInWithPassword({email, password:pass}); if (r.error) throw r.error; }
+    else if (m === "criar") {
+      const r = await sb.auth.signUp({email, password:pass, options:{emailRedirectTo:back, data:name ? {name} : {}}}); if (r.error) throw r.error;
+      if (!r.data.session) { AUTH.mode = "entrar"; AUTH.ok = `Enviamos um link de confirmação para <b>${esc(email)}</b>. Abra o e-mail, toque no link e depois entre aqui.`; }
+    }
+    else if (m === "senha") { const r = await sb.auth.resetPasswordForEmail(email, {redirectTo:back}); if (r.error) throw r.error; AUTH.ok = "Se esse e-mail tiver conta, o link chega em instantes."; }
+    else if (m === "nova") { const r = await sb.auth.updateUser({password:pass}); if (r.error) throw r.error; AUTH.mode = "entrar"; AUTH.busy = false; toast("Senha alterada"); const s = await sb.auth.getSession(); S.user = null; await onSession(s.data.session); return; }
+  } catch (e) { AUTH.msg = authMsg(e); }
+  AUTH.busy = false;
+  if (!$("#gate").hidden) showGate();
+});
+
+function showApp(){
+  $("#boot").hidden = true; $("#gate").hidden = true; $("#app").hidden = false;
+  render();
+}
+
+/* ======================= TELAS ======================= */
+function tabs(){
+  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"]];
+  if (isAdmin()) t.push(["incumbencias","Incumbências","clip"],["equipe","Equipe","users"]);
+  t.push(["conta","Conta","user"]);
+  return t;
+}
+function render(){
+  if (!S.user) return;
+  if (!tabs().some(t => t[0] === S.tab)) S.tab = "inicio";
+  const navHtml = tabs().map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
+  $("#nav").innerHTML = navHtml; $("#tabbar").innerHTML = navHtml;
+  setSync(S.sync);
+  const nome = (S.member && S.member.nome) || (S.user.user_metadata && S.user.user_metadata.name) || (S.user.email || "").split("@")[0];
+  const top = `<div class="topbar"><div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
+    <div class="hello-wrap"><div class="hello">Olá, ${esc(nome)}</div><div class="hello-sub">${isAdmin() ? "Encarregado" : isMember() ? "Militar da divisão" : "Acesso pendente"}</div></div>
+    <button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${esc((nome[0] || "?").toUpperCase())}</button></div>`;
+  let body;
+  if (!isMember()) body = viewPending();
+  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
+  if (S.tab === "conta" && !isMember()) body = viewConta();
+  $("#view").innerHTML = top + body;
+}
+
+function viewPending(){
+  return `<div class="card col" style="max-width:560px">
+    <div class="tile-i">${ic("lock")}</div>
+    <h2 style="font-family:var(--f-display);font-size:20px">Aguardando liberação</h2>
+    <p class="sub" style="font-size:15px">Sua conta foi criada. Peça ao encarregado da Primeira Divisão para liberar seu acesso. Assim que ele aprovar, toque em <b>Verificar de novo</b>.</p>
+    <div class="row" style="flex-wrap:wrap"><button class="btn primary" data-act="recheck">${ic("reset")}Verificar de novo</button><button class="btn ghost" data-act="logout">${ic("logout")}Sair</button></div></div>`;
+}
+
+const bem = () => (S.content.bemvindo && S.content.bemvindo.data) || {modulos:[]};
+const inc = () => (S.content.incumbencias && S.content.incumbencias.data) || null;
+function incStats(l){ const total = l.itens.length * Math.max(1, l.colunas.length); let f = 0; l.itens.forEach(it => l.colunas.forEach(c => { if (String((it.campos || {})[c] || "").trim()) f++; })); return {f, total, pct: total ? Math.round(f / total * 100) : 0}; }
+
+function viewHome(){
+  const b = bem(), I = inc();
+  const mods = b.modulos || [];
+  let incCard = "";
+  if (isAdmin() && I) {
+    const st = I.locais.reduce((a, l) => { const s = incStats(l); a.f += s.f; a.t += s.total; a.n += l.itens.length; return a; }, {f:0, t:0, n:0});
+    const pct = st.t ? Math.round(st.f / st.t * 100) : 0;
+    incCard = `<button class="tile" data-act="tab" data-arg="incumbencias"><div class="row"><div class="tile-i">${ic("clip")}</div><span class="pill accent" style="margin-left:auto">${ic("lock").replace('<svg','<svg width="12" height="12"')}Só você</span></div>
+      <b>Minhas incumbências</b><div class="sub">${I.locais.length} locais · ${st.n} itens</div>
+      <div class="foot"><div class="bar"><i style="width:${pct}%"></i></div><span class="num sub">${pct}% preenchido</span></div></button>`;
+  }
+  const pend = isAdmin() ? S.members.filter(m => !m.approved).length : 0;
+  return `<div class="page-h"><span class="eyebrow">Primeira Divisão</span><h1>Almanaque</h1><p class="sub" style="font-size:15px">${esc((b.intro && b.intro.texto) || "")}</p></div>
+    ${pend ? `<button class="note warn" data-act="tab" data-arg="equipe" style="text-align:left;cursor:pointer;color:var(--ink)">${ic("users")}<span><b>${pend} ${pend === 1 ? "militar aguarda" : "militares aguardam"} liberação.</b> Toque para ver.</span></button>` : ""}
+    <div class="grid">
+      ${incCard}
+      <button class="tile" data-act="tab" data-arg="bemvindo"><div class="tile-i">${ic("anchor")}</div><b>Bem-vindo a Bordo</b><div class="sub">Guia de chegada: ${mods.length} ${mods.length === 1 ? "módulo" : "módulos"}</div><div class="foot"><span class="sub">${esc(mods.map(m => m.titulo).join(" · "))}</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button>
+      ${mods.map(m => modTile(m)).join("")}
+    </div>`;
+}
+function stepsDone(id){ return lsGet(STEPS, {})[id] || []; }
+function modTile(m){
+  return `<button class="tile" data-act="mod" data-arg="${esc(m.id)}"><div class="tile-i">${ic(m.icone || "book")}</div><b>${esc(m.titulo)}</b><div class="sub">${esc(m.resumo || m.subtitulo || "")}</div><div class="foot"><span class="pill">${(m.secoes || []).length} seções</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button>`;
+}
+
+function viewBemvindo(){
+  const b = bem();
+  if (S.mod) { const m = (b.modulos || []).find(x => x.id === S.mod); if (m) return viewModulo(m); S.mod = null; }
+  return `<div class="page-h"><span class="eyebrow">Para quem acabou de chegar</span><h1>${esc((b.intro && b.intro.titulo) || "Bem-vindo a Bordo")}</h1><p class="sub" style="font-size:15px">${esc((b.intro && b.intro.texto) || "")}</p></div>
+    <div class="grid">${(b.modulos || []).map(modTile).join("") || `<div class="empty">Nenhum módulo ainda.</div>`}</div>
+    <div class="note">${ic("clock")}<span>Novos módulos entram aqui conforme forem preparados.</span></div>`;
+}
+function viewModulo(m){
+  return `<button class="back" data-act="modBack">${ic("left")}Bem-vindo a Bordo</button>
+    <div class="page-h"><span class="eyebrow">${esc(m.subtitulo || "")}</span><h1>${esc(m.titulo)}</h1>${m.resumo ? `<p class="sub" style="font-size:15px">${esc(m.resumo)}</p>` : ""}</div>
+    <div class="col">${(m.secoes || []).map((s, i) => `<details class="sec" data-sec="${i}" ${openSecs(m.id).includes(i) ? "open" : ""}><summary><span class="sec-n">${i + 1}</span><b>${esc(s.titulo)}</b>${ic("down")}</summary><div class="sec-body">${(s.blocos || []).map(blk).join("")}</div></details>`).join("")}</div>`;
+}
+/* Lembra quais seções estão abertas, para não fechar tudo ao marcar um passo. */
+const OPEN = {};
+const openSecs = id => OPEN[id] || (OPEN[id] = [0]);
+document.addEventListener("toggle", ev => {
+  const d = ev.target; if (!d.matches || !d.matches("details[data-sec]") || !S.mod) return;
+  const i = +d.dataset.sec, o = openSecs(S.mod).filter(x => x !== i);
+  OPEN[S.mod] = d.open ? [...o, i] : o;
+}, true);
+function blk(b){
+  const t = b.titulo ? `<div class="blk-t">${esc(b.titulo)}</div>` : "";
+  switch (b.tipo) {
+    case "texto": return `<div>${t}<p class="prose">${esc(b.texto)}</p></div>`;
+    case "lista": return `<div>${t}${b.intro ? `<p class="prose" style="margin-bottom:8px">${esc(b.intro)}</p>` : ""}<ul class="ul">${b.itens.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+    case "chips": return `<div>${t}<div class="chips">${b.itens.map(x => `<div class="chip-v ${esc(x.cor || "")}"><small>${esc(x.rotulo)}</small><span>${esc(x.valor)}</span></div>`).join("")}</div></div>`;
+    case "tabela": return `<div>${t}<div class="tbl-wrap"><table><thead><tr>${b.colunas.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${b.linhas.map(r => `<tr>${r.map((c, k) => `<td data-l="${esc(b.colunas[k])}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    case "cards": return `<div>${t}<div class="mcards">${b.itens.map(x => `<div class="mcard">${x.tag ? `<span class="pill accent" style="align-self:flex-start">${esc(x.tag)}</span>` : ""}<b>${esc(x.titulo)}</b><p>${esc(x.texto)}</p></div>`).join("")}</div></div>`;
+    case "nota": return `<div class="note">${ic("info")}<span>${esc(b.texto)}</span></div>`;
+    case "alerta": return `<div class="note bad">${ic("alert")}<span>${esc(b.texto)}</span></div>`;
+    case "passos": {
+      const done = stepsDone(b.id);
+      return `<div>${t}<ol class="steps">${b.itens.map((x, i) => `<li><button class="step ${done.includes(i) ? "done" : ""}" data-act="step" data-arg="${esc(b.id)}" data-i="${i}" aria-pressed="${done.includes(i)}"><span class="n">${done.includes(i) ? ic("check").replace('<svg','<svg width="15" height="15"') : i + 1}</span><span>${esc(x)}</span></button></li>`).join("")}</ol>
+        <div class="row" style="margin-top:10px"><span class="sub">${done.length} de ${b.itens.length} feitos</span>${done.length ? `<button class="btn sm ghost" data-act="stepReset" data-arg="${esc(b.id)}" style="margin-left:auto">${ic("reset")}Recomeçar</button>` : ""}</div></div>`;
+    }
+    default: return "";
+  }
+}
+
+/* ---------- incumbências ---------- */
+function viewInc(){
+  const I = inc();
+  if (!I) return `<div class="note">${ic("info")}<span>Nenhuma incumbência carregada ainda.</span></div>`;
+  if (S.local) { const l = I.locais.find(x => x.id === S.local); if (l) return viewLocal(l); S.local = null; }
+  const q = norm(S.q);
+  let results = "";
+  if (q) {
+    const hits = [];
+    I.locais.forEach(l => l.itens.forEach(it => { const hay = norm([l.nome, it.nome, it.obs, ...Object.values(it.campos || {})].join(" ")); if (hay.includes(q)) hits.push([l, it]); }));
+    results = `<div class="col"><div class="sub">${hits.length} ${hits.length === 1 ? "resultado" : "resultados"}</div><div class="items">${hits.map(([l, it]) => itemRow(l, it, true)).join("") || `<div class="empty">Nada encontrado.</div>`}</div></div>`;
+  }
+  return `<div class="page-h"><span class="eyebrow">${ic("lock").replace('<svg','<svg style="display:inline;vertical-align:-2px" width="12" height="12"')} Só você vê</span><h1>Incumbências</h1><p class="sub" style="font-size:15px">Material de cada local da divisão. Toque em um item para preencher as medidas.</p></div>
+    <div class="search">${ic("search")}<input class="input" id="inc-q" type="search" placeholder="Buscar item, local ou medida" value="${esc(S.q)}" autocomplete="off"></div>
+    ${results || `<div class="grid">${I.locais.map(l => { const s = incStats(l); return `<button class="tile" data-act="local" data-arg="${esc(l.id)}"><b>${esc(l.nome)}</b><div class="sub">${l.itens.length} ${l.itens.length === 1 ? "item" : "itens"}</div><div class="foot"><div class="bar"><i style="width:${s.pct}%"></i></div><span class="num sub">${s.pct}%</span></div></button>`; }).join("")}
+      <button class="tile" data-act="localNew" style="align-items:center;justify-content:center;border-style:dashed;color:var(--muted)">${ic("plus")}<span>Novo local</span></button></div>`}`;
+}
+function itemRow(l, it, showLocal){
+  const filled = l.colunas.filter(c => String((it.campos || {})[c] || "").trim());
+  return `<button class="item" data-act="item" data-arg="${esc(l.id)}" data-i="${esc(it.id)}"><div class="item-main"><b>${esc(it.nome)}</b>${showLocal ? `<span class="sub">${esc(l.nome)}</span>` : ""}
+    ${filled.length ? `<div class="kv">${filled.map(c => `<span>${esc(c)}: <em>${esc(it.campos[c])}</em></span>`).join("")}</div>` : `<span class="empty">Sem medidas ainda</span>`}
+    ${it.obs ? `<div class="sub" style="white-space:pre-line;font-size:13px">${esc(it.obs.length > 140 ? it.obs.slice(0, 140) + "…" : it.obs)}</div>` : ""}</div>
+    <span class="pill ${filled.length === l.colunas.length ? "good" : ""}">${filled.length}/${l.colunas.length}</span>${ic("chev")}</button>`;
+}
+function viewLocal(l){
+  const s = incStats(l);
+  return `<button class="back" data-act="localBack">${ic("left")}Incumbências</button>
+    <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1><p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button></div>
+    <div class="items">${l.itens.map(it => itemRow(l, it)).join("") || `<div class="empty">Nenhum item.</div>`}</div>`;
+}
+function itemModal(lid, iid){
+  const l = inc().locais.find(x => x.id === lid); if (!l) return;
+  const it = iid ? l.itens.find(x => x.id === iid) : {id:"", nome:"", campos:{}, obs:""};
+  openModal(`${sheetHead(iid ? it.nome : "Novo item", l.nome)}
+    <form class="col" data-form="item" data-l="${esc(lid)}" data-i="${esc(iid || "")}">
+      <div class="field"><label for="f-nome">Nome do item</label><input id="f-nome" name="nome" class="input" required maxlength="80" value="${esc(it.nome)}"></div>
+      <div class="fields2">${l.colunas.map((c, k) => `<div class="field"><label for="f-c${k}">${esc(c)}</label><input id="f-c${k}" class="input" name="c:${esc(c)}" maxlength="120" value="${esc((it.campos || {})[c] || "")}"></div>`).join("")}</div>
+      <div class="field"><label for="f-obs">Observações</label><textarea id="f-obs" name="obs" class="input" maxlength="2000">${esc(it.obs || "")}</textarea></div>
+      <div class="row sheet-foot" style="flex-wrap:wrap">${iid ? `<button type="button" class="btn ghost danger sm" data-act="itemDel" data-arg="${esc(lid)}" data-i="${esc(iid)}">${ic("trash")}Apagar</button>` : ""}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
+}
+function localModal(lid){
+  const l = lid ? inc().locais.find(x => x.id === lid) : {id:"", nome:"", colunas:["Comprimento", "Espessura", "Capacidade de carga", "Peso"], itens:[]};
+  openModal(`${sheetHead(lid ? "Local e campos" : "Novo local", "Os campos são as medidas pedidas em cada item deste local.")}
+    <form class="col" data-form="local" data-l="${esc(lid || "")}">
+      <div class="field"><label for="f-ln">Nome do local</label><input id="f-ln" name="nome" class="input" required maxlength="60" value="${esc(l.nome)}"></div>
+      <div class="field"><label for="f-cols">Campos (um por linha)</label><textarea id="f-cols" name="cols" class="input" style="min-height:160px">${esc(l.colunas.join("\n"))}</textarea></div>
+      <div class="row sheet-foot" style="flex-wrap:wrap">${lid ? `<button type="button" class="btn ghost danger sm" data-act="localDel" data-arg="${esc(lid)}">${ic("trash")}Apagar local</button>` : ""}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
+}
+document.addEventListener("submit", ev => {
+  const f = ev.target, kind = f.dataset.form; if (!kind) return;
+  ev.preventDefault();
+  const I = inc(), fd = new FormData(f);
+  if (kind === "item") {
+    const l = I.locais.find(x => x.id === f.dataset.l); if (!l) return;
+    const nome = String(fd.get("nome") || "").trim(); if (!nome) { toast("Dê um nome ao item"); return; }
+    const campos = {}; for (const [k, v] of fd.entries()) if (k.startsWith("c:") && String(v).trim()) campos[k.slice(2)] = String(v).trim();
+    const obs = String(fd.get("obs") || "").trim();
+    if (f.dataset.i) Object.assign(l.itens.find(x => x.id === f.dataset.i), {nome, campos, obs});
+    else l.itens.push({id:l.id + "-" + uid(), nome, campos, obs});
+  } else if (kind === "local") {
+    const nome = String(fd.get("nome") || "").trim(); if (!nome) { toast("Dê um nome ao local"); return; }
+    const colunas = [...new Set(String(fd.get("cols") || "").split("\n").map(s => s.trim()).filter(Boolean))];
+    if (f.dataset.l) Object.assign(I.locais.find(x => x.id === f.dataset.l), {nome, colunas});
+    else { const id = norm(nome).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + uid(); I.locais.push({id, nome, colunas, itens:[]}); S.local = id; }
+  }
+  putContent("incumbencias"); closeModal(); render(); toast("Salvo");
+});
+
+/* ---------- equipe (admin) ---------- */
+function viewEquipe(){
+  const pend = S.members.filter(m => !m.approved), ok = S.members.filter(m => m.approved);
+  const row = m => `<div class="item" style="cursor:default"><div class="item-main"><b>${esc(m.nome || (m.email || "").split("@")[0])}</b><span class="sub">${esc(m.email || "")}</span></div>
+    ${m.role === "admin" ? `<span class="pill accent">Encarregado</span>` : m.approved ? `<button class="btn sm ghost danger" data-act="memberOff" data-arg="${m.user_id}">Remover acesso</button>` : `<button class="btn sm primary" data-act="memberOn" data-arg="${m.user_id}">${ic("check")}Liberar</button><button class="iconbtn" data-act="memberDel" data-arg="${m.user_id}" aria-label="Recusar">${ic("x")}</button>`}</div>`;
+  return `<div class="page-h"><span class="eyebrow">Acesso</span><h1>Equipe</h1><p class="sub" style="font-size:15px">Quem cria conta no app fica aguardando até você liberar. Militares liberados veem o Bem-vindo a Bordo. As incumbências continuam só com você.</p></div>
+    <div class="row"><button class="btn sm" data-act="membersReload">${ic("reset")}Atualizar</button></div>
+    <div class="card"><div class="card-h"><h2>Aguardando liberação</h2><span class="pill ${pend.length ? "warn" : ""}">${pend.length}</span></div><div class="items">${pend.map(row).join("") || `<div class="empty">Ninguém aguardando.</div>`}</div></div>
+    <div class="card"><div class="card-h"><h2>Com acesso</h2><span class="pill">${ok.length}</span></div><div class="items">${ok.map(row).join("")}</div></div>`;
+}
+async function memberUpdate(id, patch){
+  const r = patch ? await sb.from("alm_members").update(patch).eq("user_id", id) : await sb.from("alm_members").delete().eq("user_id", id);
+  if (r.error) { toast(navigator.onLine ? "Não deu certo agora" : "Sem conexão"); return; }
+  await loadMembers(); render();
+}
+
+/* ---------- conta ---------- */
+function installNote(){
+  if (matchMedia("(display-mode: standalone)").matches || navigator.standalone) return `<div class="note good">${ic("check")}<span>App instalado neste aparelho.</span></div>`;
+  if (INSTALL_EVT) return `<button class="btn primary" data-act="install">${ic("download")}Instalar o app</button>`;
+  return `<div class="note">${ic("info")}<span><b>Instalar no celular:</b> no iPhone, abra no Safari, toque em Compartilhar e depois em <b>Adicionar à Tela de Início</b>. No Android, toque nos três pontinhos do Chrome e depois em <b>Instalar app</b>.</span></div>`;
+}
+function viewConta(){
+  return `<div class="page-h"><span class="eyebrow">Sua conta</span><h1>Conta</h1></div>
+    <div class="card col"><div><b>${esc(S.user.email || "")}</b><div class="sub">${isAdmin() ? "Encarregado da divisão" : isMember() ? "Acesso liberado" : "Aguardando liberação"}</div></div>
+      <div class="field"><label for="f-nick">Nome de guerra</label><div class="row"><input id="f-nick" class="input" maxlength="40" value="${esc((S.member && S.member.nome) || "")}"><button class="btn" data-act="saveNick">Salvar</button></div></div>
+      <div class="note">${ic("lock")}<span>O conteúdo fica guardado neste aparelho para abrir sem internet. Ao sair da conta, ele é apagado do aparelho.</span></div>
+      ${installNote()}
+      <button class="btn ghost danger" data-act="logout" style="align-self:flex-start">${ic("logout")}Sair da conta</button></div>`;
+}
+
+/* ======================= AÇÕES ======================= */
+let INSTALL_EVT = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL_EVT = e; });
+const ACT = {
+  tab(a){ S.tab = a; S.mod = null; S.local = null; S.q = ""; render(); scrollTo(0, 0); },
+  mod(a){ S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
+  modBack(){ S.mod = null; render(); },
+  local(a){ S.local = a; render(); scrollTo(0, 0); },
+  localBack(){ S.local = null; render(); },
+  item(a, el){ itemModal(a, el.dataset.i); },
+  itemNew(a){ itemModal(a); },
+  itemDel(a, el){ if (!confirm("Apagar este item?")) return; const l = inc().locais.find(x => x.id === a); l.itens = l.itens.filter(x => x.id !== el.dataset.i); putContent("incumbencias"); closeModal(); render(); },
+  localNew(){ localModal(); },
+  localEdit(a){ localModal(a); },
+  localDel(a){ const I = inc(), l = I.locais.find(x => x.id === a); if (!confirm(`Apagar o local "${l.nome}" e os ${l.itens.length} itens dele?`)) return; I.locais = I.locais.filter(x => x.id !== a); S.local = null; putContent("incumbencias"); closeModal(); render(); },
+  step(a, el){ const all = lsGet(STEPS, {}), d = all[a] || [], i = +el.dataset.i; all[a] = d.includes(i) ? d.filter(x => x !== i) : [...d, i]; lsSet(STEPS, all); const y = scrollY; render(); scrollTo(0, y); },
+  stepReset(a){ const all = lsGet(STEPS, {}); delete all[a]; lsSet(STEPS, all); const y = scrollY; render(); scrollTo(0, y); },
+  memberOn(a){ memberUpdate(a, {approved:true}); },
+  memberOff(a){ if (confirm("Remover o acesso deste militar?")) memberUpdate(a, {approved:false}); },
+  memberDel(a){ if (confirm("Recusar este pedido?")) memberUpdate(a, null); },
+  async membersReload(){ await loadMembers(); render(); },
+  async recheck(){ try { await fetchAll(); render(); if (!isMember()) toast("Ainda aguardando liberação"); } catch (e) { toast("Sem conexão"); } },
+  async saveNick(){ const v = $("#f-nick").value.trim().slice(0, 40); const r = await sb.rpc("alm_set_nome", {novo:v}); if (r.error) { toast(navigator.onLine ? "Não deu certo agora" : "Sem conexão"); return; } S.member.nome = v; saveCache(); render(); toast("Salvo"); },
+  async logout(){
+    if (Object.keys(lsGet(PEND, {})).length && !confirm("Há alterações que ainda não foram enviadas. Sair mesmo assim?")) return;
+    if (S.user) lsSet(CACHE(S.user.id), null);
+    lsSet(PEND, null); lsSet(LAST, null);
+    S.user = null; S.member = null; S.content = {}; S.offline = false;
+    try { await sb.auth.signOut(); } catch (e) {}
+    AUTH.mode = "entrar"; showGate();
+  },
+  async install(){ if (!INSTALL_EVT) return; INSTALL_EVT.prompt(); await INSTALL_EVT.userChoice; INSTALL_EVT = null; render(); },
+  authMode(a){ AUTH.mode = a; AUTH.msg = ""; AUTH.ok = ""; showGate(); },
+  close(){ closeModal(); }
+};
+document.addEventListener("click", ev => {
+  if (ev.target.matches("[data-scrim]")) { closeModal(); return; }
+  const el = ev.target.closest("[data-act]"); if (!el) return;
+  const fn = ACT[el.dataset.act]; if (fn) { ev.preventDefault(); fn(el.dataset.arg, el); }
+});
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") closeModal(); });
+document.addEventListener("input", ev => {
+  if (ev.target.id === "inc-q") { S.q = ev.target.value; const pos = ev.target.selectionStart; render(); const i = $("#inc-q"); if (i) { i.focus(); i.setSelectionRange(pos, pos); } }
+});
+
+/* Início: sem sessão salva mostra a entrada; com sessão o Supabase avisa pelo onAuthStateChange. */
+if (!hasToken()) showGate();
+if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
