@@ -282,6 +282,7 @@ const ICONS = {
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', reset:'<path d="M4 4v6h6"/><path d="M4.5 15a8 8 0 1 0 1.9-8.4L4 10"/>',
   logout:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', book:'<path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+  pdf:'<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
 };
@@ -586,6 +587,7 @@ function viewInc(){
   }
   return `<div class="page-h"><span class="eyebrow">${ic("lock").replace('<svg','<svg style="display:inline;vertical-align:-2px" width="12" height="12"')} Só você vê</span><h1>Incumbências</h1><p class="sub" style="font-size:15px">Material de cada local da divisão. Toque em um item para preencher as medidas.</p></div>
     <div class="search">${ic("search")}<input class="input" id="inc-q" type="search" placeholder="Buscar item, local ou medida" value="${esc(S.q)}" autocomplete="off"></div>
+    ${results ? "" : `<div class="row"><button class="btn sm" data-act="pdf" data-arg="">${ic("pdf")}PDF de todas as incumbências</button></div>`}
     ${results || `<div class="grid">${I.locais.map(l => { const s = incStats(l); return `<button class="tile" data-act="local" data-arg="${esc(l.id)}"><b>${esc(l.nome)}</b><div class="sub">${l.itens.length} ${l.itens.length === 1 ? "item" : "itens"}</div><div class="foot"><div class="bar"><i style="width:${s.pct}%"></i></div><span class="num sub">${s.pct}%</span></div></button>`; }).join("")}
       <button class="tile" data-act="localNew" style="align-items:center;justify-content:center;border-style:dashed;color:var(--muted)">${ic("plus")}<span>Novo local</span></button></div>`}`;
 }
@@ -606,7 +608,7 @@ function viewLocal(l){
     <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1>${l.descricao ? `<p class="sub" style="font-size:15px">${esc(l.descricao)}</p>` : ""}<p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
     ${(l.checklists || []).map(c => `<details class="sec" data-chk="${esc(c.id)}" ${OPEN_CHK.includes(c.id) ? "open" : ""}><summary><span class="sec-n">${ic("check").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(c.titulo)}</b><span class="pill">${stepsDone(c.id).length}/${c.itens.length}</span>${ic("down")}</summary><div class="sec-body">${blk({tipo:"passos", id:c.id, itens:c.itens})}</div></details>`).join("")}
     ${S.sel ? `<div class="note">${ic("folder")}<span>Toque nos itens que quer juntar e depois em <b>Mover para pasta</b>.</span></div>`
-      : `<div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="organize">${ic("folder")}Organizar em pastas</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button></div>`}
+      : `<div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="organize">${ic("folder")}Organizar em pastas</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button><button class="btn sm" data-act="pdf" data-arg="${esc(l.id)}">${ic("pdf")}Gerar PDF</button></div>`}
     ${pastasDe(l).map(pa => { const its = l.itens.filter(it => it.pasta === pa), open = S.sel || OPEN_PASTA.includes(l.id + "/" + pa);
       return `<details class="sec folder" data-pasta="${esc(l.id + "/" + pa)}" ${open ? "open" : ""}><summary><span class="sec-n">${ic("folder").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(pa)}</b><span class="pill">${its.length}</span>${S.sel ? "" : `<span class="iconbtn sm" role="button" tabindex="0" data-act="pastaEdit" data-arg="${esc(pa)}" aria-label="Editar pasta e campos">${ic("edit")}</span>`}${ic("down")}</summary><div class="sec-body"><div class="items">${its.map(it => itemRow(l, it)).join("")}</div></div></details>`; }).join("")}
     <div class="items">${l.itens.filter(it => !it.pasta).map(it => itemRow(l, it)).join("") || (l.itens.length ? "" : `<div class="empty">Nenhum item.</div>`)}</div>
@@ -702,6 +704,113 @@ document.addEventListener("submit", ev => {
   putContent("incumbencias"); closeModal(); render(); toast("Salvo");
 });
 
+/* ---------- PDF das incumbências ---------- */
+/* jsPDF fica em vendor/ e entra no cache do app, então o PDF também sai sem internet. */
+const loadScript = src => new Promise((res, rej) => { if (document.querySelector(`script[src="${src}"]`)) return res(); const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+async function pdfLib(){
+  if (!window.jspdf) await loadScript("vendor/jspdf.umd.min.js");
+  if (!window.jspdf.jsPDF.API.autoTable) await loadScript("vendor/jspdf.plugin.autotable.min.js");
+  return window.jspdf.jsPDF;
+}
+const PDFC = {navy:[11,29,46], navy2:[21,41,61], brass:[201,143,42], brassL:[240,203,115], ink:[25,32,40], muted:[96,110,125], line:[214,220,228], soft:[243,245,248], soft2:[250,247,238]};
+async function gerarPDF(lid){
+  const jsPDF = await pdfLib(), I = inc();
+  const locais = lid ? I.locais.filter(l => l.id === lid) : I.locais;
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const W = 210, H = 297, M = 16, quando = new Date().toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"});
+  const fill = c => doc.setFillColor(...c), color = c => doc.setTextColor(...c), draw = c => doc.setDrawColor(...c);
+  let y = 0, runTitle = "";
+  const newPage = () => { doc.addPage(); y = 24; miniHead(); };
+  const miniHead = () => { fill(PDFC.navy); doc.rect(0, 0, W, 12, "F"); fill(PDFC.brass); doc.rect(0, 12, W, 0.8, "F"); color(PDFC.brassL); doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.text("ALMANAQUE DA PRIMEIRA DIVISÃO", M, 7.6); color([255,255,255]); doc.text(runTitle, W - M, 7.6, {align:"right"}); };
+  const need = h => { if (y + h > H - 18) newPage(); };
+  const bigHead = (eyebrow, title, sub) => {
+    fill(PDFC.navy); doc.rect(0, 0, W, 46, "F"); fill(PDFC.brass); doc.rect(0, 46, W, 1.2, "F");
+    color(PDFC.brassL); doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.text(eyebrow, M, 15);
+    color([255,255,255]); doc.setFontSize(24); doc.text(title, M, 28);
+    color([190,204,218]); doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.text(sub, M, 37);
+    y = 58;
+  };
+  const stats = boxes => {
+    const gap = 4, bw = (W - 2 * M - gap * (boxes.length - 1)) / boxes.length;
+    boxes.forEach(([n, lbl], i) => { const x = M + i * (bw + gap); fill(PDFC.soft); draw(PDFC.line); doc.roundedRect(x, y, bw, 18, 2, 2, "FD");
+      color(PDFC.navy); doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.text(String(n), x + 5, y + 9.5);
+      color(PDFC.muted); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.text(lbl, x + 5, y + 14.5); });
+    y += 26;
+  };
+  const para = (t, size = 10, c = PDFC.ink) => { doc.setFont("helvetica", "normal"); doc.setFontSize(size); color(c); const lines = doc.splitTextToSize(t, W - 2 * M); need(lines.length * size * 0.45 + 2); doc.text(lines, M, y); y += lines.length * size * 0.42 + 4; };
+  const secBar = (t, right) => { need(16); fill(PDFC.navy2); doc.roundedRect(M, y, W - 2 * M, 9, 1.5, 1.5, "F"); fill(PDFC.brass); doc.rect(M, y, 1.6, 9, "F");
+    color([255,255,255]); doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); doc.text(t, M + 5, y + 6.1);
+    if (right) { color(PDFC.brassL); doc.setFontSize(8.5); doc.text(right, W - M - 4, y + 6.1, {align:"right"}); } y += 13; };
+  const checklist = c => {
+    need(14); color(PDFC.navy); doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text(c.titulo, M, y); y += 2;
+    draw(PDFC.brass); doc.setLineWidth(0.5); doc.line(M, y, M + 30, y); y += 5;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); color(PDFC.ink);
+    c.itens.forEach((t, i) => { const lines = doc.splitTextToSize(t, W - 2 * M - 9); const h = lines.length * 4.2 + 2.4; need(h);
+      draw(PDFC.muted); doc.setLineWidth(0.3); doc.rect(M, y - 3.2, 3.8, 3.8); doc.text(lines, M + 7, y); y += h; });
+    y += 4;
+  };
+  const itemTable = (l, it) => {
+    const cols = itemCols(l, it), body = cols.map(c => [c, (it.campos || {})[c] || ""]);
+    if (it.obs) body.push([{content:"Observações", styles:{fontStyle:"bold"}}, it.obs]);
+    if (!body.length) body.push(["", ""]);
+    const est = 11 + body.reduce((a, r) => a + 8.8 + (String(r[1]).split("\n").length - 1) * 4.5, 0);
+    need(Math.min(est, 120));
+    doc.autoTable({
+      startY:y, margin:{left:M, right:M, top:20, bottom:18}, theme:"grid",
+      head:[[{content:it.nome, colSpan:2}]], body,
+      styles:{font:"helvetica", fontSize:9.5, cellPadding:{top:2.2, bottom:2.2, left:3, right:3}, lineColor:PDFC.line, lineWidth:0.25, textColor:PDFC.ink, minCellHeight:7.5, valign:"middle"},
+      headStyles:{fillColor:PDFC.soft2, textColor:PDFC.navy, fontStyle:"bold", fontSize:10.5, lineColor:PDFC.line},
+      columnStyles:{0:{cellWidth:55, fillColor:PDFC.soft, textColor:PDFC.muted, fontSize:8.8}, 1:{fontStyle:"normal"}},
+      rowPageBreak:"avoid", showHead:"everyPage",
+      didDrawPage:d => { if (d.pageNumber > 1) miniHead(); }
+    });
+    y = doc.lastAutoTable.finalY + 5;
+  };
+  const renderLocal = (l, first) => {
+    runTitle = l.nome;
+    if (!first) doc.addPage();
+    START.push(doc.getCurrentPageInfo().pageNumber);
+    const s = incStats(l), ps = pastasDe(l);
+    bigHead("INCUMBÊNCIA · ALMANAQUE DA PRIMEIRA DIVISÃO", l.nome, `Gerado em ${quando}`);
+    stats([[l.itens.length, "itens"], [ps.length || "—", "pastas"], [s.pct + "%", "medidas preenchidas"]]);
+    if (l.descricao) para(l.descricao, 10, PDFC.muted);
+    (l.checklists || []).forEach(checklist);
+    ps.forEach(pa => { const its = l.itens.filter(it => it.pasta === pa); secBar(pa, its.length + (its.length === 1 ? " item" : " itens")); its.forEach(it => itemTable(l, it)); y += 2; });
+    const soltos = l.itens.filter(it => !it.pasta);
+    if (soltos.length) { if (ps.length) secBar("Outros itens", soltos.length + (soltos.length === 1 ? " item" : " itens")); soltos.forEach(it => itemTable(l, it)); }
+    if (!l.itens.length) para("Nenhum item cadastrado.", 10, PDFC.muted);
+  };
+  START.length = 0;
+  if (lid) renderLocal(locais[0], true);
+  else {
+    runTitle = "Incumbências";
+    const tot = locais.reduce((a, l) => { const s = incStats(l); a.f += s.f; a.t += s.total; a.n += l.itens.length; return a; }, {f:0, t:0, n:0});
+    bigHead("ALMANAQUE DA PRIMEIRA DIVISÃO", "Incumbências", `Gerado em ${quando}`);
+    stats([[locais.length, "locais"], [tot.n, "itens"], [(tot.t ? Math.round(tot.f / tot.t * 100) : 0) + "%", "medidas preenchidas"]]);
+    color(PDFC.navy); doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("Sumário", M, y); y += 4;
+    const tocY = y;
+    doc.autoTable({startY:y, margin:{left:M, right:M, bottom:18}, theme:"plain", head:[["Local", "Itens", "Preenchido", "Página"]],
+      body:locais.map(l => [l.nome, String(l.itens.length), incStats(l).pct + "%", ""]),
+      styles:{fontSize:10, cellPadding:2.6, textColor:PDFC.ink}, headStyles:{textColor:PDFC.muted, fontSize:8.5, fontStyle:"bold"},
+      columnStyles:{1:{halign:"right", cellWidth:22}, 2:{halign:"right", cellWidth:28}, 3:{halign:"right", cellWidth:22}},
+      didDrawCell:d => { if (d.section === "body") { draw(PDFC.line); doc.setLineWidth(0.2); doc.line(d.cell.x, d.cell.y + d.cell.height, d.cell.x + d.cell.width, d.cell.y + d.cell.height); } }});
+    const rows = doc.lastAutoTable.body.map(r => r.cells[3]), tocPage = doc.getCurrentPageInfo().pageNumber;
+    START.length = 0;
+    locais.forEach(l => renderLocal(l, false));
+    doc.setPage(tocPage); color(PDFC.navy); doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+    START.forEach((pg, i) => { const c = rows[i]; if (c) doc.text(String(pg), c.x + c.width - 2.6, c.y + c.height / 2 + 1.3, {align:"right"}); });
+    START.length = 0;
+  }
+  const n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) { doc.setPage(i); draw(PDFC.line); doc.setLineWidth(0.3); doc.line(M, H - 12, W - M, H - 12);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8); color(PDFC.muted); doc.text("Uso interno · Primeira Divisão", M, H - 7.5); doc.text(`Página ${i} de ${n}`, W - M, H - 7.5, {align:"right"}); }
+  const nome = "Incumbencias-" + norm(lid ? locais[0].nome : "todas").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".pdf";
+  const blob = doc.output("blob"), file = new File([blob], nome, {type:"application/pdf"});
+  if (navigator.canShare && navigator.canShare({files:[file]}) && matchMedia("(pointer:coarse)").matches) { try { await navigator.share({files:[file], title:nome}); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+  doc.save(nome);
+}
+const START = [];
+
 /* ---------- equipe (admin) ---------- */
 function viewEquipe(){
   const pend = S.members.filter(m => !m.approved), ok = S.members.filter(m => m.approved);
@@ -743,6 +852,11 @@ const ACT = {
   local(a){ S.local = a; render(); scrollTo(0, 0); },
   localBack(){ S.local = null; S.sel = null; render(); },
   organize(){ S.sel = []; render(); },
+  async pdf(a, el){
+    if (el.disabled) return; const old = el.innerHTML; el.disabled = true; el.innerHTML = "Gerando…";
+    try { await gerarPDF(a || null); } catch (e) { console.warn(e); toast("Não foi possível gerar o PDF"); }
+    el.disabled = false; el.innerHTML = old;
+  },
   fieldDel(a, el){ el.closest(".frow").remove(); },
   fieldAdd(){
     const i = $("#f-newcol"), c = i.value.trim().slice(0, 40); if (!c) { i.focus(); return; }
