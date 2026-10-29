@@ -191,6 +191,16 @@ td:last-child{font-family:var(--f-mono)}
 .kv em{font-style:normal;color:var(--ink);font-family:var(--f-mono);font-size:12.5px}
 .item>svg{width:18px;height:18px;color:var(--faint);flex:none}
 .empty{color:var(--faint);font-size:13px}
+.folder>summary .iconbtn.sm{width:32px;height:32px;border-radius:9px}
+.folder>summary .iconbtn.sm svg{width:15px;height:15px}
+.folder .sec-body{padding:0 10px 10px}
+.tick{width:24px;height:24px;border-radius:7px;border:2px solid var(--faint);flex:none;display:flex;align-items:center;justify-content:center}
+.tick svg{width:15px;height:15px}
+.item.picked{border-color:rgba(227,181,74,.55);background:var(--accent-soft)}
+.item.picked .tick{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.selbar{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:#132A40;border:1px solid rgba(227,181,74,.35);box-shadow:var(--shadow)}
+.selbar>span{margin-right:auto;font-size:14px}
+@media (min-width:821px){.selbar{bottom:16px}}
 .ring{width:42px;height:42px;flex:none}
 
 /* modal */
@@ -263,6 +273,7 @@ const ICONS = {
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', reset:'<path d="M4 4v6h6"/><path d="M4.5 15a8 8 0 1 0 1.9-8.4L4 10"/>',
   logout:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', book:'<path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
@@ -563,7 +574,11 @@ function viewInc(){
 }
 function itemRow(l, it, showLocal){
   const filled = l.colunas.filter(c => String((it.campos || {})[c] || "").trim());
-  return `<button class="item" data-act="item" data-arg="${esc(l.id)}" data-i="${esc(it.id)}"><div class="item-main"><b>${esc(it.nome)}</b>${showLocal ? `<span class="sub">${esc(l.nome)}</span>` : ""}
+  if (S.sel) {
+    const on = S.sel.includes(it.id);
+    return `<button class="item ${on ? "picked" : ""}" data-act="pick" data-arg="${esc(it.id)}" aria-pressed="${on}"><span class="tick">${on ? ic("check") : ""}</span><div class="item-main"><b>${esc(it.nome)}</b>${filled.length ? `<span class="sub">${filled.length}/${l.colunas.length} medidas</span>` : ""}</div></button>`;
+  }
+  return `<button class="item" data-act="item" data-arg="${esc(l.id)}" data-i="${esc(it.id)}"><div class="item-main"><b>${esc(it.nome)}</b>${showLocal ? `<span class="sub">${esc(l.nome)}${it.pasta ? " › " + esc(it.pasta) : ""}</span>` : ""}
     ${filled.length ? `<div class="kv">${filled.map(c => `<span>${esc(c)}: <em>${esc(it.campos[c])}</em></span>`).join("")}</div>` : `<span class="empty">Sem medidas ainda</span>`}
     ${it.obs ? `<div class="sub" style="white-space:pre-line;font-size:13px">${esc(it.obs.length > 140 ? it.obs.slice(0, 140) + "…" : it.obs)}</div>` : ""}</div>
     <span class="pill ${filled.length === l.colunas.length ? "good" : ""}">${filled.length}/${l.colunas.length}</span>${ic("chev")}</button>`;
@@ -573,8 +588,42 @@ function viewLocal(l){
   return `<button class="back" data-act="localBack">${ic("left")}Incumbências</button>
     <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1>${l.descricao ? `<p class="sub" style="font-size:15px">${esc(l.descricao)}</p>` : ""}<p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
     ${(l.checklists || []).map(c => `<details class="sec" data-chk="${esc(c.id)}" ${OPEN_CHK.includes(c.id) ? "open" : ""}><summary><span class="sec-n">${ic("check").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(c.titulo)}</b><span class="pill">${stepsDone(c.id).length}/${c.itens.length}</span>${ic("down")}</summary><div class="sec-body">${blk({tipo:"passos", id:c.id, itens:c.itens})}</div></details>`).join("")}
-    <div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button></div>
-    <div class="items">${l.itens.map(it => itemRow(l, it)).join("") || `<div class="empty">Nenhum item.</div>`}</div>`;
+    ${S.sel ? `<div class="note">${ic("folder")}<span>Toque nos itens que quer juntar e depois em <b>Mover para pasta</b>.</span></div>`
+      : `<div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="organize">${ic("folder")}Organizar em pastas</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button></div>`}
+    ${pastasDe(l).map(pa => { const its = l.itens.filter(it => it.pasta === pa), open = S.sel || OPEN_PASTA.includes(l.id + "/" + pa);
+      return `<details class="sec folder" data-pasta="${esc(l.id + "/" + pa)}" ${open ? "open" : ""}><summary><span class="sec-n">${ic("folder").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(pa)}</b><span class="pill">${its.length}</span>${S.sel ? "" : `<span class="iconbtn sm" role="button" tabindex="0" data-act="pastaEdit" data-arg="${esc(pa)}" aria-label="Renomear pasta">${ic("edit")}</span>`}${ic("down")}</summary><div class="sec-body"><div class="items">${its.map(it => itemRow(l, it)).join("")}</div></div></details>`; }).join("")}
+    <div class="items">${l.itens.filter(it => !it.pasta).map(it => itemRow(l, it)).join("") || (l.itens.length ? "" : `<div class="empty">Nenhum item.</div>`)}</div>
+    ${S.sel ? `<div class="selbar"><span><b class="num">${S.sel.length}</b> ${S.sel.length === 1 ? "item" : "itens"}</span><button class="btn sm ghost" data-act="organizeEnd">Cancelar</button><button class="btn sm primary" data-act="moveOpen" ${S.sel.length ? "" : "disabled"}>${ic("folder")}Mover para pasta</button></div>` : ""}`;
+}
+/* Pastas: cada item guarda o nome da pasta em "pasta"; a ordem segue a primeira aparição. */
+const pastasDe = l => [...new Set(l.itens.map(it => it.pasta).filter(Boolean))];
+let OPEN_PASTA = [];
+document.addEventListener("toggle", ev => {
+  const d = ev.target; if (!d.matches || !d.matches("details[data-pasta]") || S.sel) return;
+  const k = d.dataset.pasta; OPEN_PASTA = OPEN_PASTA.filter(x => x !== k); if (d.open) OPEN_PASTA.push(k);
+}, true);
+const curLocal = () => inc().locais.find(x => x.id === S.local);
+function moveModal(){
+  const l = curLocal(), ps = pastasDe(l);
+  openModal(`${sheetHead("Mover para pasta", `${S.sel.length} ${S.sel.length === 1 ? "item" : "itens"} de ${l.nome}`)}
+    <form class="col" data-form="move">
+      ${ps.length ? `<div class="field"><label>Pastas deste local</label><div class="chips">${ps.map(p => `<button type="button" class="btn sm" data-act="moveTo" data-arg="${esc(p)}">${ic("folder")}${esc(p)}</button>`).join("")}</div></div>` : ""}
+      <div class="field"><label for="f-pasta">${ps.length ? "Ou crie uma pasta nova" : "Nome da pasta"}</label><input id="f-pasta" name="pasta" class="input" maxlength="40" placeholder="Ex.: Espias"></div>
+      <div class="row sheet-foot" style="flex-wrap:wrap"><button type="button" class="btn ghost sm" data-act="moveTo" data-arg="">Tirar da pasta</button><button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Mover</button></div>
+    </form>`);
+}
+function moveTo(pasta){
+  const l = curLocal(); pasta = String(pasta || "").trim().slice(0, 40);
+  l.itens.forEach(it => { if (S.sel.includes(it.id)) { if (pasta) it.pasta = pasta; else delete it.pasta; } });
+  if (pasta) OPEN_PASTA.push(l.id + "/" + pasta);
+  S.sel = null; putContent("incumbencias"); closeModal(); render(); toast(pasta ? `Movido para ${pasta}` : "Tirado da pasta");
+}
+function pastaModal(pa){
+  openModal(`${sheetHead("Pasta", "Apagar a pasta não apaga os itens: eles voltam para a lista do local.")}
+    <form class="col" data-form="pasta" data-old="${esc(pa)}">
+      <div class="field"><label for="f-pn">Nome da pasta</label><input id="f-pn" name="nome" class="input" maxlength="40" value="${esc(pa)}"></div>
+      <div class="row sheet-foot" style="flex-wrap:wrap"><button type="button" class="btn ghost danger sm" data-act="pastaDel" data-arg="${esc(pa)}">${ic("trash")}Apagar pasta</button><button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
 }
 function itemModal(lid, iid){
   const l = inc().locais.find(x => x.id === lid); if (!l) return;
@@ -584,6 +633,7 @@ function itemModal(lid, iid){
       <div class="field"><label for="f-nome">Nome do item</label><input id="f-nome" name="nome" class="input" required maxlength="80" value="${esc(it.nome)}"></div>
       <div class="fields2">${l.colunas.map((c, k) => `<div class="field"><label for="f-c${k}">${esc(c)}</label><input id="f-c${k}" class="input" name="c:${esc(c)}" maxlength="120" value="${esc((it.campos || {})[c] || "")}"></div>`).join("")}</div>
       <div class="field"><label for="f-obs">Observações</label><textarea id="f-obs" name="obs" class="input" maxlength="2000">${esc(it.obs || "")}</textarea></div>
+      <div class="field"><label for="f-ip">Pasta (opcional)</label><input id="f-ip" name="pasta" class="input" maxlength="40" list="dl-pastas" value="${esc(it.pasta || "")}" placeholder="Sem pasta"><datalist id="dl-pastas">${pastasDe(l).map(p => `<option value="${esc(p)}">`).join("")}</datalist></div>
       <div class="row sheet-foot" style="flex-wrap:wrap">${iid ? `<button type="button" class="btn ghost danger sm" data-act="itemDel" data-arg="${esc(lid)}" data-i="${esc(iid)}">${ic("trash")}Apagar</button>` : ""}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
     </form>`);
 }
@@ -604,9 +654,15 @@ document.addEventListener("submit", ev => {
     const l = I.locais.find(x => x.id === f.dataset.l); if (!l) return;
     const nome = String(fd.get("nome") || "").trim(); if (!nome) { toast("Dê um nome ao item"); return; }
     const campos = {}; for (const [k, v] of fd.entries()) if (k.startsWith("c:") && String(v).trim()) campos[k.slice(2)] = String(v).trim();
-    const obs = String(fd.get("obs") || "").trim();
-    if (f.dataset.i) Object.assign(l.itens.find(x => x.id === f.dataset.i), {nome, campos, obs});
-    else l.itens.push({id:l.id + "-" + uid(), nome, campos, obs});
+    const obs = String(fd.get("obs") || "").trim(), pasta = String(fd.get("pasta") || "").trim().slice(0, 40);
+    const it = f.dataset.i ? Object.assign(l.itens.find(x => x.id === f.dataset.i), {nome, campos, obs}) : {id:l.id + "-" + uid(), nome, campos, obs};
+    if (pasta) it.pasta = pasta; else delete it.pasta;
+    if (!f.dataset.i) l.itens.push(it);
+  } else if (kind === "move") { moveTo(fd.get("pasta")); return;
+  } else if (kind === "pasta") {
+    const nv = String(fd.get("nome") || "").trim().slice(0, 40); if (!nv) { toast("Dê um nome à pasta"); return; }
+    curLocal().itens.forEach(it => { if (it.pasta === f.dataset.old) it.pasta = nv; });
+    OPEN_PASTA.push(S.local + "/" + nv);
   } else if (kind === "local") {
     const nome = String(fd.get("nome") || "").trim(); if (!nome) { toast("Dê um nome ao local"); return; }
     const colunas = [...new Set(String(fd.get("cols") || "").split("\n").map(s => s.trim()).filter(Boolean))];
@@ -651,11 +707,18 @@ function viewConta(){
 let INSTALL_EVT = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL_EVT = e; });
 const ACT = {
-  tab(a){ S.tab = a; S.mod = null; S.local = null; S.q = ""; render(); scrollTo(0, 0); },
+  tab(a){ S.tab = a; S.mod = null; S.local = null; S.sel = null; S.q = ""; render(); scrollTo(0, 0); },
   mod(a){ S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
   modBack(){ S.mod = null; render(); },
   local(a){ S.local = a; render(); scrollTo(0, 0); },
-  localBack(){ S.local = null; render(); },
+  localBack(){ S.local = null; S.sel = null; render(); },
+  organize(){ S.sel = []; render(); },
+  organizeEnd(){ S.sel = null; render(); },
+  pick(a){ S.sel = S.sel.includes(a) ? S.sel.filter(x => x !== a) : [...S.sel, a]; const y = scrollY; render(); scrollTo(0, y); },
+  moveOpen(){ if (S.sel && S.sel.length) moveModal(); },
+  moveTo(a){ moveTo(a); },
+  pastaEdit(a){ pastaModal(a); },
+  pastaDel(a){ curLocal().itens.forEach(it => { if (it.pasta === a) delete it.pasta; }); putContent("incumbencias"); closeModal(); render(); toast("Pasta apagada"); },
   item(a, el){ itemModal(a, el.dataset.i); },
   itemNew(a){ itemModal(a); },
   itemDel(a, el){ if (!confirm("Apagar este item?")) return; const l = inc().locais.find(x => x.id === a); l.itens = l.itens.filter(x => x.id !== el.dataset.i); putContent("incumbencias"); closeModal(); render(); },
