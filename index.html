@@ -198,6 +198,17 @@ td:last-child{font-family:var(--f-mono)}
 .sec-title h2{font-family:var(--f-display);font-size:18px;font-weight:800;margin-right:auto}
 .sec-title .btn svg{width:16px;height:16px}
 .tile.soon{border-style:dashed;background:none;color:var(--muted)}
+.blk-edit{position:relative;padding-right:40px}
+.blk-edit>.iconbtn{position:absolute;top:0;right:0}
+.iconbtn.sm{width:32px;height:32px;border-radius:9px}
+.iconbtn.sm svg{width:15px;height:15px}
+select.input{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.grid.mini{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.grid.mini .tile{min-height:0}
+.linkcard{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;border:1px solid rgba(61,220,151,.35);background:linear-gradient(135deg,rgba(61,220,151,.10),rgba(255,255,255,.02));color:var(--ink);text-decoration:none}
+.linkcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:2px}
+.linkcard .tile-i{background:rgba(61,220,151,.15);color:var(--good)}
+.linkcard>svg{width:18px;height:18px;color:var(--muted);flex:none}
 .tile.soon .tile-i{background:var(--glass);color:var(--faint)}
 .emblems{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .emblem{display:flex;gap:16px;align-items:center;padding:16px;border-radius:var(--r);border:1px solid rgba(227,181,74,.22);background:linear-gradient(135deg,rgba(226,85,60,.10),rgba(255,255,255,.02))}
@@ -311,6 +322,12 @@ const ICONS = {
   logout:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', book:'<path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
   pdf:'<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  external:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  ship:'<path d="M3 17l2 3h14l2-3H3zM6 17V9h12v8M9 9V5h6v4M12 5V2"/>',
+  bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  up:'<path d="M6 15l6-6 6 6"/>',
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
 };
@@ -551,15 +568,19 @@ const ART = {
 /* Seções do Bem-vindo já abertas pelo militar neste aparelho, para mostrar o progresso do guia. */
 const LIDAS = "alm-lidas";
 const lidas = id => lsGet(LIDAS, {})[id] || [];
+/* Módulos do Bem-vindo: "chegada" (o guia em si) ou "mais" (Mais a bordo). "embreve" mostra o módulo como em preparação. */
+const guia = mods => mods.filter(m => (m.grupo || "chegada") === "chegada");
+const maisBordo = mods => mods.filter(m => m.grupo === "mais");
 function modProgress(m){ const n = (m.secoes || []).length, r = lidas(m.id).filter(i => i < n).length; return {n, r, pct:n ? Math.round(r / n * 100) : 0}; }
 
 function viewHome(){
   const b = bem(), I = inc();
   const mods = b.modulos || [];
   const pend = isAdmin() ? S.members.filter(m => !m.approved).length : 0;
-  const tot = mods.reduce((a, m) => { const p = modProgress(m); a.n += p.n; a.r += p.r; return a; }, {n:0, r:0});
+  const prontos = guia(mods).filter(m => !m.embreve);
+  const tot = prontos.reduce((a, m) => { const p = modProgress(m); a.n += p.n; a.r += p.r; return a; }, {n:0, r:0});
   const gpct = tot.n ? Math.round(tot.r / tot.n * 100) : 0;
-  const next = mods.find(m => modProgress(m).pct < 100) || mods[0];
+  const next = prontos.find(m => modProgress(m).pct < 100) || prontos[0];
   let adm = "";
   if (isAdmin() && I) {
     const st = I.locais.reduce((a, l) => { const s = incStats(l); a.f += s.f; a.t += s.total; a.n += l.itens.length; return a; }, {f:0, t:0, n:0});
@@ -581,8 +602,8 @@ function viewHome(){
       ${ART.waves}
     </section>
     <div class="sec-title"><h2>Guia de chegada</h2><button class="btn ghost sm" data-act="tab" data-arg="bemvindo">Ver tudo${ic("chev")}</button></div>
-    <div class="grid">${mods.map(modTile).join("")}
-      <div class="tile soon"><div class="tile-i">${ic("clock")}</div><b>Próximos módulos</b><div class="sub">Novos assuntos entram aqui conforme forem preparados.</div></div></div>
+    <div class="grid">${guia(mods).map(modTile).join("")}</div>
+    ${maisBordo(mods).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(mods).map(modTile).join("")}</div>` : ""}
     <div class="sec-title"><h2>Nossos símbolos</h2></div>
     <div class="emblems">
       <div class="emblem"><div class="emblem-art">${ART.dragon}</div><div><span class="eyebrow">Mascote do navio</span><b>O Dragão</b><p class="sub">O símbolo do A140. Quem embarca passa a ser parte da Alma do Dragão: uma tripulação só, de proa a popa.</p></div></div>
@@ -592,6 +613,7 @@ function viewHome(){
 }
 function stepsDone(id){ return lsGet(STEPS, {})[id] || []; }
 function modTile(m){
+  if (m.embreve) return `<button class="tile soon" data-act="mod" data-arg="${esc(m.id)}"><div class="row"><div class="tile-i">${ic(m.icone || "book")}</div><span class="pill" style="margin-left:auto">Em preparação</span></div><b>${esc(m.titulo)}</b><div class="sub">${esc(m.resumo || "")}</div></button>`;
   const p = modProgress(m);
   return `<button class="tile" data-act="mod" data-arg="${esc(m.id)}"><div class="row"><div class="tile-i">${ic(m.icone || "book")}</div>${p.pct === 100 ? `<span class="pill good" style="margin-left:auto">${ic("check").replace('<svg','<svg width="12" height="12"')}Lido</span>` : ""}</div><b>${esc(m.titulo)}</b><div class="sub">${esc(m.resumo || m.subtitulo || "")}</div><div class="foot"><div class="bar"><i style="width:${p.pct}%"></i></div><span class="num sub">${p.r}/${p.n}</span></div></button>`;
 }
@@ -600,14 +622,111 @@ function viewBemvindo(){
   const b = bem();
   if (S.mod) { const m = (b.modulos || []).find(x => x.id === S.mod); if (m) return viewModulo(m); S.mod = null; }
   return `<div class="page-h"><span class="eyebrow">Para quem acabou de chegar</span><h1>${esc((b.intro && b.intro.titulo) || "Bem-vindo a Bordo")}</h1><p class="sub" style="font-size:15px">${esc((b.intro && b.intro.texto) || "")}</p></div>
-    <div class="grid">${(b.modulos || []).map(modTile).join("") || `<div class="empty">Nenhum módulo ainda.</div>`}</div>
-    <div class="note">${ic("clock")}<span>Novos módulos entram aqui conforme forem preparados.</span></div>`;
+    <div class="sec-title"><h2>Guia de chegada</h2></div>
+    <div class="grid">${guia(b.modulos || []).map(modTile).join("") || `<div class="empty">Nenhum módulo ainda.</div>`}</div>
+    ${maisBordo(b.modulos || []).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(b.modulos || []).map(modTile).join("")}</div>` : ""}
+    ${isAdmin() ? `<button class="btn" data-act="modNew" style="align-self:flex-start">${ic("plus")}Novo módulo</button>` : `<div class="note">${ic("clock")}<span>Novos módulos entram aqui conforme forem preparados.</span></div>`}`;
 }
 function viewModulo(m){
   return `<button class="back" data-act="modBack">${ic("left")}Bem-vindo a Bordo</button>
     <div class="page-h"><span class="eyebrow">${esc(m.subtitulo || "")}</span><h1>${esc(m.titulo)}</h1>${m.resumo ? `<p class="sub" style="font-size:15px">${esc(m.resumo)}</p>` : ""}</div>
-    <div class="col">${(m.secoes || []).map((s, i) => `<details class="sec" data-sec="${i}" ${openSecs(m.id).includes(i) ? "open" : ""}><summary><span class="sec-n">${i + 1}</span><b>${esc(s.titulo)}</b>${ic("down")}</summary><div class="sec-body">${(s.blocos || []).map(blk).join("")}</div></details>`).join("")}</div>`;
+    ${isAdmin() ? `<div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="modEdit">${ic("edit")}Editar módulo</button><button class="btn sm" data-act="secNew">${ic("plus")}Nova seção</button></div>` : ""}
+    ${m.embreve ? `<div class="note">${ic("clock")}<span>Este módulo está em preparação. O conteúdo entra aqui em breve.</span></div>` : ""}
+    <div class="col">${(m.secoes || []).map((s, i) => `<details class="sec" data-sec="${i}" ${openSecs(m.id).includes(i) ? "open" : ""}><summary><span class="sec-n">${i + 1}</span><b>${esc(s.titulo)}</b>${isAdmin() ? `<span class="iconbtn sm" role="button" tabindex="0" data-act="secEdit" data-arg="${i}" aria-label="Editar seção">${ic("edit")}</span>` : ""}${ic("down")}</summary><div class="sec-body">${(s.blocos || []).map((b, k) => isAdmin() ? `<div class="blk-edit">${blk(b)}<button class="iconbtn sm" data-act="blkEdit" data-arg="${i}" data-i="${k}" aria-label="Editar bloco">${ic("edit")}</button></div>` : blk(b)).join("")}${isAdmin() ? `<button class="btn sm ghost" data-act="blkNew" data-arg="${i}" style="align-self:flex-start">${ic("plus")}Adicionar conteúdo</button>` : ""}</div></details>`).join("")}</div>`;
 }
+
+/* ---------- editor do Bem-vindo (só o encarregado) ----------
+   Cada bloco é editado como texto simples: listas uma linha por item, tabelas e cartões com " | " entre as partes. */
+const curMod = () => (bem().modulos || []).find(x => x.id === S.mod);
+const BLK_TIPOS = {texto:"Texto", lista:"Lista", nota:"Nota (destaque azul)", alerta:"Alerta (destaque vermelho)", passos:"Passo a passo para marcar", link:"Link", tabela:"Tabela", cards:"Cartões", chips:"Valores em destaque"};
+const BLK_AJUDA = {texto:"Escreva o texto normalmente.", lista:"Um item por linha.", nota:"Escreva o texto da nota.", alerta:"Escreva o texto do alerta.", passos:"Um passo por linha.",
+  link:"Cole o endereço (https://…) e escreva uma frase sobre ele.", tabela:"Primeira linha: os títulos das colunas. Depois uma linha por registro. Separe as colunas com |", cards:"Uma linha por cartão: Título | Destaque | Texto", chips:"Uma linha por valor: Rótulo | Valor | cor (vermelho, azul ou amarelo, opcional)"};
+const COR = {bad:"vermelho", blue:"azul", warn:"amarelo"}, COR_INV = {vermelho:"bad", azul:"blue", amarelo:"warn"};
+function blkToText(b){
+  switch (b.tipo) {
+    case "lista": case "passos": return (b.itens || []).join("\n");
+    case "tabela": return [b.colunas || [], ...(b.linhas || [])].map(r => r.join(" | ")).join("\n");
+    case "cards": return (b.itens || []).map(x => [x.titulo, x.tag || "", x.texto || ""].join(" | ")).join("\n");
+    case "chips": return (b.itens || []).map(x => [x.rotulo, x.valor, COR[x.cor] || ""].filter((v, i) => i < 2 || v).join(" | ")).join("\n");
+    default: return b.texto || "";
+  }
+}
+function textToBlk(tipo, txt, extra){
+  const lines = txt.split("\n").map(x => x.trim()).filter(Boolean), parts = l => l.split("|").map(x => x.trim());
+  const b = {tipo};
+  if (extra.titulo) b.titulo = extra.titulo;
+  switch (tipo) {
+    case "lista": b.itens = lines; if (extra.intro) b.intro = extra.intro; break;
+    case "passos": b.itens = lines; b.id = extra.id || "p-" + uid(); break;
+    case "tabela": { const [h, ...r] = lines.map(parts); b.colunas = h || []; b.linhas = r; break; }
+    case "cards": b.itens = lines.map(l => { const [t, g, ...x] = parts(l); return {titulo:t, tag:g || "", texto:x.join(" | ")}; }); break;
+    case "chips": b.itens = lines.map(l => { const [r, v, c] = parts(l); const o = {rotulo:r, valor:v || ""}; if (COR_INV[norm(c)]) o.cor = COR_INV[norm(c)]; return o; }); break;
+    case "link": b.url = extra.url; b.texto = txt.trim(); break;
+    default: b.texto = txt.trim();
+  }
+  return b;
+}
+function blkModal(si, bi){
+  const m = curMod(), b = bi != null ? m.secoes[si].blocos[bi] : {tipo:"texto"};
+  openModal(`${sheetHead(bi != null ? "Editar conteúdo" : "Adicionar conteúdo", m.secoes[si].titulo)}
+    <form class="col" data-form="blk" data-s="${si}" data-b="${bi != null ? bi : ""}">
+      <div class="field"><label for="f-bt">Tipo</label><select id="f-bt" name="tipo" class="input">${Object.entries(BLK_TIPOS).map(([k, v]) => `<option value="${k}" ${b.tipo === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+      <div class="field"><label for="f-btit">Título (opcional)</label><input id="f-btit" name="titulo" class="input" maxlength="120" value="${esc(b.titulo || "")}"></div>
+      <div class="field" data-only="lista"><label for="f-bin">Introdução (opcional)</label><input id="f-bin" name="intro" class="input" maxlength="400" value="${esc(b.intro || "")}"></div>
+      <div class="field" data-only="link"><label for="f-burl">Endereço</label><input id="f-burl" name="url" class="input" type="url" maxlength="300" placeholder="https://" value="${esc(b.url || "")}"></div>
+      <div class="field"><label for="f-btx">Conteúdo</label><span class="sub" id="f-help" style="font-size:12.5px">${BLK_AJUDA[b.tipo] || ""}</span><textarea id="f-btx" name="txt" class="input" style="min-height:180px">${esc(blkToText(b))}</textarea></div>
+      <input type="hidden" name="pid" value="${esc(b.id || "")}">
+      <div class="row sheet-foot" style="flex-wrap:wrap">${bi != null ? `<button type="button" class="btn ghost danger sm" data-act="blkDel" data-arg="${si}" data-i="${bi}">${ic("trash")}Apagar</button><button type="button" class="iconbtn" data-act="blkMove" data-arg="${si}" data-i="${bi}" data-d="-1" aria-label="Subir">${ic("up")}</button><button type="button" class="iconbtn" data-act="blkMove" data-arg="${si}" data-i="${bi}" data-d="1" aria-label="Descer">${ic("down")}</button>` : ""}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
+  blkFormSync();
+}
+function blkFormSync(){ const t = ($("#f-bt") || {}).value; if (!t) return; document.querySelectorAll("[data-only]").forEach(el => el.hidden = el.dataset.only !== t); $("#f-help").textContent = BLK_AJUDA[t] || ""; }
+document.addEventListener("change", ev => { if (ev.target.id === "f-bt") blkFormSync(); });
+function secModal(si){
+  const m = curMod(), sec = si != null ? m.secoes[si] : {titulo:""};
+  openModal(`${sheetHead(si != null ? "Editar seção" : "Nova seção", m.titulo)}
+    <form class="col" data-form="sec" data-s="${si != null ? si : ""}">
+      <div class="field"><label for="f-st">Título da seção</label><input id="f-st" name="titulo" class="input" required maxlength="120" value="${esc(sec.titulo)}"></div>
+      <div class="row sheet-foot" style="flex-wrap:wrap">${si != null ? `<button type="button" class="btn ghost danger sm" data-act="secDel" data-arg="${si}">${ic("trash")}Apagar seção</button><button type="button" class="iconbtn" data-act="secMove" data-arg="${si}" data-d="-1" aria-label="Subir">${ic("up")}</button><button type="button" class="iconbtn" data-act="secMove" data-arg="${si}" data-d="1" aria-label="Descer">${ic("down")}</button>` : ""}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
+}
+const MOD_ICONES = {book:"Livro", fire:"Fogo", anchor:"Âncora", cal:"Calendário", trash:"Lixo", ship:"Navio", bulb:"Ideia", heart:"Saúde", clip:"Prancheta", info:"Informação"};
+function modModal(isNew){
+  const m = isNew ? {titulo:"", subtitulo:"", resumo:"", icone:"book", grupo:"chegada", embreve:true} : curMod();
+  openModal(`${sheetHead(isNew ? "Novo módulo" : "Editar módulo", "Bem-vindo a Bordo")}
+    <form class="col" data-form="mod" data-new="${isNew ? 1 : ""}">
+      <div class="field"><label for="f-mt">Título</label><input id="f-mt" name="titulo" class="input" required maxlength="80" value="${esc(m.titulo)}"></div>
+      <div class="field"><label for="f-ms">Subtítulo (opcional)</label><input id="f-ms" name="subtitulo" class="input" maxlength="120" value="${esc(m.subtitulo || "")}"></div>
+      <div class="field"><label for="f-mr">Resumo</label><input id="f-mr" name="resumo" class="input" maxlength="200" value="${esc(m.resumo || "")}"></div>
+      <div class="fields2"><div class="field"><label for="f-mi">Ícone</label><select id="f-mi" name="icone" class="input">${Object.entries(MOD_ICONES).map(([k, v]) => `<option value="${k}" ${m.icone === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+        <div class="field"><label for="f-mg">Onde aparece</label><select id="f-mg" name="grupo" class="input"><option value="chegada" ${(m.grupo || "chegada") === "chegada" ? "selected" : ""}>Guia de chegada</option><option value="mais" ${m.grupo === "mais" ? "selected" : ""}>Mais a bordo</option></select></div></div>
+      <label class="row" style="gap:10px;font-weight:600"><input type="checkbox" name="embreve" ${m.embreve ? "checked" : ""} style="width:20px;height:20px">Em preparação (aparece com aviso)</label>
+      <div class="row sheet-foot" style="flex-wrap:wrap">${isNew ? "" : `<button type="button" class="btn ghost danger sm" data-act="modDel">${ic("trash")}Apagar módulo</button>`}<button class="btn primary" type="submit" style="margin-left:auto">${ic("check")}Salvar</button></div>
+    </form>`);
+}
+function saveBem(){ putContent("bemvindo"); closeModal(); const y = scrollY; render(); scrollTo(0, y); toast("Salvo"); }
+document.addEventListener("submit", ev => {
+  const f = ev.target, kind = f.dataset.form; if (!["blk", "sec", "mod"].includes(kind)) return;
+  ev.preventDefault(); ev.stopImmediatePropagation();
+  const fd = new FormData(f), g = k => String(fd.get(k) || "").trim();
+  if (kind === "blk") {
+    const sec = curMod().secoes[+f.dataset.s], tipo = g("tipo");
+    if (tipo === "link" && !/^https:\/\//.test(g("url"))) { toast("O endereço precisa começar com https://"); return; }
+    const b = textToBlk(tipo, String(fd.get("txt") || ""), {titulo:g("titulo"), intro:g("intro"), url:g("url"), id:g("pid")});
+    sec.blocos = sec.blocos || [];
+    if (f.dataset.b !== "") sec.blocos[+f.dataset.b] = b; else sec.blocos.push(b);
+  } else if (kind === "sec") {
+    const m = curMod(); m.secoes = m.secoes || [];
+    if (f.dataset.s !== "") m.secoes[+f.dataset.s].titulo = g("titulo");
+    else { m.secoes.push({titulo:g("titulo"), blocos:[]}); OPEN[m.id] = [...openSecs(m.id), m.secoes.length - 1]; }
+  } else {
+    const data = {titulo:g("titulo"), subtitulo:g("subtitulo"), resumo:g("resumo"), icone:g("icone"), grupo:g("grupo"), embreve:!!fd.get("embreve")};
+    if (!data.titulo) { toast("Dê um título ao módulo"); return; }
+    if (f.dataset.new) { const b = bem(); b.modulos = b.modulos || []; const id = norm(data.titulo).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + uid(); b.modulos.push({id, ...data, secoes:[]}); S.mod = id; }
+    else Object.assign(curMod(), data);
+  }
+  saveBem();
+}, true);
 /* Lembra quais seções estão abertas, para não fechar tudo ao marcar um passo. */
 const OPEN = {};
 const openSecs = id => OPEN[id] || (OPEN[id] = [0]);
@@ -632,6 +751,7 @@ function blk(b){
     case "tabela": return `<div>${t}<div class="tbl-wrap"><table><thead><tr>${b.colunas.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${b.linhas.map(r => `<tr>${r.map((c, k) => `<td data-l="${esc(b.colunas[k])}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
     case "cards": return `<div>${t}<div class="mcards">${b.itens.map(x => `<div class="mcard">${x.tag ? `<span class="pill accent" style="align-self:flex-start">${esc(x.tag)}</span>` : ""}<b>${esc(x.titulo)}</b><p>${esc(x.texto)}</p></div>`).join("")}</div></div>`;
     case "nota": return `<div class="note">${ic("info")}<span>${esc(b.texto)}</span></div>`;
+    case "link": return `<a class="linkcard" href="${esc(/^https:\/\//.test(b.url) ? b.url : "#")}" target="_blank" rel="noopener"><span class="tile-i">${ic(b.icone || "external")}</span><span><b>${esc(b.titulo)}</b><span class="sub">${esc(b.texto || "")}</span></span>${ic("external")}</a>`;
     case "alerta": return `<div class="note bad">${ic("alert")}<span>${esc(b.texto)}</span></div>`;
     case "passos": {
       const done = stepsDone(b.id);
@@ -921,6 +1041,17 @@ const ACT = {
   local(a){ S.local = a; render(); scrollTo(0, 0); },
   localBack(){ S.local = null; S.sel = null; render(); },
   organize(){ S.sel = []; render(); },
+  modNew(){ if (!S.content.bemvindo) S.content.bemvindo = {key:"bemvindo", audience:"todos", data:{modulos:[]}}; modModal(true); },
+  modEdit(){ modModal(false); },
+  modDel(){ const m = curMod(); if (!confirm(`Apagar o módulo "${m.titulo}" e todo o conteúdo dele?`)) return; bem().modulos = bem().modulos.filter(x => x.id !== m.id); S.mod = null; saveBem(); },
+  secNew(){ secModal(null); },
+  secEdit(a){ secModal(+a); },
+  secDel(a){ const m = curMod(); if (!confirm(`Apagar a seção "${m.secoes[+a].titulo}"?`)) return; m.secoes.splice(+a, 1); OPEN[m.id] = [0]; saveBem(); },
+  secMove(a, el){ const m = curMod(), i = +a, j = i + +el.dataset.d; if (j < 0 || j >= m.secoes.length) return; [m.secoes[i], m.secoes[j]] = [m.secoes[j], m.secoes[i]]; OPEN[m.id] = [j]; saveBem(); },
+  blkNew(a){ blkModal(+a, null); },
+  blkEdit(a, el){ blkModal(+a, +el.dataset.i); },
+  blkDel(a, el){ if (!confirm("Apagar este conteúdo?")) return; curMod().secoes[+a].blocos.splice(+el.dataset.i, 1); saveBem(); },
+  blkMove(a, el){ const bl = curMod().secoes[+a].blocos, i = +el.dataset.i, j = i + +el.dataset.d; if (j < 0 || j >= bl.length) return; [bl[i], bl[j]] = [bl[j], bl[i]]; saveBem(); },
   async pdf(a, el){
     if (el.disabled) return; const old = el.innerHTML; el.disabled = true; el.innerHTML = "Gerando…";
     try { await gerarPDF(a || null); } catch (e) { console.warn(e); toast("Não foi possível gerar o PDF"); }
