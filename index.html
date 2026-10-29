@@ -300,7 +300,7 @@ async function fetchAll(){
   if (m.error) throw m.error;
   S.member = m.data;
   if (!S.member) {
-    const nome = (S.user.user_metadata && S.user.user_metadata.name) || "";
+    const nome = ((S.user.user_metadata && S.user.user_metadata.alm_nome) || "").slice(0, 40);
     const ins = await sb.from("alm_members").insert({user_id:S.user.id, email:S.user.email, nome}).select().single();
     if (ins.error) throw ins.error;
     S.member = ins.data;
@@ -408,7 +408,7 @@ function showGate(){
         ${m === "entrar" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="senha">Esqueci minha senha</button>` : ""}
         ${m === "senha" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="entrar">Voltar para Entrar</button>` : ""}
       </form>
-      <div class="gate-foot">Quem já usa o Desfrangolizador entra com o mesmo e-mail e senha. Conteúdo de uso interno da divisão.</div></div>
+      <div class="gate-foot">Conteúdo de uso interno da divisão.</div></div>
   </div>`;
 }
 document.addEventListener("submit", async ev => {
@@ -423,7 +423,7 @@ document.addEventListener("submit", async ev => {
   try {
     if (m === "entrar") { const r = await sb.auth.signInWithPassword({email, password:pass}); if (r.error) throw r.error; }
     else if (m === "criar") {
-      const r = await sb.auth.signUp({email, password:pass, options:{emailRedirectTo:back, data:name ? {name} : {}}}); if (r.error) throw r.error;
+      const r = await sb.auth.signUp({email, password:pass, options:{emailRedirectTo:back, data:name ? {alm_nome:name} : {}}}); if (r.error) throw r.error;
       if (!r.data.session) { AUTH.mode = "entrar"; AUTH.ok = `Enviamos um link de confirmação para <b>${esc(email)}</b>. Abra o e-mail, toque no link e depois entre aqui.`; }
     }
     else if (m === "senha") { const r = await sb.auth.resetPasswordForEmail(email, {redirectTo:back}); if (r.error) throw r.error; AUTH.ok = "Se esse e-mail tiver conta, o link chega em instantes."; }
@@ -451,10 +451,10 @@ function render(){
   const navHtml = tabs().map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
   $("#nav").innerHTML = navHtml; $("#tabbar").innerHTML = navHtml;
   setSync(S.sync);
-  const nome = (S.member && S.member.nome) || (S.user.user_metadata && S.user.user_metadata.name) || (S.user.email || "").split("@")[0];
+  const nome = (S.member && S.member.nome) || "";
   const top = `<div class="topbar"><div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
-    <div class="hello-wrap"><div class="hello">Olá, ${esc(nome)}</div><div class="hello-sub">${isAdmin() ? "Encarregado" : isMember() ? "Militar da divisão" : "Acesso pendente"}</div></div>
-    <button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${esc((nome[0] || "?").toUpperCase())}</button></div>`;
+    <div class="hello-wrap"><div class="hello">${nome ? `Olá, ${esc(nome)}` : "Bem-vindo a bordo"}</div><div class="hello-sub">${isAdmin() ? "Encarregado" : isMember() ? "Militar da divisão" : "Acesso pendente"}</div></div>
+    <button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${nome ? esc(nome[0].toUpperCase()) : ic("user").replace('<svg','<svg width="20" height="20"')}</button></div>`;
   let body;
   if (!isMember()) body = viewPending();
   else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
