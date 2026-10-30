@@ -1161,7 +1161,7 @@ const APPS = [
   {id:"desfrangolizador", nome:"Desfrangolizador", tag:"Qualidade de vida", cor:"desf", resumo:"Treino de hipertrofia, dieta flexível e evolução do corpo em um só app. Para aguentar a rotina de bordo com saúde.",
     url:"https://fernandocruzjr.github.io/Desfrangolizador/", telas:[{img:"desfrangolizador.jpg", t:"Página inicial"}]},
   {id:"hifamily", nome:"Hi Family", tag:"Inglês", cor:"hi", resumo:"Inglês para toda a família, com lições curtas, áudio e quiz. Tem a área Inglês Naval: vocabulário de bordo, rádio, manobra e cerimonial.",
-    url:"", telas:[{img:"hifamily.jpg", t:"Página inicial"}, {img:"hifamily-naval.jpg", t:"Inglês Naval", path:"#/marinha"}]}
+    url:"https://poliglotamais.vercel.app/", telas:[{img:"hifamily.jpg", t:"Página inicial"}, {img:"hifamily-naval.jpg", t:"Inglês Naval", path:"#/marinha"}]}
 ];
 const appUrl = a => ((S.content.apps && S.content.apps.data && S.content.apps.data.urls) || {})[a.id] || a.url;
 const appLink = (a, path) => { const u = appUrl(a); return u ? u.replace(/\/?(#.*)?$/, "/") + (path || "") : ""; };
