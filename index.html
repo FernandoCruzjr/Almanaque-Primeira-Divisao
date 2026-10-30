@@ -287,6 +287,23 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:14px}
 .seg button{border:0;border-radius:10px;padding:11px;font-weight:600;color:var(--muted);background:transparent}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* busca e menu do início */
+.homebar{position:sticky;top:0;z-index:25;display:flex;flex-direction:column;gap:10px;margin:-6px -4px 0;padding:8px 4px 10px;background:linear-gradient(180deg,var(--bg) 82%,rgba(7,20,32,0))}
+.gsearch{display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;border-radius:16px;border:1px solid rgba(227,181,74,.35);background:#0F2235;min-height:52px}
+.gsearch>svg{width:20px;height:20px;color:var(--accent-ink);flex:none}
+.gsearch input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font-size:16px;padding:12px 0;outline:none}
+.gsearch input::-webkit-search-cancel-button{display:none}
+.hmenu{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.hmenu::-webkit-scrollbar{display:none}
+.hmenu button{flex:none;display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;border:1px solid var(--glass-b);background:var(--glass);color:var(--ink);font-size:13.5px;font-weight:600;white-space:nowrap}
+.hmenu button svg{width:15px;height:15px;color:var(--accent-ink)}
+.gres{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:18px;border:1px solid var(--glass-b);background:#0C1C2C}
+.gres-i{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--glass-b);background:rgba(255,255,255,.03);color:var(--ink)}
+.gres-i:hover{border-color:rgba(227,181,74,.4)}
+.gres-i b{font-size:15px}
+.gres-i .pill{font-size:11px}
+.gres-s{font-size:13px;color:var(--muted);line-height:1.45}
+.sec-title{scroll-margin-top:130px}
 /* destaque do DragãoDrive */
 .drive-hl{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;align-items:center;padding:18px 20px;border-radius:22px;border:1px solid rgba(227,181,74,.4);background:radial-gradient(360px 200px at 0% 50%,rgba(226,85,60,.25),transparent 70%),linear-gradient(135deg,#1A2433,#0C1622)}
 .drive-art svg{width:100%;height:auto}
@@ -667,12 +684,19 @@ function viewHome(){
   if (isAdmin() && I) {
     const st = I.locais.reduce((a, l) => { const s = incStats(l); a.f += s.f; a.t += s.total; a.n += l.itens.length; return a; }, {f:0, t:0, n:0});
     const pct = st.t ? Math.round(st.f / st.t * 100) : 0;
-    adm = `<div class="sec-title"><h2>Encarregado</h2><span class="pill accent">${ic("lock").replace('<svg','<svg width="12" height="12"')}Só você vê</span></div>
+    adm = `<div class="sec-title" id="h-enc"><h2>Encarregado</h2><span class="pill accent">${ic("lock").replace('<svg','<svg width="12" height="12"')}Só você vê</span></div>
       ${pend ? `<button class="note warn" data-act="tab" data-arg="equipe" style="text-align:left;cursor:pointer;color:var(--ink)">${ic("users")}<span><b>${pend} ${pend === 1 ? "militar aguarda" : "militares aguardam"} liberação.</b> Toque para ver.</span></button>` : ""}
       <div class="grid"><button class="tile" data-act="tab" data-arg="incumbencias"><div class="tile-i">${ic("clip")}</div><b>Incumbências</b><div class="sub">${I.locais.length} locais · ${st.n} itens</div><div class="foot"><div class="bar"><i style="width:${pct}%"></i></div><span class="num sub">${pct}%</span></div></button>
       <button class="tile" data-act="tab" data-arg="equipe"><div class="tile-i">${ic("users")}</div><b>Equipe</b><div class="sub">${S.members.filter(m => m.approved).length} com acesso${pend ? ` · ${pend} aguardando` : ""}</div><div class="foot"><span class="sub">Liberar quem chegou</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button></div>`;
   }
-  return `<section class="hero">
+  const menu = [["h-guia", "Guia", "anchor"], ["h-vida", "Qualidade de vida", "heart"], ["h-ferr", "Ferramentas", "calc"], ["h-simb", "Símbolos", "ship"]];
+  if (adm) menu.push(["h-enc", "Encarregado", "lock"]);
+  return `<div class="homebar">
+      <div class="gsearch">${ic("search")}<input id="g-q" type="search" placeholder="Buscar em todo o app" autocomplete="off" aria-label="Buscar em todo o app" value="${esc(S.gq || "")}">${S.gq ? `<button class="iconbtn sm" data-act="gClear" aria-label="Limpar busca">${ic("x")}</button>` : ""}</div>
+      <nav class="hmenu" aria-label="Atalhos do Início">${menu.map(([id, n, i]) => `<button data-act="jump" data-arg="${id}">${ic(i)}${n}</button>`).join("")}<button data-act="tab" data-arg="bemvindo">${ic("book")}Bem-vindo</button><button data-act="tab" data-arg="apps">${ic("grid")}Apps</button></nav>
+    </div>
+    <div id="g-res" class="gres" ${S.gq ? "" : "hidden"}>${S.gq ? gResults(S.gq) : ""}</div>
+    <section class="hero">
       <div class="hero-txt">
         <span class="hero-eyebrow">NAM Atlântico · A140 · Marinha do Brasil</span>
         <h1>Bem-vindo<br>a <span>bordo</span></h1>
@@ -684,14 +708,14 @@ function viewHome(){
       ${ART.waves}
     </section>
     ${destaqueDrive(mods)}
-    <div class="sec-title"><h2>Guia de chegada</h2><button class="btn ghost sm" data-act="tab" data-arg="bemvindo">Ver tudo${ic("chev")}</button></div>
+    <div class="sec-title" id="h-guia"><h2>Guia de chegada</h2><button class="btn ghost sm" data-act="tab" data-arg="bemvindo">Ver tudo${ic("chev")}</button></div>
     <div class="grid">${guia(mods).filter(m => m.id !== "adestramento").map(modTile).join("")}</div>
-    <div class="sec-title"><h2>Qualidade de vida</h2><button class="btn ghost sm" data-act="tab" data-arg="apps">Ver apps${ic("chev")}</button></div>
+    <div class="sec-title" id="h-vida"><h2>Qualidade de vida</h2><button class="btn ghost sm" data-act="tab" data-arg="apps">Ver apps${ic("chev")}</button></div>
     <div class="apps-home">${APPS.map(a => appCard(a, false)).join("")}</div>
     ${maisBordo(mods).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(mods).map(modTile).join("")}</div>` : ""}
-    <div class="sec-title"><h2>Ferramentas</h2></div>
+    <div class="sec-title" id="h-ferr"><h2>Ferramentas</h2></div>
     <div class="grid mini">${calcTiles()}</div>
-    <div class="sec-title"><h2>Nossos símbolos</h2></div>
+    <div class="sec-title" id="h-simb"><h2>Nossos símbolos</h2></div>
     <div class="emblems">
       <div class="emblem"><div class="emblem-art">${ART.dragon}</div><div><span class="eyebrow">Mascote do navio</span><b>O Dragão</b><p class="sub">O símbolo do A140. Quem embarca passa a ser parte da Alma do Dragão: uma tripulação só, de proa a popa.</p></div></div>
       <div class="emblem sea"><div class="emblem-art">${ART.trident}</div><div><span class="eyebrow" style="color:#8CC4FA">Mascote da Primeira Divisão</span><b>Poseidon</b><p class="sub">Senhor dos mares. Representa a nossa divisão, na marinharia, nas fainas de convés e no cuidado com o costado.</p></div></div>
@@ -705,6 +729,46 @@ function destaqueDrive(mods){
   return `<section class="drive-hl"><div class="drive-art">${ART.dragon}</div><div class="drive-txt"><span class="hero-eyebrow">${esc(m.titulo)}</span><b>${esc(m.subtitulo || m.titulo)}</b><p>${esc(m.resumo || "")}</p>
     <div class="row" style="flex-wrap:wrap;gap:8px">${lk ? `<a class="btn primary" href="${esc(lk.url)}" target="_blank" rel="noopener">${ic("external")}Abrir os vídeos</a>` : ""}<button class="btn ghost" data-act="mod" data-arg="adestramento">Saiba mais${ic("chev")}</button></div></div></section>`;
 }
+/* ---------- busca em todo o app ----------
+   Monta um índice do que o militar pode ver: módulos do Bem-vindo (seções e blocos), incumbências (só o encarregado), ferramentas e apps. */
+function blkTexto(b){
+  switch (b.tipo) {
+    case "lista": case "passos": return [b.titulo, b.intro, ...(b.itens || [])].join(" ");
+    case "tabela": return [b.titulo, ...(b.colunas || []), ...(b.linhas || []).flat()].join(" ");
+    case "cards": return [b.titulo, ...(b.itens || []).map(x => [x.titulo, x.tag, x.texto].join(" "))].join(" ");
+    case "chips": return [b.titulo, ...(b.itens || []).map(x => x.rotulo + " " + x.valor)].join(" ");
+    default: return [b.titulo, b.texto].join(" ");
+  }
+}
+function gIndex(){
+  const E = [];
+  (bem().modulos || []).forEach(m => {
+    E.push({tipo:"Bem-vindo", t:m.titulo, sub:m.subtitulo || "", txt:[m.titulo, m.subtitulo, m.resumo].join(" "), act:"gMod", arg:m.id, i:-1});
+    (m.secoes || []).forEach((s, i) => E.push({tipo:"Bem-vindo", t:s.titulo, sub:m.titulo, txt:[s.titulo, ...(s.blocos || []).map(blkTexto)].join(" "), act:"gMod", arg:m.id, i}));
+  });
+  const I = isAdmin() && inc();
+  if (I) I.locais.forEach(l => {
+    E.push({tipo:"Incumbências", t:l.nome, sub:"Local", txt:[l.nome, l.descricao, ...(l.checklists || []).map(c => [c.titulo, ...c.itens].join(" "))].join(" "), act:"local", arg:l.id});
+    l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
+  });
+  E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
+  E.push({tipo:"Ferramentas", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"tool", arg:"fin"});
+  APPS.forEach(a => E.push({tipo:"Apps", t:a.nome, sub:a.tag, txt:[a.nome, a.tag, a.resumo, ...a.telas.map(x => x.t)].join(" "), act:"tab", arg:"apps"}));
+  return E;
+}
+function gSnippet(txt, terms){
+  const n = norm(txt), k = terms.map(t => n.indexOf(t)).filter(x => x >= 0).sort((a, b) => a - b)[0] || 0;
+  const a = Math.max(0, k - 40), s = txt.replace(/\s+/g, " ").slice(a, a + 120).trim();
+  return (a ? "…" : "") + s + (a + 120 < txt.length ? "…" : "");
+}
+function gResults(q){
+  const terms = norm(q).split(/\s+/).filter(Boolean); if (!terms.length) return "";
+  const hits = gIndex().map(e => { const n = norm(e.txt + " " + e.t); if (!terms.every(t => n.includes(t))) return null; return Object.assign({score:terms.filter(t => norm(e.t).includes(t)).length}, e); }).filter(Boolean)
+    .sort((a, b) => b.score - a.score).slice(0, 40);
+  if (!hits.length) return `<div class="empty" style="padding:12px 4px">Nada encontrado para “${esc(q)}”.</div>`;
+  return `<div class="sub" style="padding:2px 4px 6px">${hits.length === 40 ? "40 primeiros resultados" : hits.length + (hits.length === 1 ? " resultado" : " resultados")}</div>` + hits.map(h => `<button class="gres-i" data-act="${h.act}" data-arg="${esc(h.arg)}"${h.i != null ? ` data-i="${esc(h.i)}"` : ""}><span class="pill">${esc(h.tipo)}</span><b>${esc(h.t)}</b>${h.sub ? `<span class="sub">${esc(h.sub)}</span>` : ""}<span class="gres-s">${esc(gSnippet(h.txt, terms))}</span></button>`).join("");
+}
+
 function stepsDone(id){ return lsGet(STEPS, {})[id] || []; }
 function modTile(m){
   if (m.embreve) return `<button class="tile soon" data-act="mod" data-arg="${esc(m.id)}"><div class="row"><div class="tile-i">${ic(m.icone || "book")}</div><span class="pill" style="margin-left:auto">Em preparação</span></div><b>${esc(m.titulo)}</b><div class="sub">${esc(m.resumo || "")}</div></button>`;
@@ -1458,8 +1522,12 @@ function viewConta(){
 let INSTALL_EVT = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL_EVT = e; });
 const ACT = {
-  tab(a){ S.tab = a; S.mod = null; S.local = null; S.sel = null; S.q = ""; S.tool = null; render(); scrollTo(0, 0); },
-  tool(a){ S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
+  tab(a){ S.tab = a; S.mod = null; S.local = null; S.sel = null; S.q = ""; S.tool = null; S.gq = ""; render(); scrollTo(0, 0); },
+  jump(a){ const el = document.getElementById(a); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
+  gClear(){ S.gq = ""; render(); const i = $("#g-q"); if (i) i.focus(); },
+  gMod(a, el){ const i = +el.dataset.i; S.gq = ""; S.tab = "bemvindo"; S.mod = a; if (i >= 0) OPEN[a] = [i]; render(); const s = i >= 0 && document.querySelector(`[data-sec="${i}"]`); if (s) s.scrollIntoView({block:"start"}); else scrollTo(0, 0); },
+  gItem(a, el){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); itemModal(a, el.dataset.i); },
+  tool(a){ S.gq = ""; S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
   toolBack(){ S.tool = null; render(); scrollTo(0, 0); },
   tintaModo(a){ const f = $("[data-calc=tinta]"); calcSet("tinta", Object.assign(formVals(f), {modo:a})); render(); },
   appUrl(a){ const app = APPS.find(x => x.id === a); const v = prompt(`Endereço do ${app.nome} (começa com https://)`, appUrl(app)); if (v == null) return; const u = v.trim();
@@ -1472,7 +1540,7 @@ const ACT = {
   finReset(){ if (!confirm("Voltar todos os valores aos da planilha de 2026?")) return; S.content.financeiro = {key:"financeiro", audience:"todos", data:clone(FIN_PADRAO)}; putContent("financeiro"); closeModal(); render(); toast("Valores da planilha restaurados"); },
   mod(a){ S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
   modBack(){ S.mod = null; render(); },
-  local(a){ S.local = a; render(); scrollTo(0, 0); },
+  local(a){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); },
   localBack(){ S.local = null; S.sel = null; render(); },
   organize(){ S.sel = []; render(); },
   modNew(){ if (!S.content.bemvindo) S.content.bemvindo = {key:"bemvindo", audience:"todos", data:{modulos:[]}}; modModal(true); },
@@ -1541,6 +1609,7 @@ document.addEventListener("keydown", ev => {
   if (ev.key === "Enter" && ev.target.id === "f-newcol") { ev.preventDefault(); ACT.fieldAdd(); }
 });
 document.addEventListener("input", ev => {
+  if (ev.target.id === "g-q") { S.gq = ev.target.value; const r = $("#g-res"); r.hidden = !S.gq.trim(); r.innerHTML = S.gq.trim() ? gResults(S.gq) : ""; return; }
   const cf = ev.target.closest("[data-calc]");
   if (cf && cf.dataset.calc === "ter" && /^(atual|ent|p\d+)$/.test(ev.target.name)) { calcSet("ter", formVals(cf)); const y = scrollY; render(); scrollTo(0, y); return; }
   if (cf) { if (ev.target.name === "grad") { const g = fin().grads.find(x => x.nome === ev.target.value); if (g) cf.curso.value = g.curso; } calcUpdate(cf); return; }
