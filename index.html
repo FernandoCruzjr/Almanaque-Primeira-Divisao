@@ -287,6 +287,14 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:14px}
 .seg button{border:0;border-radius:10px;padding:11px;font-weight:600;color:var(--muted);background:transparent}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* destaque do DragãoDrive */
+.drive-hl{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;align-items:center;padding:18px 20px;border-radius:22px;border:1px solid rgba(227,181,74,.4);background:radial-gradient(360px 200px at 0% 50%,rgba(226,85,60,.25),transparent 70%),linear-gradient(135deg,#1A2433,#0C1622)}
+.drive-art svg{width:100%;height:auto}
+.drive-txt{display:flex;flex-direction:column;gap:8px;min-width:0}
+.drive-txt b{font-family:var(--f-display);font-size:22px;font-weight:800}
+.drive-txt p{color:#C3D2E0;font-size:14.5px;line-height:1.5}
+.drive-hl a.btn{text-decoration:none}
+@media (max-width:560px){.drive-hl{grid-template-columns:64px minmax(0,1fr);gap:12px;padding:16px}.drive-txt b{font-size:19px}}
 /* apps da tripulação */
 .appcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center;padding:20px;border-radius:24px;border:1px solid var(--glass-b);overflow:hidden}
 .appcard.hi{background:radial-gradient(420px 260px at 0% 0%,rgba(61,220,151,.25),transparent 70%),linear-gradient(135deg,#0F7A4A,#0A3F2A)}
@@ -675,8 +683,9 @@ function viewHome(){
       <div class="hero-art">${ART.dragon}</div>
       ${ART.waves}
     </section>
+    ${destaqueDrive(mods)}
     <div class="sec-title"><h2>Guia de chegada</h2><button class="btn ghost sm" data-act="tab" data-arg="bemvindo">Ver tudo${ic("chev")}</button></div>
-    <div class="grid">${guia(mods).map(modTile).join("")}</div>
+    <div class="grid">${guia(mods).filter(m => m.id !== "adestramento").map(modTile).join("")}</div>
     <div class="sec-title"><h2>Qualidade de vida</h2><button class="btn ghost sm" data-act="tab" data-arg="apps">Ver apps${ic("chev")}</button></div>
     <div class="apps-home">${APPS.map(a => appCard(a, false)).join("")}</div>
     ${maisBordo(mods).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(mods).map(modTile).join("")}</div>` : ""}
@@ -688,6 +697,13 @@ function viewHome(){
       <div class="emblem sea"><div class="emblem-art">${ART.trident}</div><div><span class="eyebrow" style="color:#8CC4FA">Mascote da Primeira Divisão</span><b>Poseidon</b><p class="sub">Senhor dos mares. Representa a nossa divisão, na marinharia, nas fainas de convés e no cuidado com o costado.</p></div></div>
     </div>
     ${adm}`;
+}
+/* Destaque logo abaixo do Bem-vindo: o módulo de adestramento em vídeo. O link vem do banco, não do código. */
+function destaqueDrive(mods){
+  const m = mods.find(x => x.id === "adestramento"); if (!m) return "";
+  const lk = (m.secoes || []).flatMap(s => s.blocos || []).find(b => b.tipo === "link" && /^https:\/\//.test(b.url || ""));
+  return `<section class="drive-hl"><div class="drive-art">${ART.dragon}</div><div class="drive-txt"><span class="hero-eyebrow">${esc(m.titulo)}</span><b>${esc(m.subtitulo || m.titulo)}</b><p>${esc(m.resumo || "")}</p>
+    <div class="row" style="flex-wrap:wrap;gap:8px">${lk ? `<a class="btn primary" href="${esc(lk.url)}" target="_blank" rel="noopener">${ic("external")}Abrir os vídeos</a>` : ""}<button class="btn ghost" data-act="mod" data-arg="adestramento">Saiba mais${ic("chev")}</button></div></div></section>`;
 }
 function stepsDone(id){ return lsGet(STEPS, {})[id] || []; }
 function modTile(m){
