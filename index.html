@@ -391,6 +391,25 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .tn-steps li>.num{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700}
 .tn-steps li>div{display:flex;flex-direction:column;gap:2px}
 @media (max-width:560px){.tn-pair{grid-template-columns:1fr}.tn-plus{display:none}.tn-one{grid-column:auto}.tn-mix .fields3{grid-template-columns:1fr 1fr}}
+/* esquemas de pintura */
+.es-chips{display:flex;flex-wrap:wrap;gap:6px}.es-chips button{border:1px solid var(--glass-b);background:rgba(0,0,0,.2);color:var(--muted);border-radius:99px;padding:7px 12px;font-weight:600;font-size:13px}
+.es-chips button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.es-mat{grid-template-columns:repeat(4,minmax(0,1fr))}.es-mat button{padding:9px 4px;font-size:13px}
+.es-card{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px 16px 16px 20px;border-radius:var(--r);background:var(--glass);border:1px solid var(--glass-b);overflow:hidden}
+.es-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.es-h{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.es-top{color:var(--good);border-color:rgba(61,220,151,.45)}
+.es-t{font-family:var(--f-display);font-size:19px;margin:0 0 2px}
+.es-prep{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:rgba(0,0,0,.22);border:1px dashed var(--glass-b)}
+.es-prep>div{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.45}.es-prep small,.es-gh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.es-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.es-steps li{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid var(--glass-b)}
+.es-n{flex:none;min-width:30px;height:30px;border-radius:50%;border:2px solid var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.es-sw{flex:none;width:14px;height:30px;border-radius:5px;border:1px solid rgba(255,255,255,.25)}
+.es-d{display:flex;flex-direction:column;gap:4px;min-width:0}.es-d b{font-size:15px;line-height:1.35}
+.es-tags{display:flex;flex-wrap:wrap;gap:5px}.es-dm{color:var(--accent-ink);border-color:rgba(227,181,74,.5)}.es-neb{cursor:pointer;white-space:normal;text-align:left}
+.es-total{font-size:13.5px;color:var(--muted)}
+.es-obs summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:14px}.es-obs ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}
+@media (max-width:480px){.es-mat{grid-template-columns:1fr 1fr}}
 /* jogo "Que peça é essa?" */
 .niveis{display:flex;flex-direction:column;gap:10px}
 .nivel{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;text-align:left;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));border-radius:var(--r);padding:14px 16px;color:var(--ink)}
@@ -730,6 +749,7 @@ function showGate(){
   </div>`;
 }
 document.addEventListener("submit", ev => {
+  if (ev.target.id === "es-form") { ev.preventDefault(); esSalvar(ev.target); return; }
   if (ev.target.id === "tn-form") { ev.preventDefault(); tnSalvar(ev.target); return; }
   if (ev.target.dataset && ev.target.dataset.tn === "mix") { ev.preventDefault(); return; }
   if (ev.target.id !== "j-form") return; ev.preventDefault();
@@ -914,9 +934,11 @@ function gIndex(){
   });
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
   E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
-  E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar", act:"marOpen", arg:"apostilas"});
+  E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso, ENGENALMARINST 60-01D", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar engenalmarinst 60-01d publicação pintura", act:"marOpen", arg:"apostilas"});
   E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Localizador, tipos, compatibilidade, mistura", txt:"tinta tintas pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
   ((S.content.tintas && S.content.tintas.data.itens) || []).forEach(t => E.push({tipo:"Tintas", t:(t.num ? t.num + " · " : "") + (t.nome || "Tinta"), sub:(TIPOS_TINTA[t.tipo] || TIPOS_TINTA.out).n + (t.comp ? " · componente " + t.comp : ""), txt:[t.num, t.nome, t.comp, t.compNome, t.cor, t.uso, t.obs].join(" "), act:"tnAbrir", arg:t.num || t.nome || ""}));
+  E.push({tipo:"Marinharia", t:"Esquemas de pintura", sub:"Ordem das tintas por local (ENGENALMARINST 60-01D)", txt:"esquema esquemas de pintura engenalmarinst 60-01d ordem das tintas demão demãos primer acabamento costado superestrutura linha d'água obras vivas convoo convés de voo convés escada plataforma de pouso tanque aguada paiol amarras ferro munição console painel indicativo calado", act:"marOpen", arg:"esquemas"});
+  { const D = esData(); if (D) { D.grupos.forEach(g => E.push({tipo:"Pintura", t:"Esquema de pintura: " + g.nome, sub:"Apêndices " + g.aps.join(", ") + " da ENGENALMARINST 60-01D", txt:g.nome + " " + g.chave + " esquema pintura", act:"esAbrir", arg:g.id})); (D.bordo || []).forEach(r => E.push({tipo:"Pintura", t:"Esquema de pintura: " + r.area, sub:"Esquema de bordo", txt:r.area + " " + (r.esquema || "") + " esquema pintura", act:"esAbrir", arg:"bordo"})); } }
   E.push({tipo:"Marinharia", t:"Cintas de elevação", sub:"Cores, etiqueta, fator 7:1, modos, inspeção", txt:"cinta cintas elevação içamento içar lingada cor cores lilás verde amarela cinza vermelha marrom azul laranja etiqueta cmt wll carga máxima trabalho fator segurança 7 enforcada cesto ângulo pernas inspeção descarte nbr 15637 en 1492 nr-11 poliéster tubular plana", act:"marOpen", arg:"cintas"});
   E.push({tipo:"Ferramentas", t:"Calculadora de espias", sub:"Bitola, diâmetro e carga de ruptura", txt:"calculadora espia espias cabo cabos bitola circunferência diâmetro polegada mm carga ruptura trabalho segurança nylon polietileno polipropileno poliéster kevlar aramida dyneema manilha sisal fibra vegetal aço amarração", act:"tool", arg:"espias"});
   E.push({tipo:"Ferramentas", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"tool", arg:"fin"});
@@ -1334,14 +1356,16 @@ function viewMar(){
   if (S.mar === "cintas") return viewCintas();
   if (S.mar === "jogo") return viewJogo();
   if (S.mar === "tintas") return viewTintas();
+  if (S.mar === "esquemas") return viewEsquemas();
   if (S.mar === "apostilas") return viewApostilas();
   if (S.mar === "apo" && S.apo) return viewLeitor();
   return `<div class="page-h"><span class="eyebrow">Fainas de convés</span><h1>Marinharia</h1><p class="sub" style="font-size:15px">Cabos, cintas, poleame e acessórios: as apostilas para consulta, um jogo para treinar os nomes e guias para usar com segurança.</p></div>
     <div class="grid">${marTiles()}</div>`;
 }
 const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
-  <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais e Manobras de Peso, com pesquisa.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso e ENGENALMARINST 60-01D, com pesquisa.</div></button>
   <button class="tile" data-act="marOpen" data-arg="tintas"><div class="tile-i">${ic("roller")}</div><b>Tintas e pintura</b><div class="sub">Localizador de tinta e catalisador, alquídica, epóxi e PU, o que pode ir sobre o quê e como acertar a mistura.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="esquemas"><div class="tile-i">${ic("layers")}</div><b>Esquemas de pintura</b><div class="sub">Costado, convoo, convés, tanques, paióis: o preparo e a ordem das tintas, pela ENGENALMARINST 60-01D.</div></button>
   <button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
   <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Bitola, diâmetro e carga de ruptura dos cabos por material.</div></button>`;
 
@@ -1625,7 +1649,7 @@ function viewLeitor(){
     <div class="rd-h"><div><span class="eyebrow">${esc(a.sub)}</span><h1>${esc(a.titulo)}</h1></div></div>
     <div class="rd-bar">
       <div class="rd-nav"><button class="iconbtn" data-act="apoPg" data-arg="-1" aria-label="Página anterior">${ic("left")}</button><label class="rd-pg"><input id="rd-p" class="input num" inputmode="numeric" value="${R.p}" aria-label="Página"><span class="sub">/ ${a.paginas}</span></label><button class="iconbtn" data-act="apoPg" data-arg="1" aria-label="Próxima página">${ic("chev")}</button></div>
-      <div class="rd-tools">${caps.length ? `<select id="rd-cap" class="input" aria-label="Ir para o capítulo"><option value="">Capítulos</option>${caps.map(c => `<option value="${c.p}">${esc(c.n + ". " + c.t)}</option>`).join("")}</select>` : ""}
+      <div class="rd-tools">${caps.length ? `<select id="rd-cap" class="input" aria-label="Ir para o capítulo"><option value="">Capítulos</option>${caps.map(c => `<option value="${c.p}">${esc((c.n ? c.n + ". " : "") + c.t)}</option>`).join("")}</select>` : ""}
         <button class="iconbtn" data-act="apoZoom" data-arg="-1" aria-label="Diminuir">−</button><button class="iconbtn" data-act="apoZoom" data-arg="1" aria-label="Aumentar">+</button>
         <button class="iconbtn" data-act="apoBusca" aria-label="Pesquisar nesta apostila">${ic("search")}</button><button class="iconbtn" data-act="apoPdf" aria-label="Abrir o PDF no aparelho">${ic("download")}</button></div>
     </div>
@@ -1786,6 +1810,101 @@ function tnSalvar(form){
   const rec = {id:id || "t" + Date.now().toString(36)}; ["tipo", "num", "nome", "comp", "compNome", "prop", "embA", "embB", "cor", "pot", "dil", "uso", "obs"].forEach(k => { const x = String(v[k] || "").trim(); if (x) rec[k] = x; });
   const i = L.findIndex(x => x.id === id); if (i >= 0) L[i] = rec; else L.push(rec);
   putContent("tintas"); closeModal(); render(); toast("Tinta salva");
+}
+
+/* ===== Esquemas de pintura (ENGENALMARINST 60-01D). Os dados ficam no Supabase (alm_content key "esquemas"), nunca no código. ===== */
+let ES = {q:"", g:null, mat:"aco"};
+const ES_MAT = [["aco", "Aço"], ["aluminio", "Alumínio"], ["madeira", "Madeira"], ["fibra", "Fibra de vidro"]];
+const esData = () => (S.content.esquemas && S.content.esquemas.data) || null;
+function esCor(c){
+  const n = norm(c);
+  const M = [["oxido", "#8a3a26"], ["marrom avermelh", "#7a3b2a"], ["vermelh", "#b5322a"], ["rosa", "#e6a0b0"], ["cinza escuro", "#4b5157"], ["cinza", "#8d949b"], ["branc", "#f1f1ee"], ["pret", "#151515"], ["marrom", "#5d3c22"], ["bronze", "#8d6b3a"], ["amarel", "#e7c23a"], ["aluminio", "#c3c7cc"], ["verde", "#2f7a4a"], ["azul", "#2E6FD6"]];
+  const m = M.find(([k]) => n.includes(k)); return m ? m[1] : "#777";
+}
+const esTipoCor = e => { const n = norm(e); return n.startsWith("alq") ? "#E3B54A" : n.includes("betum") ? "#9AA3AD" : n.includes("vinil") ? "#C77DFF" : "#4FA3F7"; };
+function esVariante(r){
+  const v = [];
+  v.push({aco:"Aço", aluminio:"Alumínio", madeira:"Madeira", fibra:"Fibra de vidro", "aluminio madeira":"Alumínio ou madeira"}[r.mat] || "");
+  if (r.cores) v.push("navio " + r.cores.join(" ou "));
+  if (r.sub) v.push("submarino"); if (r.polar && !(r.cores || []).includes("cinza")) v.push("áreas polares"); if (r.camuflado) v.push("camuflado ComFlotAM/MT"); if (r.doce) v.push("água doce");
+  if (r.escopo) v.push(r.escopo);
+  return v.filter(Boolean).join(" · ");
+}
+function esPeso(r){ return (r.sub ? 40 : 0) + (r.polar && !(r.cores || []).includes("cinza") ? 20 : 0) + (r.camuflado ? 15 : 0) + (r.doce ? 10 : 0) + (r.escopo && /parcial|retoque/i.test(r.escopo) ? 5 : 0) + (r.cores && !r.cores.includes("cinza") ? 8 : 0); }
+function esFiltra(D){
+  const q = norm(ES.q).trim(), todos = [...(D.bordo || []).map(r => ({...r, bordo:true})), ...(D.esquemas || [])];
+  let L;
+  if (ES.g) { const g = D.grupos.find(x => x.id === ES.g); L = todos.filter(r => r.grupo === ES.g || (g && g.aps.includes(r.id))); }
+  else if (q) {
+    const ws = q.split(/\s+/).filter(w => w.length > 1);
+    L = todos.filter(r => { const g = D.grupos.find(x => x.id === r.grupo); const t = norm([r.area, r.titulo, r.esquema, g ? g.nome + " " + g.chave : "", r.bordo ? "bordo interno" : ""].join(" ")); return ws.every(w => t.includes(w) || (w.length > 4 && t.includes(w.slice(0, -1)))); });
+  } else return null;
+  const mat = L.filter(r => r.bordo || String(r.mat).includes(ES.mat));
+  return {L: (mat.length ? mat : L).sort((a, b) => (b.bordo ? 1 : 0) - (a.bordo ? 1 : 0) || esPeso(a) - esPeso(b)), outroMat: !mat.length && L.length};
+}
+function viewEsquemas(){
+  const D = esData(), back = `<button class="back" data-act="marBack">${ic("left")}Marinharia</button>`;
+  const head = `<div class="page-h"><span class="eyebrow">Marinharia · Pintura</span><h1>Esquemas de pintura</h1><p class="sub" style="font-size:15px">Diga onde vai pintar e veja o esquema: preparo da superfície, a ordem das tintas, a cor, a espessura de cada demão e o NEB, conforme a ENGENALMARINST 60-01D.</p></div>`;
+  if (!D) return back + head + `<div class="note">${ic("info")}<span>Os esquemas ainda não foram baixados. Abra o app com internet uma vez para carregar.</span></div>`;
+  return back + head + `<section class="card col tn-loc">
+      <div class="search">${ic("search")}<input id="es-q" class="input" type="search" inputmode="search" placeholder="Onde vai pintar? Ex.: costado" autocomplete="off" value="${esc(ES.q)}" aria-label="Onde vai pintar"></div>
+      <div class="es-chips">${D.grupos.map(g => `<button type="button" data-act="esGrupo" data-arg="${g.id}" aria-pressed="${ES.g === g.id}">${esc(g.curto || g.nome)}</button>`).join("")}${(D.bordo || []).length ? `<button type="button" data-act="esGrupo" data-arg="bordo" aria-pressed="${ES.g === "bordo"}">Esquemas de bordo</button>` : ""}</div>
+      <div class="seg es-mat" role="group" aria-label="Material da chapa">${ES_MAT.map(([k, n]) => `<button type="button" data-act="esMat" data-arg="${k}" aria-pressed="${ES.mat === k}">${n}</button>`).join("")}</div>
+      ${isAdmin() ? `<button class="btn ghost sm" data-act="esNovo" style="align-self:flex-start">${ic("plus")}Adicionar esquema de bordo</button>` : ""}
+    </section>
+    <div id="es-res" class="col" style="gap:14px">${esRes()}</div>
+    <p class="sub" style="font-size:12.5px">Fonte: ${esc(D.fonte || "ENGENALMARINST 60-01D")}. Confira sempre o boletim técnico de cada tinta (intervalo entre demãos, diluente, vida da mistura) e a última edição da publicação.</p>`;
+}
+function esRes(){
+  const D = esData(); if (!D) return "";
+  const q = norm(ES.q).trim();
+  const r = esFiltra(D);
+  if (!r) return `<div class="sub">Escolha um local acima ou digite onde vai pintar. O material da chapa (aço, alumínio…) muda o primer.</div>`;
+  const interno = /intern|piso|antepara|compart|camarote|corredor|teto/.test(q) || ES.g === "bordo";
+  const aviso = interno ? `<div class="note">${ic("info")}<span>A ENGENALMARINST 60-01D só traz esquemas para áreas externas, tanques, paióis de munição e de amarras, painéis e indicativos. Para <b>compartimentos internos</b> (piso, anteparas e teto de corredores, camarotes, oficinas) vale o plano de pintura do navio: confira com o encarregado.${isAdmin() ? " Você pode cadastrar esses esquemas em <b>Adicionar esquema de bordo</b>." : ""}</span></div>` : "";
+  if (!r.L.length) return aviso || `<div class="note warn">${ic("alert")}<span>Nada encontrado para “${esc(ES.q)}”. Tente outra palavra (costado, linha d’água, obras vivas, convoo, convés, tanque, aguada, paiol, amarras, painel, indicativo, calado) ou escolha um local acima.</span></div>`;
+  const m = ES_MAT.find(x => x[0] === ES.mat);
+  return aviso + (r.outroMat ? `<div class="note warn">${ic("alert")}<span>Não há esquema para ${esc(m ? m[1].toLowerCase() : "")} neste local. Mostrando os de outros materiais.</span></div>` : "") + r.L.map(esCard).join("");
+}
+function esCard(r, i, arr){
+  const tc = esTipoCor(r.esquema || "");
+  let k = 0;
+  const grupos = (r.grupos || []).map(g => { k = 0; return `${g.nome ? `<div class="es-gh">${esc(g.nome)}</div>` : ""}<ol class="es-steps">${g.demaos.map(d => { k++; return `<li><span class="es-n">${k}º</span><span class="es-sw" style="background:${esCor(d.cor)}"></span><div class="es-d"><b>${esc(d.produto)}</b>
+      <span class="sub">${esc(d.cor)}${d.esp ? ` · ${esc(d.esp)} µm secos por demão` : ""}</span>
+      <div class="es-tags"><span class="pill es-dm">${d.n || 1} ${(d.n || 1) > 1 ? "demãos" : "demão"}</span>${(d.neb || []).map(n => /\d/.test(n) ? `<button class="pill es-neb num" data-act="tnAbrir" data-arg="${esc(n.replace(/\s*\(.*$/, ""))}" title="Procurar no localizador de tintas">${esc(n)}</button>` : `<span class="pill">${esc(n)}</span>`).join("")}</div></div></li>`; }).join("")}</ol>${g.total ? `<div class="es-total">Espessura total do esquema: <b class="num">${g.total} µm</b></div>` : ""}`; }).join("");
+  const notas = [...(r.req || []), ...(r.notas || [])];
+  const apo = r.bordo ? "" : (APO() && (APO().apostilas || []).find(a => a.id === (esData().apostila || ""))) ? `<button class="btn ghost sm" data-act="apoLer" data-arg="${esc(esData().apostila)}" data-p="${r.pg}">${ic("book")}Ver na publicação (pág. ${r.pg})</button>` : "";
+  return `<article class="es-card" style="--c:${tc}">
+    <div class="es-h"><span class="pill" style="color:${tc};border-color:${tc}66">${esc(r.esquema || "")}</span><span class="pill">${r.bordo ? "Esquema de bordo" : "Apêndice " + esc(r.id)}</span>${i === 0 && arr.length > 1 && !r.bordo && !r.sub ? `<span class="pill es-top">Mais usado</span>` : ""}${r.bordo && isAdmin() ? `<button class="iconbtn sm" data-act="esEdit" data-arg="${esc(r.id)}" aria-label="Editar" style="margin-left:auto">${ic("edit")}</button>` : ""}</div>
+    <div><h3 class="es-t">${esc(r.area)}</h3>${r.bordo ? "" : `<div class="sub">${esc(esVariante(r))}</div>`}</div>
+    ${r.alt ? `<div class="sub">Cada bloco abaixo é para um caso diferente. Use só o do seu navio.</div>` : ""}
+    ${r.preparo ? `<div class="es-prep"><span class="es-n">0</span><div><small>Preparo da superfície</small><span>${esc(r.preparo)}</span></div></div>` : ""}
+    ${grupos}
+    ${notas.length ? `<details class="es-obs"><summary>Observações (${notas.length})</summary><ul>${notas.map(n => `<li>${esc(n)}</li>`).join("")}</ul></details>` : ""}
+    ${apo}</article>`;
+}
+function esModal(id){
+  const D = esData() || {}, r = (D.bordo || []).find(x => x.id === id) || {grupos:[{demaos:[]}]};
+  const linhas = (r.grupos[0] ? r.grupos[0].demaos : []).map(d => [d.n || 1, d.produto, d.cor, d.esp, (d.neb || []).join(", ")].join(" ; ")).join("\n");
+  const f = (n, l, ph, v) => `<div class="field"><label for="es-${n}">${l}</label><input id="es-${n}" name="${n}" class="input" maxlength="160" placeholder="${ph}" value="${esc(v || "")}"></div>`;
+  openModal(sheetHead(id ? "Editar esquema" : "Esquema de bordo", "Para locais que a 60-01D não cobre, como pisos internos") + `<form id="es-form" class="col" data-id="${esc(id || "")}">
+    ${f("area", "Local", "Ex.: Piso interno de corredores", r.area)}${f("esquema", "Tipo de esquema", "Ex.: Epóxi", r.esquema)}
+    <div class="field"><label for="es-preparo">Preparo da superfície</label><textarea id="es-preparo" name="preparo" class="input" rows="2">${esc(r.preparo || "")}</textarea></div>
+    <div class="field"><label for="es-dem">Demãos, na ordem (uma por linha)</label><textarea id="es-dem" name="dem" class="input" rows="5" placeholder="nº de demãos ; tinta ; cor ; espessura (µm) ; NEB&#10;1 ; Primer epóxi ; vermelha ; 60 ; E-8010-...">${esc(linhas)}</textarea><small class="sub">Separe os campos com ponto e vírgula. Só a tinta é obrigatória.</small></div>
+    <div class="field"><label for="es-obs">Observações</label><textarea id="es-obs" name="obs" class="input" rows="2">${esc((r.notas || []).join("\n"))}</textarea></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn primary">${ic("check")}Salvar</button>${id ? `<button type="button" class="btn ghost danger" data-act="esDel" data-arg="${esc(id)}">${ic("trash")}Apagar</button>` : ""}</div></form>`);
+}
+function esSalvar(form){
+  const v = formVals(form), id = form.dataset.id, area = String(v.area || "").trim();
+  if (!area) { toast("Preencha o local"); return; }
+  const demaos = String(v.dem || "").split("\n").map(l => l.split(";").map(x => x.trim())).filter(p => p.some(Boolean)).map(p => {
+    let [n, produto, cor, e, neb] = p; if (!/^\d+$/.test(n || "")) { neb = e; e = cor; cor = produto; produto = n; n = "1"; }
+    return {n:+n || 1, produto:produto || "", cor:cor || "", esp:String(e || "").replace(/\s*µ?m$/i, ""), neb:String(neb || "").split(",").map(x => x.trim()).filter(Boolean)}; }).filter(d => d.produto);
+  if (!S.content.esquemas) { toast("Os esquemas ainda não foram carregados"); return; }
+  const D = S.content.esquemas.data, L = D.bordo = D.bordo || [];
+  const rec = {id:id || "b" + Date.now().toString(36), area, esquema:String(v.esquema || "").trim(), preparo:String(v.preparo || "").trim(), grupos:[{demaos}], notas:String(v.obs || "").split("\n").map(x => x.trim()).filter(Boolean), grupo:"bordo"};
+  const i = L.findIndex(x => x.id === id); if (i >= 0) L[i] = rec; else L.push(rec);
+  putContent("esquemas"); closeModal(); ES.g = "bordo"; ES.q = ""; render(); toast("Esquema salvo");
 }
 
 /* --- guia --- */
@@ -2491,6 +2610,11 @@ const ACT = {
   tnEdit(a){ tnModal(a); },
   tnDel(a){ if (!confirm("Apagar esta tinta da tabela?")) return; const L = tintasData().itens; const i = L.findIndex(x => x.id === a); if (i >= 0) L.splice(i, 1); putContent("tintas"); closeModal(); render(); toast("Tinta apagada"); },
   tnTipo(a){ TN.mix.tipo = a; const y = scrollY; render(); scrollTo(0, y); },
+  esGrupo(a){ ES.g = ES.g === a ? null : a; ES.q = ""; const i = $("#es-q"); if (i) i.value = ""; document.querySelectorAll("[data-act=esGrupo]").forEach(b => b.setAttribute("aria-pressed", b.dataset.arg === ES.g)); const r = $("#es-res"); if (r) r.innerHTML = esRes(); },
+  esMat(a){ ES.mat = a; document.querySelectorAll("[data-act=esMat]").forEach(b => b.setAttribute("aria-pressed", b.dataset.arg === a)); const r = $("#es-res"); if (r) r.innerHTML = esRes(); },
+  esAbrir(a){ S.gq = ""; S.tab = "mar"; S.mar = "esquemas"; ES.g = a; ES.q = ""; render(); scrollTo(0, 0); },
+  esNovo(){ esModal(null); }, esEdit(a){ esModal(a); },
+  esDel(a){ if (!confirm("Apagar este esquema de bordo?")) return; const D = esData(); D.bordo = (D.bordo || []).filter(x => x.id !== a); putContent("esquemas"); closeModal(); render(); toast("Esquema apagado"); },
   tnModo(a){ TN.mix.modo = a; const y = scrollY; render(); scrollTo(0, y); },
   tnUsarProp(a){ const [p, ea, eb] = a.split("|"), [x, y] = p.split(":").map(v => v.trim()); if (ea && eb) Object.assign(TN.mix, {tipo:"kit", ka:x, kb:y, ea, eb}); else Object.assign(TN.mix, {tipo:"vol", a:x, b:y}); const sy = scrollY; render(); scrollTo(0, sy); const el = document.getElementById("tn-mistura"); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
   jNivel(a){ jogoNovo(a); render(); scrollTo(0, 0); },
@@ -2596,6 +2720,7 @@ document.addEventListener("keydown", ev => {
 });
 document.addEventListener("input", ev => {
   if (ev.target.id === "apo-q") { apoQ(ev.target.value); return; }
+  if (ev.target.id === "es-q") { ES.q = ev.target.value; ES.g = null; document.querySelectorAll("[data-act=esGrupo]").forEach(b => b.setAttribute("aria-pressed", "false")); const r = $("#es-res"); if (r) r.innerHTML = esRes(); return; }
   if (ev.target.id === "tn-q") { TN.q = ev.target.value; const L = tintasData().itens || [], q = norm(TN.q).trim(); const r = $("#tn-res"); if (r) r.innerHTML = tnRes(L, q, q ? L.filter(t => norm([t.num, t.nome, t.comp, t.compNome, t.cor, TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].join(" ")).includes(q)) : []); return; }
   if (ev.target.closest("[data-tn=mix]")) { tnMixPaint(ev.target.closest("[data-tn=mix]")); return; }
   if (ev.target.id === "rd-q") { clearTimeout(RDQ_T); const v = ev.target.value; RDQ_T = setTimeout(() => apoBuscaRun(v), 250); return; }
