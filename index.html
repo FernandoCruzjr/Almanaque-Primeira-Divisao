@@ -406,6 +406,7 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .apo-meta{display:flex;flex-wrap:wrap;gap:5px}.apo-off{color:var(--good)}.apo-off svg{width:12px;height:12px}
 .apo-res{display:flex;flex-direction:column;gap:6px}
 .apo-res mark{background:rgba(227,181,74,.35);color:var(--ink);border-radius:3px;padding:0 1px}
+.g-apo{display:flex;flex-direction:column;gap:6px}.g-apo:empty{display:none}
 .apo-grp{display:flex;align-items:baseline;gap:8px;padding:10px 4px 2px}.apo-grp b{font-family:var(--f-display)}
 .rd-h h1{font-family:var(--f-display);font-weight:800;font-size:clamp(20px,3.4vw,26px)}
 .rd-bar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:8px;border-radius:14px;background:rgba(14,31,48,.94);backdrop-filter:blur(10px);border:1px solid var(--glass-b)}
@@ -716,7 +717,7 @@ document.addEventListener("submit", async ev => {
 
 function showApp(){
   $("#boot").hidden = true; $("#gate").hidden = true; $("#app").hidden = false;
-  render();
+  render(); if (isMember()) apoPreload();
 }
 
 /* ======================= TELAS ======================= */
@@ -743,6 +744,7 @@ function render(){
   else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, mar:viewMar, apps:viewApps, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
   if (S.tab === "conta" && !isMember()) body = viewConta();
   $("#view").innerHTML = top + body;
+  if (S.gq && $("#g-apo")) gApo(S.gq);
   if (S.tab === "mar" && S.mar === "apo") apoDraw();
 }
 
@@ -885,8 +887,9 @@ function gResults(q){
   const terms = norm(q).split(/\s+/).filter(Boolean); if (!terms.length) return "";
   const hits = gIndex().map(e => { const n = norm(e.txt + " " + e.t); if (!terms.every(t => n.includes(t))) return null; return Object.assign({score:terms.filter(t => norm(e.t).includes(t)).length}, e); }).filter(Boolean)
     .sort((a, b) => b.score - a.score).slice(0, 40);
-  if (!hits.length) return `<div class="empty" style="padding:12px 4px">Nada encontrado para “${esc(q)}”.</div>`;
-  return `<div class="sub" style="padding:2px 4px 6px">${hits.length === 40 ? "40 primeiros resultados" : hits.length + (hits.length === 1 ? " resultado" : " resultados")}</div>` + hits.map(h => `<button class="gres-i" data-act="${h.act}" data-arg="${esc(h.arg)}"${h.i != null ? ` data-i="${esc(h.i)}"` : ""}><span class="pill">${esc(h.tipo)}</span><b>${esc(h.t)}</b>${h.sub ? `<span class="sub">${esc(h.sub)}</span>` : ""}<span class="gres-s">${esc(gSnippet(h.txt, terms))}</span></button>`).join("");
+  const apo = APO() ? `<div id="g-apo" class="g-apo"></div>` : "";
+  if (!hits.length) return (apo ? "" : `<div class="empty" style="padding:12px 4px">Nada encontrado para “${esc(q)}”.</div>`) + apo;
+  return `<div class="sub" style="padding:2px 4px 6px">${hits.length === 40 ? "40 primeiros resultados" : hits.length + (hits.length === 1 ? " resultado" : " resultados")}</div>` + hits.map(h => `<button class="gres-i" data-act="${h.act}" data-arg="${esc(h.arg)}"${h.i != null ? ` data-i="${esc(h.i)}"` : ""}><span class="pill">${esc(h.tipo)}</span><b>${esc(h.t)}</b>${h.sub ? `<span class="sub">${esc(h.sub)}</span>` : ""}<span class="gres-s">${esc(gSnippet(h.txt, terms))}</span></button>`).join("") + apo;
 }
 
 function stepsDone(id){ return lsGet(STEPS, {})[id] || []; }
@@ -1320,8 +1323,10 @@ async function apoBuf(f, prog){
 }
 async function apoGet(f, prog){ const buf = await apoBuf(f, prog); return new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM", iv:new Uint8Array(buf, 0, 12)}, await apoKey(), new Uint8Array(buf, 12))); }
 async function gunzipJSON(u8){
-  if (!("DecompressionStream" in window)) throw new Error("Este aparelho é antigo demais para abrir o índice (atualize o sistema).");
-  return JSON.parse(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+  if ("DecompressionStream" in window) { try { return JSON.parse(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream("gzip"))).text()); } catch (e) { console.warn(e); } }
+  /* iPhone com iOS antes do 16.4 não tem DecompressionStream: usa o fflate (vendor/fflate.mjs). */
+  const ff = await import(new URL("vendor/fflate.mjs", location.href).href);
+  return JSON.parse(ff.strFromU8(ff.gunzipSync(u8)));
 }
 async function apoCached(f){ if (AM.off[f]) return true; try { const c = await caches.open(APOC); AM.off[f] = !!(await c.match(apoUrl(f))); } catch (e) {} return !!AM.off[f]; }
 /* Apaga do aparelho versões antigas que não estão mais na lista. */
@@ -1485,7 +1490,7 @@ function apoSearch(q, ids){
   for (const id of ids) {
     const N = AM.ntxt[id]; if (!N) continue;
     const frase = terms.join(" ");
-    N.forEach((t, i) => { if (terms.every(x => t.includes(x))) { const fr = t.includes(frase); const n = terms.reduce((s, x) => s + t.split(x).length - 1, 0); hits.push({id, p:i + 1, score:(fr ? 1000 : 0) + n}); } });
+    N.forEach((t, i) => { if (terms.every(x => t.includes(x))) { const fr = t.includes(frase); const n = terms.reduce((s, x) => s + t.split(x).length - 1, 0); hits.push({id, p:i + 1, score:(fr ? 1000 : 0) + n - (t.includes("......") ? 600 : 0)}); /* página de índice (sumário) fica por último */ } });
   }
   return hits;
 }
@@ -1525,6 +1530,34 @@ async function apoQ(q){
     if (!APQ.msg) APQ.hits = apoSearch(APQ.q, A.apostilas.map(a => a.id));
     apoResPaint();
   }, 250);
+}
+
+/* Busca do Início: procura também no texto das apostilas (todas as páginas). */
+let GAPO_T = null;
+function gApo(q){
+  clearTimeout(GAPO_T);
+  GAPO_T = setTimeout(async () => {
+    const box = $("#g-apo"), A = APO(); if (!box || !A || !apoTerms(q).length) { if (box) box.innerHTML = ""; return; }
+    const falta = A.apostilas.filter(a => !AM.txt[a.id]);
+    if (falta.length) {
+      box.innerHTML = `<div class="sub" style="padding:8px 4px">Procurando nas apostilas…</div>`;
+      try { for (const a of falta) await apoTxt(a.id); }
+      catch (e) { console.warn(e); const b = $("#g-apo"); if (b && S.gq === q) b.innerHTML = `<div class="note warn">${ic("alert")}<span>Apostilas: ${esc(apoErr(e))}</span></div>`; return; }
+    }
+    const b = $("#g-apo"); if (!b || S.gq !== q) return;
+    const H = apoSearch(q, A.apostilas.map(a => a.id)).sort((x, y) => y.score - x.score);
+    if (!H.length) { b.innerHTML = `<div class="sub" style="padding:8px 4px">Nada nas apostilas para “${esc(q)}”.</div>`; return; }
+    const tit = id => (apoById(id) || {}).titulo || "";
+    b.innerHTML = `<div class="apo-grp"><b>Nas apostilas</b><span class="sub">${H.length} ${H.length === 1 ? "página" : "páginas"}</span></div>` +
+      H.slice(0, 8).map(h => `<button class="gres-i" data-act="apoLerG" data-arg="${h.id}" data-p="${h.p}" data-q="${esc(q)}"><span class="pill">Apostila</span><b>${esc(tit(h.id))} · pág. ${h.p}</b><span class="gres-s">${apoSnippet(h.id, h.p, q)}</span></button>`).join("") +
+      (H.length > 8 ? `<button class="btn ghost sm" data-act="apoTodos" data-arg="${esc(q)}" style="align-self:flex-start">Ver as ${H.length} páginas nas apostilas${ic("chev")}</button>` : "");
+  }, 200);
+}
+/* Deixa o índice das apostilas pronto no aparelho depois de entrar, para a busca responder na hora (também sem internet). */
+let APO_PRE = false;
+function apoPreload(){
+  if (APO_PRE || !APO()) return; APO_PRE = true;
+  setTimeout(async () => { for (const a of APO().apostilas) { try { await apoTxt(a.id); } catch (e) { APO_PRE = false; return; } } }, 3000);
 }
 
 /* Leitor: pdf.js desenha uma página por vez num canvas. */
@@ -2226,6 +2259,8 @@ const ACT = {
   jSair(){ G = null; clearInterval(GT); render(); scrollTo(0, 0); },
   jRetry(){ AM.jogoErr = ""; render(); },
   apoLer(a, el){ closeModal(); const p = el && el.dataset.p ? +el.dataset.p : (lsGet("alm-apo-pg", {})[a] || 1); S.gq = ""; S.tab = "mar"; S.mar = "apo"; S.apo = {id:a, p, z:1, q:el && el.dataset.p ? APQ.q : ""}; render(); scrollTo(0, 0); },
+  apoLerG(a, el){ APQ.q = el.dataset.q; ACT.apoLer(a, el); },
+  apoTodos(a){ S.gq = ""; S.tab = "mar"; S.mar = "apostilas"; APQ.q = a; APQ.hits = null; render(); scrollTo(0, 0); apoQ(a); },
   apoLerQ(a, el){ closeModal(); S.apo.q = el.dataset.q; const y = scrollY; render(); scrollTo(0, y); apoIr(+a); },
   apoVoltar(){ S.mar = "apostilas"; render(); scrollTo(0, 0); },
   apoPg(a){ apoIr(S.apo.p + +a); },
@@ -2318,7 +2353,7 @@ document.addEventListener("keydown", ev => {
 document.addEventListener("input", ev => {
   if (ev.target.id === "apo-q") { apoQ(ev.target.value); return; }
   if (ev.target.id === "rd-q") { clearTimeout(RDQ_T); const v = ev.target.value; RDQ_T = setTimeout(() => apoBuscaRun(v), 250); return; }
-  if (ev.target.id === "g-q") { S.gq = ev.target.value; const r = $("#g-res"); r.hidden = !S.gq.trim(); r.innerHTML = S.gq.trim() ? gResults(S.gq) : ""; return; }
+  if (ev.target.id === "g-q") { S.gq = ev.target.value; const r = $("#g-res"); r.hidden = !S.gq.trim(); r.innerHTML = S.gq.trim() ? gResults(S.gq) : ""; gApo(S.gq); return; }
   const cf = ev.target.closest("[data-calc]");
   if (cf && cf.dataset.calc === "ter" && /^(atual|ent|p\d+)$/.test(ev.target.name)) { calcSet("ter", formVals(cf)); const y = scrollY; render(); scrollTo(0, y); return; }
   if (cf) { if (ev.target.name === "grad") { const g = fin().grads.find(x => x.nome === ev.target.value); if (g) cf.curso.value = g.curso; } calcUpdate(cf); return; }
