@@ -349,6 +349,34 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
   .apps-home .app-head b{font-size:18px}
   .apps-home .app-icon{width:40px;height:40px;border-radius:11px}
 }
+/* marinharia */
+.cinta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.cinta-card{position:relative;display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:var(--r);border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));overflow:hidden}
+.cinta-card>div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cinta-card b{font-family:var(--f-display);font-size:17px}
+.cinta-card .num{font-family:var(--f-mono);font-weight:700;font-size:20px;color:var(--accent-ink)}
+.cinta-card small{font-size:12.5px;color:var(--muted)}
+.cinta-sw{position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.sling-svg{width:100%;height:auto}
+.etq-svg{width:100%;max-width:340px;height:auto}
+.etq-row{display:flex;gap:12px;align-items:center;font-size:14.5px}
+.etq-sw{width:34px;height:24px;border-radius:5px;flex:none;border:1px solid rgba(255,255,255,.25)}
+.modo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.modo-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px;border-radius:var(--r);border:1px solid var(--glass-b);background:rgba(0,0,0,.18);text-align:center}
+.modo-card b{font-size:13.5px;line-height:1.25}
+.modo-card .num{font-family:var(--f-mono);font-weight:700;color:var(--accent-ink);font-size:17px}
+.modo-svg{width:110px;height:120px}
+.cinta-pick{display:flex;flex-wrap:wrap;gap:8px}
+.cpick{border:2px solid var(--c);background:rgba(0,0,0,.25);color:var(--ink);border-radius:999px;padding:7px 13px;font-weight:700;font-family:var(--f-mono);font-size:13.5px;cursor:pointer}
+.cpick[aria-pressed="true"]{background:var(--c);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.modo-d{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:2px}
+.rl .modo-d+b,.rl b{flex:none}
+.tile.insp{min-height:0;cursor:default}
+.tile-i.bad{background:rgba(240,106,92,.14);color:var(--bad)}
+.lst{display:flex;flex-direction:column;gap:10px;padding-left:20px;font-size:14.5px;line-height:1.5}
+.norma{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.norma:last-child{border-bottom:0}
+@media (max-width:600px){.cinta-grid{grid-template-columns:1fr 1fr;gap:10px}.cinta-card{padding:10px 10px 10px 14px}.cinta-card b{font-size:15px}.cinta-card .num{font-size:17px}}
 /* calculadoras */
 .seg4{display:flex;overflow-x:auto;scrollbar-width:none}
 .seg4::-webkit-scrollbar{display:none}
@@ -425,6 +453,15 @@ const ICONS = {
   calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8v4H8zM8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
   roller:'<rect x="3" y="3" width="15" height="6" rx="1.5"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
   rope:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  sling:'<path d="M12 3v4M12 7c-3 0-7 5-8 13h16C19 12 15 7 12 7z"/><path d="M8 20c1-6 2.5-9 4-9s3 3 4 9"/>',
+  tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/>',
+  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  flame:'<path d="M12 21c4 0 7-3 7-7 0-5-5-7-5-11-3 2-4 5-4 7-1-1-2-2-2-4-2 2-3 5-3 8 0 4 3 7 7 7z"/>',
+  drop:'<path d="M12 3s7 7 7 12a7 7 0 0 1-14 0c0-5 7-12 7-12z"/>',
+  layers:'<path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/>',
+  circle:'<circle cx="12" cy="12" r="8"/><path d="M8 12h8"/>',
+  knot:'<path d="M3 12h5c2 0 2-4 4-4s3 2 2 4-3 3-4 1 1-5 4-5M14 12c1 2 3 4 7 4"/>',
+  wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5l2.5 2.5-1 2-2 1-2.5-2.5"/>',
   money:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
@@ -609,7 +646,7 @@ function showApp(){
 
 /* ======================= TELAS ======================= */
 function tabs(){
-  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["calc","Calcular","calc"],["apps","Apps","grid"]];
+  const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["mar","Marinharia","rope"],["calc","Calcular","calc"],["apps","Apps","grid"]];
   if (isAdmin()) t.push(["incumbencias","Incumbências","clip"],["equipe","Equipe","users"]);
   t.push(["conta","Conta","user"]);
   return t;
@@ -619,8 +656,8 @@ function render(){
   if (!tabs().some(t => t[0] === S.tab)) S.tab = "inicio";
   const navHtml = tabs().map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
   $("#nav").innerHTML = navHtml;
-  /* No celular a conta abre pelo avatar no topo e a equipe pelo Início, então a barra de baixo fica com no máximo cinco botões. */
-  $("#tabbar").innerHTML = tabs().filter(t => t[0] !== "conta" && t[0] !== "equipe").map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
+  /* No celular a conta abre pelo avatar no topo, a equipe pelo Início e, para o encarregado, os Apps pelo Início, então a barra de baixo fica com no máximo cinco botões. */
+  $("#tabbar").innerHTML = tabs().filter(t => t[0] !== "conta" && t[0] !== "equipe" && !(t[0] === "apps" && isAdmin())).map(([id, n, i]) => `<button data-act="tab" data-arg="${id}" ${S.tab === id ? 'aria-current="page"' : ""}>${ic(i)}<span>${n}</span></button>`).join("");
   setSync(S.sync);
   const nome = (S.member && S.member.nome) || "";
   const top = `<div class="topbar"><div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
@@ -628,7 +665,7 @@ function render(){
     <span class="pill netpill" id="netpill" hidden></span><button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${nome ? esc(nome[0].toUpperCase()) : ic("user").replace('<svg','<svg width="20" height="20"')}</button></div>`;
   let body;
   if (!isMember()) body = viewPending();
-  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, apps:viewApps, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
+  else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, mar:viewMar, apps:viewApps, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
   if (S.tab === "conta" && !isMember()) body = viewConta();
   $("#view").innerHTML = top + body;
 }
@@ -690,7 +727,7 @@ function viewHome(){
       <div class="grid"><button class="tile" data-act="tab" data-arg="incumbencias"><div class="tile-i">${ic("clip")}</div><b>Incumbências</b><div class="sub">${I.locais.length} locais · ${st.n} itens</div><div class="foot"><div class="bar"><i style="width:${pct}%"></i></div><span class="num sub">${pct}%</span></div></button>
       <button class="tile" data-act="tab" data-arg="equipe"><div class="tile-i">${ic("users")}</div><b>Equipe</b><div class="sub">${S.members.filter(m => m.approved).length} com acesso${pend ? ` · ${pend} aguardando` : ""}</div><div class="foot"><span class="sub">Liberar quem chegou</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button></div>`;
   }
-  const menu = [["h-guia", "Guia", "anchor"], ["h-vida", "Qualidade de vida", "heart"], ["h-ferr", "Ferramentas", "calc"], ["h-simb", "Símbolos", "ship"]];
+  const menu = [["h-guia", "Guia", "anchor"], ["h-vida", "Qualidade de vida", "heart"], ["h-mar", "Marinharia", "rope"], ["h-ferr", "Ferramentas", "calc"], ["h-simb", "Símbolos", "ship"]];
   if (adm) menu.push(["h-enc", "Encarregado", "lock"]);
   return `<div class="homebar">
       <div class="gsearch">${ic("search")}<input id="g-q" type="search" placeholder="Buscar em todo o app" autocomplete="off" aria-label="Buscar em todo o app" value="${esc(S.gq || "")}">${S.gq ? `<button class="iconbtn sm" data-act="gClear" aria-label="Limpar busca">${ic("x")}</button>` : ""}</div>
@@ -714,6 +751,8 @@ function viewHome(){
     <div class="sec-title" id="h-vida"><h2>Qualidade de vida</h2><button class="btn ghost sm" data-act="tab" data-arg="apps">Ver apps${ic("chev")}</button></div>
     <div class="apps-home">${APPS.map(a => appCard(a, false)).join("")}</div>
     ${maisBordo(mods).length ? `<div class="sec-title"><h2>Mais a bordo</h2></div><div class="grid mini">${maisBordo(mods).map(modTile).join("")}</div>` : ""}
+    <div class="sec-title" id="h-mar"><h2>Marinharia</h2><button class="btn ghost sm" data-act="tab" data-arg="mar">Ver tudo${ic("chev")}</button></div>
+    <div class="grid mini">${marTiles()}</div>
     <div class="sec-title" id="h-ferr"><h2>Ferramentas</h2></div>
     <div class="grid mini">${calcTiles()}</div>
     <div class="sec-title" id="h-simb"><h2>Nossos símbolos</h2></div>
@@ -753,6 +792,7 @@ function gIndex(){
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
   });
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
+  E.push({tipo:"Marinharia", t:"Cintas de elevação", sub:"Cores, etiqueta, fator 7:1, modos, inspeção", txt:"cinta cintas elevação içamento içar lingada cor cores lilás verde amarela cinza vermelha marrom azul laranja etiqueta cmt wll carga máxima trabalho fator segurança 7 enforcada cesto ângulo pernas inspeção descarte nbr 15637 en 1492 nr-11 poliéster tubular plana", act:"marOpen", arg:"cintas"});
   E.push({tipo:"Ferramentas", t:"Calculadora de espias", sub:"Bitola, diâmetro e carga de ruptura", txt:"calculadora espia espias cabo cabos bitola circunferência diâmetro polegada mm carga ruptura trabalho segurança nylon polietileno polipropileno poliéster kevlar aramida dyneema manilha sisal fibra vegetal aço amarração", act:"tool", arg:"espias"});
   E.push({tipo:"Ferramentas", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"tool", arg:"fin"});
   APPS.forEach(a => E.push({tipo:"Apps", t:a.nome, sub:a.tag, txt:[a.nome, a.tag, a.resumo, ...a.telas.map(x => x.t)].join(" "), act:"tab", arg:"apps"}));
@@ -1162,6 +1202,141 @@ async function gerarPDF(lid){
   if (navigator.canShare && navigator.canShare({files:[file]}) && matchMedia("(pointer:coarse)").matches) { try { await navigator.share({files:[file], title:nome}); return; } catch (e) { if (e && e.name === "AbortError") return; } }
   doc.save(nome);
 }
+/* ---------- Marinharia ---------- */
+/* Conteúdo público (normas ABNT NBR 15637 e EN 1492), sem dado do navio, por isso pode ficar no código. */
+function viewMar(){
+  if (S.mar === "cintas") return viewCintas();
+  return `<div class="page-h"><span class="eyebrow">Fainas de convés</span><h1>Marinharia</h1><p class="sub" style="font-size:15px">Cabos, cintas e acessórios de içamento: o que cada marcação quer dizer e como usar com segurança.</p></div>
+    <div class="grid">${marTiles()}</div>`;
+}
+const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
+  <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Bitola, diâmetro e carga de ruptura dos cabos por material.</div></button>`;
+
+/* Código de cores da CMT: EN 1492-1/-2 e ABNT NBR 15637-1/-2. Cinta plana leva uma listra por tonelada. */
+const CINTAS = [
+  {t:1, cor:"Lilás", hex:"#8E5BD0"}, {t:2, cor:"Verde", hex:"#2FA65A"}, {t:3, cor:"Amarela", hex:"#F2C230"}, {t:4, cor:"Cinza", hex:"#8C939A"},
+  {t:5, cor:"Vermelha", hex:"#D8392F"}, {t:6, cor:"Marrom", hex:"#8A5A34"}, {t:8, cor:"Azul", hex:"#2F6FD6"}, {t:10, cor:"Laranja", hex:"#F07A1E", mais:true}];
+/* Fator de modo M (EN 1492-1): CMT do modo = CMT da etiqueta × M. β é o ângulo de cada perna com a vertical. */
+const MODOS = [
+  {id:"direta", n:"Direta", m:1, d:"Uma perna, na vertical."},
+  {id:"enforcada", n:"Enforcada", m:0.8, d:"A cinta passa por dentro do próprio olhal e aperta a carga."},
+  {id:"cesto", n:"Em cesto, pernas paralelas", m:2, d:"A carga apoia no meio da cinta e os dois olhais vão ao gancho."},
+  {id:"cesto45", n:"Em cesto, β até 45°", m:1.4, d:"Pernas abertas até 45° da vertical (90° entre elas)."},
+  {id:"cesto60", n:"Em cesto, β de 45° a 60°", m:1, d:"Pernas muito abertas: aguenta só a CMT da etiqueta."},
+  {id:"duas45", n:"Duas cintas diretas, β até 45°", m:1.4, d:"Valor para o conjunto, com cintas iguais."},
+  {id:"duas60", n:"Duas cintas diretas, β de 45° a 60°", m:1, d:"Valor para o conjunto."},
+  {id:"duasEnf45", n:"Duas cintas enforcadas, β até 45°", m:1.12, d:"0,8 × 1,4."},
+  {id:"quatro45", n:"Três ou quatro pernas, β até 45°", m:2.1, d:"Conta só com 3 pernas trabalhando: a quarta não divide a carga com certeza."},
+  {id:"quatro60", n:"Três ou quatro pernas, β de 45° a 60°", m:1.5, d:""}];
+
+function slingSvg(c, w = 220){
+  const n = Math.min(c.t, 10), y0 = 14, h = 30, stripes = Array.from({length:n}, (_, i) => y0 + 3 + (h - 6) * (n === 1 ? .5 : i / (n - 1)));
+  return `<svg viewBox="0 0 ${w} 58" class="sling-svg" role="img" aria-label="Cinta ${c.cor}">
+    <path d="M16 29 C16 6, 58 6, 58 ${y0} L58 ${y0 + h} C58 52, 16 52, 16 29Z M${w - 16} 29 C${w - 16} 6, ${w - 58} 6, ${w - 58} ${y0} L${w - 58} ${y0 + h} C${w - 58} 52, ${w - 16} 52, ${w - 16} 29Z" fill="none" stroke="${c.hex}" stroke-width="9"/>
+    <rect x="50" y="${y0}" width="${w - 100}" height="${h}" rx="3" fill="${c.hex}"/>
+    ${stripes.map(y => `<line x1="54" x2="${w - 54}" y1="${y}" y2="${y}" stroke="rgba(0,0,0,.45)" stroke-width="1.2"/>`).join("")}
+    <rect x="${w / 2 - 14}" y="${y0 - 4}" width="28" height="${h + 8}" rx="3" fill="#2E6FD6" stroke="#fff" stroke-width="1.2"/>
+    <text x="${w / 2}" y="${y0 + h / 2 + 4}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">${c.t}${c.mais ? "+" : ""}t</text></svg>`;
+}
+function modoSvg(id){
+  const s = `stroke="var(--accent)" stroke-width="5" fill="none" stroke-linecap="round"`;
+  const hook = `<path d="M60 4v14 M60 18c-9 0-9 13 0 13c6 0 7-6 3-8" stroke="var(--muted)" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  const box = (x = 30, w = 60) => `<rect x="${x}" y="88" width="${w}" height="34" rx="4" fill="rgba(255,255,255,.08)" stroke="var(--muted)" stroke-width="2"/>`;
+  const ang = (x1, x2) => `<path d="M60 52 L60 66" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1.5"/><text x="${x2 > 60 ? 66 : 48}" y="62" font-size="11" fill="var(--muted)">β</text>`;
+  const d = {
+    direta:`${hook}<path d="M60 31 L60 88" ${s}/>${box(40, 40)}`,
+    enforcada:`${hook}<path d="M60 31 L60 76 L40 88 L40 122 L80 122 L80 88 L60 76" ${s}/>${box(40, 40)}`,
+    cesto:`${hook}<path d="M57 31 L40 40 L40 124 L80 124 L80 40 L63 31" ${s}/>${box(40, 40)}`,
+    cesto45:`${hook}<path d="M60 31 L30 88 L30 124 L90 124 L90 88 Z" ${s} stroke-linejoin="round"/>${box()}<path d="M60 31 L60 70" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1.5"/><text x="64" y="62" font-size="12" fill="var(--muted)">β</text>`,
+    duas45:`${hook}<path d="M60 31 L32 88 M60 31 L88 88" ${s}/>${box()}<path d="M60 31 L60 70" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1.5"/><text x="64" y="62" font-size="12" fill="var(--muted)">β</text>`,
+    quatro45:`${hook}<path d="M60 31 L24 92 M60 31 L96 92 M60 31 L44 84 M60 31 L76 84" ${s}/><path d="M18 92 L42 82 L102 82 L78 92Z" fill="rgba(255,255,255,.06)" stroke="var(--muted)" stroke-width="2"/><rect x="18" y="92" width="60" height="30" fill="rgba(255,255,255,.08)" stroke="var(--muted)" stroke-width="2"/><path d="M78 92 L102 82 L102 112 L78 122" fill="rgba(255,255,255,.05)" stroke="var(--muted)" stroke-width="2"/>`};
+  return `<svg viewBox="0 0 120 130" class="modo-svg" aria-hidden="true">${d[id] || ""}</svg>`;
+}
+function etiquetaSvg(){
+  const L = [["CMT (WLL)", "2.000 kg"], ["Material", "Poliéster (PES)"], ["Comprimento útil", "3,0 m"], ["Fabricante", "nome e lote"], ["Fabricação", "mês/ano"], ["Norma", "NBR 15637-1"]];
+  return `<svg viewBox="0 0 300 200" class="etq-svg" role="img" aria-label="Exemplo de etiqueta azul de cinta de poliéster">
+    <rect x="2" y="2" width="296" height="196" rx="10" fill="#2E6FD6"/><rect x="10" y="10" width="280" height="180" rx="6" fill="none" stroke="rgba(255,255,255,.5)" stroke-dasharray="4 3"/>
+    <text x="150" y="34" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">CINTA DE ELEVAÇÃO</text>
+    ${L.map(([k, v], i) => `<text x="22" y="${62 + i * 21}" font-size="12" fill="rgba(255,255,255,.75)">${k}</text><text x="278" y="${62 + i * 21}" text-anchor="end" font-size="12.5" font-weight="700" fill="#fff">${v}</text>`).join("")}
+    <g transform="translate(22 182)"><text font-size="10" fill="rgba(255,255,255,.75)">Direta 2.000 · Enforcada 1.600 · Cesto 4.000 kg</text></g></svg>`;
+}
+
+function viewCintas(){
+  const v = Object.assign({cmt:"2"}, calcGet("cinta"));
+  return `<button class="back" data-act="marBack">${ic("left")}Marinharia</button>
+    <div class="page-h"><span class="eyebrow">Marinharia · Içamento</span><h1>Cintas de elevação</h1><p class="sub" style="font-size:15px">Cintas de poliéster planas e tubulares (redondas). A cor diz a carga, a etiqueta confirma, e o jeito de amarrar muda tudo.</p></div>
+
+    <div class="sec-title"><h2>Código de cores</h2></div>
+    <p class="sub" style="font-size:14.5px">A cor da cinta indica a <b>CMT, carga máxima de trabalho</b> em tração <b>direta, na vertical</b>. É o mesmo código na norma brasileira e na europeia. Na cinta plana, cada listra preta costurada ao longo da fita vale 1 tonelada.</p>
+    <div class="cinta-grid">${CINTAS.map(c => `<div class="cinta-card"><span class="cinta-sw" style="--c:${c.hex}"></span>${slingSvg(c)}<div><b>${c.cor}</b><span class="num">${c.mais ? "≥ 10 t" : c.t + " t"}</span></div>${c.mais ? `<small>De 10 t para cima toda cinta é laranja: existem de 10, 12, 15, 20 t e mais. Só a etiqueta diz quanto.</small>` : `<small>${c.t} ${c.t === 1 ? "listra" : "listras"} na cinta plana</small>`}</div>`).join("")}</div>
+    <div class="note warn">${ic("info")}<span><b>Laranja não é um número.</b> Uma cinta laranja pode ser de 10 t ou de 20 t, e as duas são iguais por fora. Antes de içar, leia a CMT na etiqueta.</span></div>
+
+    <div class="sec-title"><h2>A etiqueta vale mais que a cor</h2></div>
+    <div class="calc-grid">
+      <div class="card col" style="align-items:center">${etiquetaSvg()}<small class="sub" style="font-size:12.5px">Exemplo de etiqueta de cinta verde de 2 t.</small></div>
+      <div class="card col">
+        <p style="font-size:14.5px">Toda cinta deve ter etiqueta costurada com a CMT, o material, o comprimento útil, o fabricante, o lote e a norma. A <b>cor da etiqueta</b> mostra o <b>material</b>:</p>
+        <div class="col" style="gap:8px">${[["#2E6FD6", "Azul", "Poliéster (PES)", "O mais comum nas cintas de elevação."], ["#2FA65A", "Verde", "Poliamida (PA, nylon)", "Estica mais."], ["#8A5A34", "Marrom", "Polipropileno (PP)", "Mais fraco com calor."], ["#E8E8E8", "Branca", "Outros materiais", ""]].map(([h, c, m, o]) => `<div class="etq-row"><span class="etq-sw" style="background:${h}"></span><div><b>${c}</b> · ${m}${o ? `<br><small class="sub">${o}</small>` : ""}</div></div>`).join("")}</div>
+        <div class="note bad">${ic("x")}<span><b>Sem etiqueta ou etiqueta ilegível: a cinta sai de uso.</b> Não dá para saber a CMT pela cor com certeza.</span></div>
+      </div>
+    </div>
+
+    <div class="sec-title"><h2>Fator de segurança 7:1</h2></div>
+    <div class="chips"><div class="chip-v"><small>Carga de ruptura mínima</small><span>7 × CMT</span></div><div class="chip-v"><small>Cinta verde (2 t)</small><span>rompe com ≥ 14 t</span></div></div>
+    <p class="sub" style="font-size:14.5px">Essa folga existe para cobrir desgaste, trancos, ângulo mal avaliado e cantos. <b>Não é margem para passar da CMT.</b> Um tranco (carga que cai e é segurada de repente) pode multiplicar o esforço várias vezes.</p>
+
+    <div class="sec-title"><h2>Modos de amarração</h2></div>
+    <p class="sub" style="font-size:14.5px">A carga permitida é a <b>CMT da etiqueta × o fator de modo</b>. O ângulo <b>β</b> é medido entre cada perna e a vertical. Quanto mais abertas as pernas, mais força em cada uma. Acima de 60° da vertical, <b>não içar</b>.</p>
+    <div class="modo-grid">${[["direta", "Direta", "× 1,0"], ["enforcada", "Enforcada", "× 0,8"], ["cesto", "Cesto, pernas paralelas", "× 2,0"], ["cesto45", "Cesto, β até 45°", "× 1,4"], ["duas45", "Duas cintas, β até 45°", "× 1,4"], ["quatro45", "3 ou 4 pernas, β até 45°", "× 2,1"]].map(([id, n, f]) => `<div class="modo-card">${modoSvg(id)}<b>${n}</b><span class="num">${f}</span></div>`).join("")}</div>
+
+    <div class="card col" id="cinta-calc">
+      <div class="rl-h">Quanto essa cinta aguenta em cada modo</div>
+      <div class="cinta-pick">${CINTAS.map(c => `<button type="button" class="cpick" data-act="cintaCmt" data-arg="${c.t}" style="--c:${c.hex}" aria-pressed="${pnum(v.cmt) === c.t}">${c.t}${c.mais ? "+" : ""} t</button>`).join("")}</div>
+      <form data-calc="cinta" onsubmit="return false">${inF("cmt", "CMT da etiqueta", v.cmt, {suf:"t", hint:"Toque numa cor ou digite o valor da etiqueta (ex.: 20 para uma laranja de 20 t)."})}</form>
+      <div id="calc-out">${cintaOut(v)}</div>
+    </div>
+
+    <div class="sec-title"><h2>Inspeção: quando retirar de uso</h2></div>
+    <p class="sub" style="font-size:14.5px">Olhe a cinta inteira <b>antes de cada uso</b>. Achou um destes, separe e não use:</p>
+    <div class="grid mini">${[
+      ["tag", "Etiqueta ausente ou ilegível", "Sem CMT confirmada, sem uso."],
+      ["x", "Cortes, rasgos e furos", "Na fita ou nas bordas, em qualquer direção."],
+      ["link", "Costura rompida ou gasta", "Principalmente nos olhais, onde a carga se concentra."],
+      ["flame", "Queimadura ou derretimento", "Pontos duros, brilhantes ou vitrificados, por calor ou atrito."],
+      ["drop", "Contaminação química", "Manchas, fibras quebradiças ou que soltam pó."],
+      ["layers", "Abrasão forte", "Fita felpuda, mais fina ou com fibras arrancadas."],
+      ["circle", "Capa rasgada na tubular", "Se o núcleo aparece, a cinta tubular sai de uso."],
+      ["knot", "Nó na cinta", "Nó corta a resistência pela metade. Nunca dê nó."],
+      ["wrench", "Ferragem danificada", "Olhais metálicos deformados, trincados ou corroídos."]].map(([i, t, d]) => `<div class="tile insp"><div class="tile-i bad">${ic(i)}</div><b>${t}</b><div class="sub">${d}</div></div>`).join("")}</div>
+
+    <div class="sec-title"><h2>Boas práticas</h2></div>
+    <div class="card col"><ul class="lst">
+      <li><b>Proteja dos cantos vivos</b> com protetores, mangas ou lona. Canto vivo corta a cinta mesmo abaixo da CMT.</li>
+      <li><b>Não torça, não dê nó, não arraste</b> a cinta no chão nem puxe por baixo da carga apoiada.</li>
+      <li>Centralize a carga e confira o <b>centro de gravidade</b>. Faça um içamento de teste a poucos centímetros do convés.</li>
+      <li><b>Ninguém embaixo da carga</b> suspensa e ninguém entre a carga e a antepara.</li>
+      <li>A cinta assenta inteira no gancho, sem dobrar a fita nem sobrepor os olhais.</li>
+      <li><b>Temperatura:</b> poliéster e poliamida de −40 °C a 100 °C; polipropileno de −40 °C a 80 °C.</li>
+      <li><b>Produtos químicos:</b> poliéster resiste a ácidos mas é atacado por álcalis; poliamida resiste a álcalis e é atacada por ácidos; polipropileno resiste bem aos dois. Em dúvida, pergunte ao fabricante.</li>
+      <li>Guarde <b>limpa, seca e longe do sol</b>. Raio UV enfraquece a fibra mesmo sem uso.</li></ul></div>
+
+    <div class="sec-title"><h2>Normas</h2></div>
+    <div class="card col" style="gap:0">${[
+      ["ABNT NBR 15637-1", "Cintas têxteis para elevação de cargas, Parte 1: cintas planas de fibras sintéticas. Código de cores, listras, etiqueta, fator 7:1 e fatores de modo."],
+      ["ABNT NBR 15637-2", "Parte 2: cintas tubulares (redondas) de fibras sintéticas."],
+      ["EN 1492-1 e EN 1492-2", "Normas europeias equivalentes, de onde vem o código de cores e a tabela de fatores de modo."],
+      ["NR-11 (Ministério do Trabalho)", "Transporte, movimentação, armazenagem e manuseio de materiais: todo equipamento de içamento deve indicar a carga máxima de trabalho em lugar visível."],
+      ["ASME B30.9 (EUA)", "Cintas americanas não seguem obrigatoriamente este código de cores. Cinta importada: só a etiqueta vale."]].map(([n, d]) => `<div class="norma"><b>${n}</b><span class="sub">${d}</span></div>`).join("")}</div>
+    <div class="note">${ic("info")}<span>Resumo para consulta rápida. As normas completas, as ordens do navio e o certificado do fabricante prevalecem.</span></div>`;
+}
+function cintaOut(v){
+  const cmt = pnum(v.cmt);
+  if (!(cmt > 0)) return `<p class="sub">Escolha a cor ou digite a CMT.</p>`;
+  const kg = x => x * 1000 >= 10000 ? nf(x, 1) + " t" : nf(x * 1000, 0) + " kg";
+  return `<div class="chips"><div class="chip-v"><small>CMT direta</small><span>${kg(cmt)}</span></div><div class="chip-v"><small>Ruptura mínima (7×)</small><span>${kg(cmt * 7)}</span></div></div>
+    <div class="col" style="gap:0;margin-top:8px">${MODOS.map(m => `<div class="rl"><span>${m.n}${m.d ? `<small class="modo-d">${m.d}</small>` : ""}</span><b class="num">${kg(cmt * m.m)}</b></div>`).join("")}</div>`;
+}
+
 /* ---------- calculadoras ---------- */
 /* O que cada um digita fica só no aparelho dele. Os valores da tabela de remuneração ficam no banco e o encarregado atualiza quando sai reajuste. */
 const CALC = "alm-calc";
@@ -1543,6 +1718,7 @@ function terOut(F, v){
 function calcUpdate(f){
   const k = f.dataset.calc, v = formVals(f), out = $("#calc-out"); calcSet(k, v); if (!out) return;
   if (k === "tinta") out.innerHTML = tintaOut(v);
+  else if (k === "cinta") { out.innerHTML = cintaOut(v); document.querySelectorAll(".cpick").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.arg === pnum(v.cmt)))); }
   else if (k === "espias") { out.innerHTML = espiasOut(v); const t = $("#esp-tab"); if (t) t.innerHTML = espiasTab(v); const a = $("#esp-area"); if (a) a.innerHTML = espArea(v); }
   else if (k === "sim") out.innerHTML = simOut(fin(), v);
   else if (k === "inv") out.innerHTML = invOut(fin(), v);
@@ -1626,12 +1802,15 @@ function viewConta(){
 let INSTALL_EVT = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL_EVT = e; });
 const ACT = {
-  tab(a){ S.tab = a; S.mod = null; S.local = null; S.sel = null; S.q = ""; S.tool = null; S.gq = ""; render(); scrollTo(0, 0); },
+  tab(a){ S.tab = a; S.mar = null; S.mod = null; S.local = null; S.sel = null; S.q = ""; S.tool = null; S.gq = ""; render(); scrollTo(0, 0); },
   jump(a){ const el = document.getElementById(a); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
   gClear(){ S.gq = ""; render(); const i = $("#g-q"); if (i) i.focus(); },
   gMod(a, el){ const i = +el.dataset.i; S.gq = ""; S.tab = "bemvindo"; S.mod = a; if (i >= 0) OPEN[a] = [i]; render(); const s = i >= 0 && document.querySelector(`[data-sec="${i}"]`); if (s) s.scrollIntoView({block:"start"}); else scrollTo(0, 0); },
   gItem(a, el){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); itemModal(a, el.dataset.i); },
   tool(a){ S.gq = ""; S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
+  marOpen(a){ S.gq = ""; S.tab = "mar"; S.mar = a; render(); scrollTo(0, 0); },
+  marBack(){ S.mar = null; render(); scrollTo(0, 0); },
+  cintaCmt(a){ calcSet("cinta", {cmt:a}); const y = scrollY; render(); scrollTo(0, y); },
   toolBack(){ S.tool = null; render(); scrollTo(0, 0); },
   espMed(a){ const f = $("[data-calc=espias]"); calcSet("espias", Object.assign(formVals(f), {med:a})); render(); },
   tintaModo(a){ const f = $("[data-calc=tinta]"); calcSet("tinta", Object.assign(formVals(f), {modo:a})); render(); },
