@@ -52,10 +52,11 @@ const RING = (() => {
   for (const [dr, dc, n] of seg) for (let i = 0; i < n; i++) { out.push([r, c]); r += dr; c += dc; }
   return out;
 })();
-/* Caminho do Fluminense: sai na porta (casa logo depois da entrada), dá a volta toda, entra no M, desce e entra no braço até o centro. */
+/* Caminho do Fluminense: sai na porta (a casa azul do canto, (3,0)), dá a volta toda, entra no M, desce e entra no braço até o centro. */
+const PORTA = 3; // índice no anel da casa de saída do paiol
 const PATH0 = (() => {
   const p = [];
-  for (let i = 1; i <= 72; i++) p.push(RING[i % 72]);
+  for (let i = PORTA; i <= 72; i++) p.push(RING[i % 72]);
   p.push([4, 3]);                                   // M: o "morto", ninguém mata ali
   for (let r = 5; r <= 13; r++) p.push([r, 3]);     // termina na caveira (13,3)
   p.push([13, 4], [13, 5]);                         // (13,5): última casa antes da bandeira de chegada
@@ -66,8 +67,8 @@ const PATHS = [0, 1, 2, 3].map(n => PATH0.map(rc => rotN(rc, n)));
 const LAST = PATH0.length - 1;  // 89
 const ARM = LAST - 5;           // 84: começo das últimas seis casas
 const MESTRE = ARM - 1;         // 83: casa da Jogada de Mestre
-const MORTO = 72;               // casa M
-const SKULL = 81;               // caveira de cada jogador
+const MORTO = 73 - PORTA;       // casa M
+const SKULL = MORTO + 9;        // caveira de cada jogador
 const key = (p, i) => PATHS[p][i][0] * 19 + PATHS[p][i][1];
 const RINGIDX = PATHS.map(P => { const m = {}; for (let i = 0; i < MORTO; i++) m[P[i][0] * 19 + P[i][1]] = i; return m; });
 const SAFE = new Set(PATHS.map((P, p) => key(p, MORTO)));
