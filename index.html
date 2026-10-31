@@ -350,6 +350,71 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
   .apps-home .app-icon{width:40px;height:40px;border-radius:11px}
 }
 /* marinharia */
+/* jogo "Que peça é essa?" */
+.niveis{display:flex;flex-direction:column;gap:10px}
+.nivel{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;text-align:left;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));border-radius:var(--r);padding:14px 16px;color:var(--ink)}
+.nivel:hover{border-color:rgba(227,181,74,.45)}
+.nivel-i{width:52px;height:52px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.divisa{width:36px;height:36px}
+.nivel-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.nivel-t b{font-family:var(--f-display);font-size:17px}
+.nivel-m{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.nivel-r{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.stars{display:inline-flex;gap:2px;font-size:18px;line-height:1}
+.stars i{font-style:normal;color:rgba(255,255,255,.18)}.stars i.on{color:var(--accent)}
+.j-top{display:flex;align-items:center;gap:10px}.j-top .j-pts{margin-left:auto;color:var(--accent-ink);font-weight:700}
+.j-prog{height:6px}
+.j-timer{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.j-timer i{display:block;height:100%;background:var(--good);transition:width .2s linear}.j-timer i.low{background:var(--bad)}
+.j-card{gap:14px}
+.j-img{background:#fff;border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:center;min-height:200px}
+.j-img.sm{min-height:0;padding:6px;width:96px;height:96px;flex:none}
+.j-wrap{position:relative;display:inline-block;line-height:0}
+.j-wrap img{max-width:100%;max-height:min(38vh,320px);width:auto;height:auto;display:block}
+.j-img.sm .j-wrap img{max-height:84px}
+.j-mark{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:4px solid #E5322D;box-shadow:0 0 0 3px rgba(255,255,255,.9);animation:jpulse 1.4s ease-in-out infinite}
+.j-img.sm .j-mark{width:14px;height:14px;margin:-7px 0 0 -7px;border-width:2px}
+@keyframes jpulse{50%{transform:scale(1.25)}}
+@media (prefers-reduced-motion:reduce){.j-mark{animation:none}}
+.j-q{font-family:var(--f-display);font-size:18px}
+.j-ops{display:grid;grid-template-columns:1fr 1fr;gap:8px}.j-ops.six{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+@media (max-width:420px){.j-ops{grid-template-columns:1fr}}
+.j-op{border:1px solid var(--glass-b);background:var(--surface2);border-radius:12px;padding:12px 14px;min-height:50px;font-weight:600;text-align:left}
+.j-op:hover:not([disabled]){background:var(--surface3)}
+.j-op[disabled]{cursor:default;opacity:.6}
+.j-op.right{background:rgba(61,220,151,.16);border-color:var(--good);opacity:1;color:var(--ink)}
+.j-op.wrong{background:rgba(240,106,92,.16);border-color:var(--bad);opacity:1}
+.j-type{display:flex;gap:8px}.j-type .input{flex:1}
+.j-fb{border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;line-height:1.5}
+.j-fb.ok{background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.4)}.j-fb.ok>div>b:first-child{color:var(--good)}
+.j-fb.no{background:rgba(240,106,92,.1);border:1px solid rgba(240,106,92,.4)}.j-fb.no>div>b:first-child{color:var(--bad)}
+.j-src{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}.j-src svg{width:14px;height:14px}
+.j-fim{align-items:center;text-align:center;gap:10px}
+.j-score{display:flex;align-items:baseline;gap:8px}.j-score .num{font-size:48px;font-weight:700;color:var(--accent-ink)}
+.j-fim .stars{font-size:30px}
+.j-rev{display:flex;flex-direction:column;gap:8px}
+.j-rev-i{display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;border:1px solid var(--glass-b);background:var(--glass)}
+.j-rev-i>div:last-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+/* apostilas */
+.apo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.apo-card{display:flex;gap:14px;padding:16px;border-radius:var(--r);border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015))}
+.apo-cover{width:48px;height:62px;flex:none;border-radius:6px 10px 10px 6px;background:linear-gradient(135deg,#1C3D5E,#0E2338);border:1px solid rgba(227,181,74,.4);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.apo-info{display:flex;flex-direction:column;gap:6px;min-width:0}.apo-info b{font-family:var(--f-display);font-size:16px}
+.apo-meta{display:flex;flex-wrap:wrap;gap:5px}.apo-off{color:var(--good)}.apo-off svg{width:12px;height:12px}
+.apo-res{display:flex;flex-direction:column;gap:6px}
+.apo-res mark{background:rgba(227,181,74,.35);color:var(--ink);border-radius:3px;padding:0 1px}
+.apo-grp{display:flex;align-items:baseline;gap:8px;padding:10px 4px 2px}.apo-grp b{font-family:var(--f-display)}
+.rd-h h1{font-family:var(--f-display);font-weight:800;font-size:clamp(20px,3.4vw,26px)}
+.rd-bar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:8px;border-radius:14px;background:rgba(14,31,48,.94);backdrop-filter:blur(10px);border:1px solid var(--glass-b)}
+.rd-nav,.rd-tools{display:flex;align-items:center;gap:6px}
+.rd-tools .iconbtn{font-size:20px;font-weight:700}
+.rd-pg{display:flex;align-items:center;gap:6px}.rd-pg .input{width:64px;min-height:40px;padding:6px 8px;text-align:center}
+#rd-cap{min-height:40px;padding:6px 10px;max-width:190px;font-size:14px}
+.rd-q{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.rd-q svg{width:16px;height:16px}.rd-q .btn{margin-left:auto}
+.rd-page{position:relative;background:#fff;border-radius:10px;overflow:auto;min-height:60vh;-webkit-overflow-scrolling:touch}
+.rd-page canvas{display:block;margin:0 auto}
+.rd-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#425466;font-weight:600;padding:20px;text-align:center}
+.rd-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+@media (max-width:820px){.rd-bar{top:calc(env(safe-area-inset-top,0px))}#rd-cap{max-width:130px}}
 .cinta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
 .cinta-card{position:relative;display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:var(--r);border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));overflow:hidden}
 .cinta-card>div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -452,6 +517,7 @@ const ICONS = {
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8v4H8zM8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
   roller:'<rect x="3" y="3" width="15" height="6" rx="1.5"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
+  game:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
   rope:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
   sling:'<path d="M12 3v4M12 7c-3 0-7 5-8 13h16C19 12 15 7 12 7z"/><path d="M8 20c1-6 2.5-9 4-9s3 3 4 9"/>',
   tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/>',
@@ -617,6 +683,11 @@ function showGate(){
       <div class="gate-foot">Conteúdo de uso interno da divisão.</div></div>
   </div>`;
 }
+document.addEventListener("submit", ev => {
+  if (ev.target.id !== "j-form") return; ev.preventDefault();
+  const v = $("#j-in").value; if (!v.trim()) { $("#j-in").focus(); return; } jogoResp(v);
+  const n = $("#j-next"); if (n) n.focus();
+});
 document.addEventListener("submit", async ev => {
   if (!ev.target.matches("[data-auth]")) return;
   ev.preventDefault(); if (AUTH.busy) return;
@@ -668,6 +739,7 @@ function render(){
   else body = ({inicio:viewHome, bemvindo:viewBemvindo, incumbencias:viewInc, calc:viewCalc, mar:viewMar, apps:viewApps, equipe:viewEquipe, conta:viewConta}[S.tab] || viewHome)();
   if (S.tab === "conta" && !isMember()) body = viewConta();
   $("#view").innerHTML = top + body;
+  if (S.tab === "mar" && S.mar === "apo") apoDraw();
 }
 
 function viewPending(){
@@ -792,6 +864,8 @@ function gIndex(){
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
   });
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
+  E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
+  E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar", act:"marOpen", arg:"apostilas"});
   E.push({tipo:"Marinharia", t:"Cintas de elevação", sub:"Cores, etiqueta, fator 7:1, modos, inspeção", txt:"cinta cintas elevação içamento içar lingada cor cores lilás verde amarela cinza vermelha marrom azul laranja etiqueta cmt wll carga máxima trabalho fator segurança 7 enforcada cesto ângulo pernas inspeção descarte nbr 15637 en 1492 nr-11 poliéster tubular plana", act:"marOpen", arg:"cintas"});
   E.push({tipo:"Ferramentas", t:"Calculadora de espias", sub:"Bitola, diâmetro e carga de ruptura", txt:"calculadora espia espias cabo cabos bitola circunferência diâmetro polegada mm carga ruptura trabalho segurança nylon polietileno polipropileno poliéster kevlar aramida dyneema manilha sisal fibra vegetal aço amarração", act:"tool", arg:"espias"});
   E.push({tipo:"Ferramentas", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"tool", arg:"fin"});
@@ -884,7 +958,7 @@ function blkModal(si, bi){
   blkFormSync();
 }
 function blkFormSync(){ const t = ($("#f-bt") || {}).value; if (!t) return; document.querySelectorAll("[data-only]").forEach(el => el.hidden = el.dataset.only !== t); $("#f-help").textContent = BLK_AJUDA[t] || ""; }
-document.addEventListener("change", ev => { if (ev.target.id === "f-bt") blkFormSync(); });
+document.addEventListener("change", ev => { if (ev.target.id === "f-bt") blkFormSync(); if (ev.target.id === "rd-cap" && ev.target.value) { apoIr(+ev.target.value); ev.target.value = ""; } if (ev.target.id === "rd-p") apoIr(ev.target.value); });
 function secModal(si){
   const m = curMod(), sec = si != null ? m.secoes[si] : {titulo:""};
   openModal(`${sheetHead(si != null ? "Editar seção" : "Nova seção", m.titulo)}
@@ -1206,11 +1280,324 @@ async function gerarPDF(lid){
 /* Conteúdo público (normas ABNT NBR 15637 e EN 1492), sem dado do navio, por isso pode ficar no código. */
 function viewMar(){
   if (S.mar === "cintas") return viewCintas();
-  return `<div class="page-h"><span class="eyebrow">Fainas de convés</span><h1>Marinharia</h1><p class="sub" style="font-size:15px">Cabos, cintas e acessórios de içamento: o que cada marcação quer dizer e como usar com segurança.</p></div>
+  if (S.mar === "jogo") return viewJogo();
+  if (S.mar === "apostilas") return viewApostilas();
+  if (S.mar === "apo" && S.apo) return viewLeitor();
+  return `<div class="page-h"><span class="eyebrow">Fainas de convés</span><h1>Marinharia</h1><p class="sub" style="font-size:15px">Cabos, cintas, poleame e acessórios: as apostilas para consulta, um jogo para treinar os nomes e guias para usar com segurança.</p></div>
     <div class="grid">${marTiles()}</div>`;
 }
-const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
+const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais e Manobras de Peso, com pesquisa.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
   <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Bitola, diâmetro e carga de ruptura dos cabos por material.</div></button>`;
+
+/* ---------- Apostilas e jogo "Que peça é essa?" ----------
+   As apostilas do CIAA proíbem reprodução e o repositório é público. Por isso os arquivos em apostilas/ ficam cifrados (AES-GCM):
+   a chave e a lista de arquivos vêm do Supabase (alm_content "apostilas", audience todos), só para quem tem acesso liberado.
+   Os arquivos baixados ficam no cache "alm-apostilas" do aparelho, para abrir sem internet. */
+const APO = () => (S.content.apostilas && S.content.apostilas.data) || null;
+const APOC = "alm-apostilas";
+const AM = {key:null, txt:{}, ntxt:{}, docs:{}, jogo:null, lib:null, off:{}};
+const apoUrl = f => new URL("apostilas/" + f, location.href).href;
+const b64u8 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const mb = n => (n / 1048576).toLocaleString("pt-BR", {maximumFractionDigits:1}) + " MB";
+async function apoKey(){ if (!AM.key) AM.key = await crypto.subtle.importKey("raw", b64u8(APO().chave), "AES-GCM", false, ["decrypt"]); return AM.key; }
+async function apoBuf(f, prog){
+  const url = apoUrl(f); let buf = null, c = null;
+  try { c = await caches.open(APOC); const hit = await c.match(url); if (hit) buf = await hit.arrayBuffer(); } catch (e) {}
+  if (!buf) {
+    const r = await fetch(url); if (!r.ok) throw new Error("http " + r.status);
+    const tot = +r.headers.get("content-length") || 0;
+    if (r.body && prog && tot) { const rd = r.body.getReader(), parts = []; let n = 0; for (;;) { const {done, value} = await rd.read(); if (done) break; parts.push(value); n += value.length; prog(Math.min(1, n / tot)); } buf = await new Blob(parts).arrayBuffer(); }
+    else buf = await r.arrayBuffer();
+    if (c) try { await c.put(url, new Response(buf.slice(0), {headers:{"content-type":"application/octet-stream"}})); AM.off[f] = true; } catch (e) {}
+  }
+  return buf;
+}
+async function apoGet(f, prog){ const buf = await apoBuf(f, prog); return new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM", iv:new Uint8Array(buf, 0, 12)}, await apoKey(), new Uint8Array(buf, 12))); }
+async function gunzipJSON(u8){
+  if (!("DecompressionStream" in window)) throw new Error("Este aparelho é antigo demais para abrir o índice (atualize o sistema).");
+  return JSON.parse(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+}
+async function apoCached(f){ if (AM.off[f]) return true; try { const c = await caches.open(APOC); AM.off[f] = !!(await c.match(apoUrl(f))); } catch (e) {} return !!AM.off[f]; }
+/* Apaga do aparelho versões antigas que não estão mais na lista. */
+async function apoPrune(){
+  const a = APO(); if (!a) return;
+  const keep = new Set([a.jogo, ...a.apostilas.flatMap(x => [x.pdf, x.txt])].map(apoUrl));
+  try { const c = await caches.open(APOC); for (const r of await c.keys()) if (!keep.has(r.url)) await c.delete(r); } catch (e) {}
+}
+const apoById = id => (APO() ? APO().apostilas : []).find(x => x.id === id);
+const apoErr = e => /http|fetch|network|Failed/i.test(String(e && e.message || e)) ? (navigator.onLine ? "Não deu para baixar agora. Tente de novo." : "Sem internet. Baixe a apostila quando tiver conexão para ler sem internet depois.") : (e && e.message) || "Não deu certo.";
+
+/* ===== Jogo ===== */
+const NIVEIS = [
+  {id:"marinheiro", n:"Marinheiro", sub:"O básico do convés: cabeço, cunho, manilha, moitão…", max:1, q:10, op:3, t:0},
+  {id:"cabo", n:"Cabo", sub:"Poleame e acessórios do dia a dia: patesca, catarina, cadernal, tornel…", max:2, q:10, op:4, t:0},
+  {id:"cesq", n:"Cabo de Esquadra", sub:"Aparelhos de laborar, ferros e peças da amarra. Opções parecidas entre si.", max:3, q:12, op:4, t:0, cat:true},
+  {id:"sargento", n:"Sargento", sub:"Peças raras, turcos, transferência no mar e a charneira. 6 opções e 20 segundos.", max:4, q:12, op:6, t:20, cat:true, partes:true},
+  {id:"mestre", n:"Mestre", sub:"Tudo, inclusive as partes do cadernal. Você digita o nome. 30 segundos.", max:5, q:15, op:0, t:30, cat:true, partes:true}
+];
+const JREC = "alm-jogo";
+let G = null, GT = null;
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+async function jogoLoad(){
+  if (AM.jogo || AM.jogoBusy) return; AM.jogoBusy = true; AM.jogoErr = "";
+  try { AM.jogo = await gunzipJSON(await apoGet(APO().jogo)); } catch (e) { console.warn(e); AM.jogoErr = apoErr(e); }
+  AM.jogoBusy = false; if (S.tab === "mar" && S.mar === "jogo") render();
+}
+function jogoPool(L){
+  const J = AM.jogo; let p = J.itens.filter(x => x.lv <= L.max).map(x => Object.assign({tipo:"item"}, x));
+  if (L.partes) p = p.concat(J.partes.filter(x => x.lv <= L.max).map(x => Object.assign({tipo:"parte"}, x)));
+  return p;
+}
+function jogoNovo(id){
+  const L = NIVEIS.find(x => x.id === id), pool = jogoPool(L);
+  const novos = shuffle(pool.filter(x => x.lv >= L.max - 1)), velhos = shuffle(pool.filter(x => x.lv < L.max - 1));
+  let qs = novos.slice(0, Math.ceil(L.q * .7)); qs = qs.concat(velhos.slice(0, L.q - qs.length));
+  if (qs.length < L.q) qs = qs.concat(novos.slice(qs.length, qs.length + L.q - qs.length));
+  qs = shuffle(qs).slice(0, L.q).map(q => Object.assign(q, {ops:L.op ? jogoOps(q, pool, L.op, L.cat) : null}));
+  G = {L, qs, i:0, pts:0, ans:null, erros:[], dica:false};
+  jogoTimer();
+}
+function jogoOps(q, pool, n, cat){
+  const same = pool.filter(x => x.tipo === q.tipo && x.n !== q.n && (!cat || q.tipo === "parte" || x.cat === q.cat));
+  const other = pool.filter(x => x.tipo === q.tipo && x.n !== q.n && !same.includes(x));
+  const names = [];
+  for (const x of shuffle(same).concat(shuffle(other))) { if (names.length >= n - 1) break; if (!names.includes(x.n)) names.push(x.n); }
+  if (q.tipo === "parte") for (const x of shuffle(["Gorne", "Perno", "Roldana", "Caixa", "Orelha", "Calço", "Charneira", "Gato", "Sapatilho", "Parede interna"])) { if (names.length >= n - 1) break; if (x !== q.n && !names.includes(x)) names.push(x); }
+  return shuffle([q.n, ...names]);
+}
+function jogoTimer(){
+  clearInterval(GT); if (!G || !G.L.t || G.ans || G.fim) return;
+  if (G.tq !== G.i) { G.fimT = Date.now() + G.L.t * 1000; G.tq = G.i; }
+  GT = setInterval(() => {
+    if (!G || G.ans || G.fim || S.mar !== "jogo") { clearInterval(GT); return; }
+    const left = Math.max(0, G.fimT - Date.now()), b = $("#j-time");
+    if (b) { b.style.width = (left / (G.L.t * 1000) * 100) + "%"; b.classList.toggle("low", left < 6000); }
+    if (!left) { clearInterval(GT); jogoResp(null); }
+  }, 200);
+}
+const jn = s => norm(s).replace(/[^a-z0-9 ]/g, " ").replace(/\b(o|a|os|as|um|uma|de|do|da|dos|das|tipo|ferro|ancora)\b/g, " ").replace(/\s+/g, " ").trim();
+function lev(a, b){ const m = a.length, n = b.length; if (Math.abs(m - n) > 2) return 9; let p = Array.from({length:n + 1}, (_, j) => j); for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
+function jogoConfere(q, txt){
+  const t = jn(txt); if (!t) return false;
+  return [q.n, ...(q.al || [])].some(x => { const y = jn(x); if (!y) return false; if (y === t) return true; const d = lev(y, t); return (y.length >= 5 && d <= 1) || (y.length >= 10 && d <= 2); });
+}
+function jogoResp(escolha){
+  if (!G || G.ans) return; clearInterval(GT);
+  const q = G.qs[G.i];
+  const ok = escolha != null && (!G.L.op && !G.dica ? jogoConfere(q, escolha) : escolha === q.n);
+  const pts = ok ? (G.dica ? .5 : 1) : 0;
+  G.pts += pts; G.ans = {ok, escolha, pts};
+  if (!ok) G.erros.push(q);
+  render();
+}
+function jogoProx(){
+  if (!G) return;
+  if (G.i + 1 >= G.qs.length) {
+    G.fim = true; const pct = Math.round(G.pts / G.qs.length * 100);
+    const rec = lsGet(JREC, {}); if (!rec[G.L.id] || pct > rec[G.L.id]) { rec[G.L.id] = pct; lsSet(JREC, rec); G.recorde = true; }
+  } else { G.i++; G.ans = null; G.dica = false; }
+  render(); scrollTo(0, 0); jogoTimer();
+}
+const estrelas = pct => pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0;
+const starRow = n => `<span class="stars" aria-label="${n} de 3 estrelas">${[0, 1, 2].map(i => `<i class="${i < n ? "on" : ""}">★</i>`).join("")}</span>`;
+const divisa = k => `<svg viewBox="0 0 40 40" class="divisa" aria-hidden="true">${Array.from({length:k}, (_, i) => `<path d="M8 ${30 - i * 5.5} L20 ${22 - i * 5.5} L32 ${30 - i * 5.5}" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`).join("")}</svg>`;
+
+function viewJogo(){
+  const back = `<button class="back" data-act="${G && !G.fim ? "jSair" : "marBack"}">${ic("left")}${G && !G.fim ? "Níveis" : "Marinharia"}</button>`;
+  const head = `<div class="page-h"><span class="eyebrow">Marinharia · Jogo</span><h1>Que peça é essa?</h1></div>`;
+  if (!APO()) return back + head + `<div class="note">${ic("info")}<span>O jogo ainda não chegou a este aparelho. Abra o app com internet uma vez para carregar.</span></div>`;
+  if (!AM.jogo) { jogoLoad(); return back + head + `<div class="card col" style="align-items:flex-start">${AM.jogoErr ? `<div class="note warn">${ic("alert")}<span>${esc(AM.jogoErr)}</span></div><button class="btn" data-act="jRetry">${ic("reset")}Tentar de novo</button>` : `<span class="sub">Carregando as figuras das apostilas…</span>`}</div>`; }
+  if (!G) {
+    const rec = lsGet(JREC, {});
+    return back + head + `<p class="sub" style="font-size:15px">Aparece a figura do equipamento e você diz o nome. As figuras vêm das apostilas (Arte Naval, Mestrança, Fainas Marinheiras Especiais). Comece de Marinheiro e vá subindo até Mestre.</p>
+      <div class="niveis">${NIVEIS.map((L, k) => { const r = rec[L.id]; const n = jogoPool(L).length; return `<button class="nivel" data-act="jNivel" data-arg="${L.id}"><span class="nivel-i">${divisa(k + 1)}</span><span class="nivel-t"><b>${L.n}</b><span class="sub">${L.sub}</span><span class="nivel-m"><span class="pill">${L.q} perguntas</span><span class="pill">${L.op ? L.op + " opções" : "Digitar o nome"}</span>${L.t ? `<span class="pill">${L.t} s</span>` : ""}<span class="pill">${n} peças</span></span></span><span class="nivel-r">${r != null ? starRow(estrelas(r)) + `<span class="num sub">${r}%</span>` : `<span class="sub">Novo</span>`}</span></button>`; }).join("")}</div>`;
+  }
+  if (G.fim) {
+    const pct = Math.round(G.pts / G.qs.length * 100), st = estrelas(pct), k = NIVEIS.indexOf(G.L), nx = NIVEIS[k + 1];
+    const msg = st === 3 ? "Mandou muito bem!" : st === 2 ? "Bom resultado." : st === 1 ? "Passou raspando." : "Vamos treinar mais.";
+    return back + `<div class="card col j-fim"><span class="eyebrow">Nível ${esc(G.L.n)}</span><div class="j-score"><span class="num">${String(G.pts).replace(".", ",")}</span><span class="sub">de ${G.qs.length}</span></div>${starRow(st)}<b>${msg}${G.recorde ? " Novo recorde!" : ""}</b>
+      <div class="row" style="flex-wrap:wrap;justify-content:center"><button class="btn" data-act="jNivel" data-arg="${G.L.id}">${ic("reset")}Jogar de novo</button>${nx && st >= 2 ? `<button class="btn primary" data-act="jNivel" data-arg="${nx.id}">Subir para ${nx.n}${ic("chev")}</button>` : ""}<button class="btn ghost" data-act="jSair">Níveis</button></div></div>
+      ${G.erros.length ? `<div class="sec-title"><h2>Para revisar</h2></div><div class="j-rev">${G.erros.map(q => `<div class="j-rev-i"><div class="j-img sm">${jImg(q)}</div><div><b>${esc(q.n)}</b><span class="sub">${esc(q.d)}</span><span class="j-src">${esc(q.f)}</span></div></div>`).join("")}</div>` : ""}`;
+  }
+  const q = G.qs[G.i], a = G.ans, L = G.L;
+  if (L.t && !a) setTimeout(jogoTimer, 0);
+  const ops = q.ops || (G.dica ? (q.dops = q.dops || jogoOps(q, jogoPool(L), 4, true)) : null);
+  const pergunta = q.tipo === "parte" ? q.q : "Qual é o nome deste equipamento?";
+  let resp;
+  if (ops) resp = `<div class="j-ops${ops.length > 4 ? " six" : ""}">${ops.map(o => `<button class="j-op${a ? (o === q.n ? " right" : o === a.escolha ? " wrong" : "") : ""}" data-act="jAns" data-arg="${esc(o)}" ${a ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>`;
+  else resp = `<form id="j-form" class="j-type" autocomplete="off"><input id="j-in" class="input" placeholder="Digite o nome" autocapitalize="none" spellcheck="false" ${a ? "disabled" : ""} value="${a ? esc(a.escolha || "") : ""}"><button class="btn primary" ${a ? "disabled" : ""}>Responder</button></form>${a ? "" : `<button class="btn ghost sm" data-act="jDica" style="align-self:flex-start">${ic("bulb")}Ver opções (vale meio ponto)</button>`}`;
+  const fb = a ? `<div class="j-fb ${a.ok ? "ok" : "no"}"><div><b>${a.ok ? (a.pts < 1 ? "Certo, meio ponto." : "Certo!") : a.escolha == null ? "Tempo esgotado." : "Não é isso."}</b> ${a.ok && !ops && jn(a.escolha) !== jn(q.n) ? `O nome certinho é <b>${esc(q.n)}</b>.` : a.ok ? "" : `É <b>${esc(q.n)}</b>.`}</div><p>${esc(q.d)}</p><span class="j-src">${ic("book")}${esc(q.f)}</span></div>
+    <button class="btn primary" data-act="jProx" id="j-next">${G.i + 1 >= G.qs.length ? "Ver resultado" : "Próxima"}${ic("chev")}</button>` : "";
+  return back + `<div class="j-top"><span class="pill accent">${esc(L.n)}</span><span class="num sub">${G.i + 1} / ${G.qs.length}</span><span class="num j-pts">${String(G.pts).replace(".", ",")} pts</span></div>
+    <div class="bar j-prog"><i style="width:${G.i / G.qs.length * 100}%"></i></div>
+    ${L.t && !a ? `<div class="j-timer"><i id="j-time" style="width:${Math.max(0, (G.fimT - Date.now()) / (L.t * 1000) * 100)}%"></i></div>` : ""}
+    <div class="card col j-card"><div class="j-img">${jImg(q)}</div><h2 class="j-q">${esc(pergunta)}</h2>${resp}${fb}</div>`;
+}
+const jImg = q => `<span class="j-wrap"><img src="${AM.jogo.imgs[q.img]}" alt="Figura da pergunta">${q.tipo === "parte" ? `<i class="j-mark" style="left:${q.x * 100}%;top:${q.y * 100}%"></i>` : ""}</span>`;
+
+/* ===== Apostilas: lista, pesquisa e leitor ===== */
+let APQ = {q:"", t:null, hits:null, busy:false, msg:""};
+function viewApostilas(){
+  const A = APO();
+  const head = `<button class="back" data-act="marBack">${ic("left")}Marinharia</button><div class="page-h"><span class="eyebrow">Marinharia · Biblioteca</span><h1>Apostilas</h1><p class="sub" style="font-size:15px">Arte Naval e as apostilas do CIAA, sem a capa. Pesquise uma palavra em todas de uma vez ou abra uma para ler.</p></div>`;
+  if (!A) return head + `<div class="note">${ic("info")}<span>As apostilas ainda não chegaram a este aparelho. Abra o app com internet uma vez.</span></div>`;
+  setTimeout(apoMarkOffline, 0); if (!AM.pruned) { AM.pruned = true; apoPrune(); }
+  return head + `<div class="search">${ic("search")}<input id="apo-q" class="input" type="search" placeholder="Pesquisar nas apostilas (ex.: patesca, amarra, nó de escota)" autocomplete="off" value="${esc(APQ.q)}" aria-label="Pesquisar nas apostilas"></div>
+    <div id="apo-res" class="apo-res" ${APQ.q.trim() ? "" : "hidden"}>${apoResHtml()}</div>
+    <div class="apo-list">${A.apostilas.map(x => `<div class="apo-card"><div class="apo-cover">${ic("book")}</div><div class="apo-info"><b>${esc(x.titulo)}</b><span class="sub">${esc(x.sub)}</span><span class="apo-meta"><span class="pill">${x.paginas} páginas</span><span class="pill">${mb(x.bytes)}</span><span class="pill apo-off" data-off="${esc(x.pdf)}" hidden>${ic("check")}No aparelho</span></span>
+      <div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn primary sm" data-act="apoLer" data-arg="${x.id}">${ic("book")}Ler</button><button class="btn ghost sm apo-dl" data-act="apoBaixar" data-arg="${x.id}" data-dl="${esc(x.pdf)}">${ic("download")}Baixar para ler sem internet</button></div></div></div>`).join("")}</div>
+    <p class="sub" style="font-size:12.5px">As apostilas ficam guardadas no aparelho só depois de abertas ou baixadas. A Arte Naval é grande (${mb((A.apostilas.find(x => x.id === "arte-naval") || {bytes:0}).bytes)}): prefira baixar no wi-fi.</p>`;
+}
+async function apoMarkOffline(){
+  for (const el of document.querySelectorAll("[data-off]")) { const ok = await apoCached(el.dataset.off); el.hidden = !ok; const b = document.querySelector(`[data-dl="${el.dataset.off}"]`); if (b && ok) b.hidden = true; }
+}
+async function apoTxt(id, prog){
+  if (AM.txt[id]) return AM.txt[id];
+  const a = apoById(id); const P = await gunzipJSON(await apoGet(a.txt, prog));
+  AM.txt[id] = P; AM.ntxt[id] = P.map(norm); return P;
+}
+function apoTerms(q){ return norm(q).replace(/["“”]/g, " ").split(/\s+/).filter(t => t.length > 1); }
+function apoSearch(q, ids){
+  const terms = apoTerms(q); if (!terms.length) return [];
+  const hits = [];
+  for (const id of ids) {
+    const N = AM.ntxt[id]; if (!N) continue;
+    const frase = terms.join(" ");
+    N.forEach((t, i) => { if (terms.every(x => t.includes(x))) { const fr = t.includes(frase); const n = terms.reduce((s, x) => s + t.split(x).length - 1, 0); hits.push({id, p:i + 1, score:(fr ? 1000 : 0) + n}); } });
+  }
+  return hits;
+}
+function apoSnippet(id, p, q){
+  const t = AM.txt[id][p - 1].replace(/\s+/g, " "), n = norm(t), terms = apoTerms(q);
+  const frase = terms.join(" "); let at = n.indexOf(frase); if (at < 0) at = Math.max(0, n.indexOf(terms[0]));
+  const s = Math.max(0, at - 70), e = Math.min(t.length, at + 150);
+  const mk = new Array(e - s).fill(false);
+  if (n.length === t.length) for (const x of terms) { let k = n.indexOf(x, s); while (k >= 0 && k < e) { for (let j = k; j < Math.min(e, k + x.length); j++) mk[j - s] = true; k = n.indexOf(x, k + 1); } }
+  let out = s ? "…" : "", on = false;
+  for (let j = s; j < e; j++) { if (mk[j - s] !== on) { out += on ? "</mark>" : "<mark>"; on = !on; } out += esc(t[j]); }
+  if (on) out += "</mark>";
+  return out + (e < t.length ? "…" : "");
+}
+function apoResHtml(){
+  if (!APQ.q.trim()) return "";
+  if (APQ.busy) return `<div class="sub" style="padding:8px 4px">${esc(APQ.msg || "Carregando o índice das apostilas…")}</div>`;
+  if (APQ.msg) return `<div class="note warn">${ic("alert")}<span>${esc(APQ.msg)}</span></div>`;
+  const H = APQ.hits || []; if (!H.length) return `<div class="sub" style="padding:8px 4px">Nada encontrado para “${esc(APQ.q)}”.</div>`;
+  const A = APO().apostilas, by = {}; H.forEach(h => (by[h.id] = by[h.id] || []).push(h));
+  return `<div class="sub" style="padding:2px 4px 6px">${H.length} ${H.length === 1 ? "página" : "páginas"} com “${esc(APQ.q)}”</div>` + A.filter(a => by[a.id]).map(a => { const L = by[a.id].sort((x, y) => y.score - x.score); return `<div class="apo-grp"><b>${esc(a.titulo)}</b><span class="sub">${L.length} ${L.length === 1 ? "página" : "páginas"}</span></div>` +
+    L.slice(0, 25).map(h => `<button class="gres-i" data-act="apoLer" data-arg="${a.id}" data-p="${h.p}"><span class="pill">pág. ${h.p}</span><span class="gres-s">${apoSnippet(a.id, h.p, APQ.q)}</span></button>`).join("") + (L.length > 25 ? `<div class="sub" style="padding:4px">+ ${L.length - 25} páginas. Refine a busca ou abra a apostila e pesquise nela.</div>` : ""); }).join("");
+}
+function apoResPaint(){ const r = $("#apo-res"); if (!r) return; r.hidden = !APQ.q.trim(); r.innerHTML = apoResHtml(); }
+async function apoQ(q){
+  APQ.q = q; clearTimeout(APQ.t);
+  if (!q.trim()) { apoResPaint(); return; }
+  APQ.t = setTimeout(async () => {
+    const A = APO(); APQ.msg = "";
+    const falta = A.apostilas.filter(a => !AM.txt[a.id]);
+    if (falta.length) {
+      APQ.busy = true; apoResPaint();
+      try { for (const a of falta) { APQ.msg = "Carregando o índice: " + a.titulo + "…"; apoResPaint(); await apoTxt(a.id, f => { APQ.msg = "Carregando o índice: " + a.titulo + " " + Math.round(f * 100) + "%"; const r = $("#apo-res .sub"); if (r) r.textContent = APQ.msg; }); } APQ.msg = ""; }
+      catch (e) { console.warn(e); APQ.msg = apoErr(e); }
+      APQ.busy = false;
+    }
+    if (!APQ.msg) APQ.hits = apoSearch(APQ.q, A.apostilas.map(a => a.id));
+    apoResPaint();
+  }, 250);
+}
+
+/* Leitor: pdf.js desenha uma página por vez num canvas. */
+async function pdfLib(){
+  if (!AM.lib) { AM.lib = await import(new URL("vendor/pdfjs/pdf.min.mjs", location.href).href); AM.lib.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/pdf.worker.min.mjs", location.href).href; }
+  return AM.lib;
+}
+async function apoDoc(id, prog){
+  if (AM.docs[id]) return AM.docs[id];
+  const a = apoById(id); const [lib, data] = await Promise.all([pdfLib(), apoGet(a.pdf, prog)]);
+  AM.docs[id] = await lib.getDocument({data, isEvalSupported:false}).promise; return AM.docs[id];
+}
+function viewLeitor(){
+  const R = S.apo, a = apoById(R.id);
+  if (!a) { S.mar = "apostilas"; return viewApostilas(); }
+  const caps = a.caps || [];
+  return `<button class="back" data-act="apoVoltar">${ic("left")}Apostilas</button>
+    <div class="rd-h"><div><span class="eyebrow">${esc(a.sub)}</span><h1>${esc(a.titulo)}</h1></div></div>
+    <div class="rd-bar">
+      <div class="rd-nav"><button class="iconbtn" data-act="apoPg" data-arg="-1" aria-label="Página anterior">${ic("left")}</button><label class="rd-pg"><input id="rd-p" class="input num" inputmode="numeric" value="${R.p}" aria-label="Página"><span class="sub">/ ${a.paginas}</span></label><button class="iconbtn" data-act="apoPg" data-arg="1" aria-label="Próxima página">${ic("chev")}</button></div>
+      <div class="rd-tools">${caps.length ? `<select id="rd-cap" class="input" aria-label="Ir para o capítulo"><option value="">Capítulos</option>${caps.map(c => `<option value="${c.p}">${esc(c.n + ". " + c.t)}</option>`).join("")}</select>` : ""}
+        <button class="iconbtn" data-act="apoZoom" data-arg="-1" aria-label="Diminuir">−</button><button class="iconbtn" data-act="apoZoom" data-arg="1" aria-label="Aumentar">+</button>
+        <button class="iconbtn" data-act="apoBusca" aria-label="Pesquisar nesta apostila">${ic("search")}</button><button class="iconbtn" data-act="apoPdf" aria-label="Abrir o PDF no aparelho">${ic("download")}</button></div>
+    </div>
+    ${R.q ? `<div class="rd-q">${ic("search")}<span>Busca: <b>${esc(R.q)}</b></span><button class="btn ghost sm" data-act="apoBusca">Outros resultados</button></div>` : ""}
+    <div class="rd-page" id="rd-page"><canvas id="rd-cv"></canvas><div class="rd-load" id="rd-load">Abrindo…</div></div>
+    <div class="rd-foot"><button class="btn" data-act="apoPg" data-arg="-1">${ic("left")}Anterior</button><span class="num sub" id="rd-lbl">${R.p} / ${a.paginas}</span><button class="btn" data-act="apoPg" data-arg="1">Próxima${ic("chev")}</button></div>`;
+}
+let RD_TOK = 0;
+async function apoDraw(){
+  const R = S.apo; if (!R || S.mar !== "apo") return;
+  const tok = ++RD_TOK, ld = $("#rd-load"), box = $("#rd-page"), cv = $("#rd-cv"); if (!box || !cv) return;
+  try {
+    const doc = await apoDoc(R.id, f => { if (ld) ld.textContent = "Baixando a apostila… " + Math.round(f * 100) + "%"; });
+    if (tok !== RD_TOK) return;
+    const page = await doc.getPage(R.p); if (tok !== RD_TOK) return;
+    const z = R.z || 1, w = Math.max(280, box.clientWidth) * z, vp0 = page.getViewport({scale:1}), sc = w / vp0.width, dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const vp = page.getViewport({scale:sc * dpr});
+    const off = document.createElement("canvas"); off.width = Math.floor(vp.width); off.height = Math.floor(vp.height);
+    await page.render({canvasContext:off.getContext("2d"), viewport:vp}).promise;
+    if (tok !== RD_TOK) return;
+    const c = $("#rd-cv"); if (!c) return;
+    c.width = off.width; c.height = off.height; c.getContext("2d").drawImage(off, 0, 0); c.style.width = w + "px";
+    const l = $("#rd-load"); if (l) l.hidden = true;
+    const lbl = $("#rd-lbl"); if (lbl) lbl.textContent = R.p + " / " + doc.numPages; const pi = $("#rd-p"); if (pi && document.activeElement !== pi) pi.value = R.p;
+    apoCached(apoById(R.id).pdf);
+  } catch (e) { console.warn(e); const l = $("#rd-load"); if (l) { l.hidden = false; l.textContent = apoErr(e); } }
+}
+function apoIr(p){
+  const R = S.apo, a = apoById(R.id); p = Math.max(1, Math.min(a.paginas, +p || 1)); if (p === R.p) return;
+  R.p = p; lsSet("alm-apo-pg", Object.assign(lsGet("alm-apo-pg", {}), {[R.id]:p}));
+  const lbl = $("#rd-lbl"); if (lbl) lbl.textContent = p + " / " + a.paginas; const pi = $("#rd-p"); if (pi) pi.value = p;
+  const bar = $(".rd-bar"); if (bar && bar.getBoundingClientRect().top < 0) bar.scrollIntoView({block:"start"});
+  apoDraw();
+}
+async function apoBuscaModal(q){
+  const R = S.apo, a = apoById(R.id); q = q != null ? q : (R.q || "");
+  openModal(sheetHead("Pesquisar na apostila", a.titulo) + `<div class="search">${ic("search")}<input id="rd-q" class="input" type="search" placeholder="Palavra ou expressão" value="${esc(q)}" autocomplete="off"></div><div id="rd-res" class="apo-res" style="margin-top:10px"></div>`);
+  const i = $("#rd-q"); if (i) { i.focus(); i.setSelectionRange(q.length, q.length); }
+  if (q.trim()) apoBuscaRun(q);
+}
+let RDQ_T = null;
+async function apoBuscaRun(q){
+  const R = S.apo, out = $("#rd-res"); if (!out) return;
+  if (!q.trim()) { out.innerHTML = ""; return; }
+  if (!AM.txt[R.id]) { out.innerHTML = `<div class="sub">Carregando o índice…</div>`; try { await apoTxt(R.id); } catch (e) { out.innerHTML = `<div class="note warn">${ic("alert")}<span>${esc(apoErr(e))}</span></div>`; return; } }
+  const H = apoSearch(q, [R.id]).sort((x, y) => x.p - y.p);
+  out.innerHTML = H.length ? `<div class="sub" style="padding:2px 4px 6px">${H.length} ${H.length === 1 ? "página" : "páginas"}</div>` + H.slice(0, 80).map(h => `<button class="gres-i" data-act="apoLerQ" data-arg="${h.p}" data-q="${esc(q)}"><span class="pill">pág. ${h.p}</span><span class="gres-s">${apoSnippet(R.id, h.p, q)}</span></button>`).join("") : `<div class="sub">Nada encontrado.</div>`;
+}
+async function apoBaixar(id, btn){
+  const a = apoById(id); if (!a) return;
+  const set = t => { if (btn) btn.innerHTML = ic("download") + esc(t); };
+  if (btn) btn.disabled = true;
+  try { await apoBuf(a.pdf, f => set("Baixando… " + Math.round(f * 100) + "%")); await apoBuf(a.txt); toast(a.titulo + " guardada no aparelho"); }
+  catch (e) { toast(apoErr(e)); }
+  if (btn) { btn.disabled = false; set("Baixar para ler sem internet"); }
+  apoMarkOffline();
+}
+async function apoPdfAbrir(){
+  const R = S.apo, a = apoById(R.id);
+  try {
+    toast("Preparando o PDF…");
+    const u8 = await apoGet(a.pdf), nome = a.titulo.replace(/[^\wÀ-ú]+/g, "-") + ".pdf", file = new File([u8], nome, {type:"application/pdf"});
+    if (navigator.canShare && navigator.canShare({files:[file]}) && matchMedia("(pointer:coarse)").matches) { try { await navigator.share({files:[file], title:a.titulo}); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    const url = URL.createObjectURL(file), l = document.createElement("a"); l.href = url; l.download = nome; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { toast(apoErr(e)); }
+}
+/* Arrastar para o lado troca de página (só sem zoom). */
+let RD_SW = null;
+document.addEventListener("touchstart", ev => { if (ev.target.closest && ev.target.closest("#rd-page") && ev.touches.length === 1 && !(S.apo && S.apo.z > 1)) RD_SW = {x:ev.touches[0].clientX, y:ev.touches[0].clientY}; else RD_SW = null; }, {passive:true});
+document.addEventListener("touchend", ev => { if (!RD_SW || S.mar !== "apo") return; const t = ev.changedTouches[0], dx = t.clientX - RD_SW.x, dy = t.clientY - RD_SW.y; RD_SW = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) apoIr(S.apo.p + (dx < 0 ? 1 : -1)); }, {passive:true});
+document.addEventListener("keydown", ev => { if (S.tab !== "mar" || S.mar !== "apo" || /input|select|textarea/i.test(ev.target.tagName) || $("#modal").innerHTML) return; if (ev.key === "ArrowRight") apoIr(S.apo.p + 1); if (ev.key === "ArrowLeft") apoIr(S.apo.p - 1); });
+let RD_RS = null; window.addEventListener("resize", () => { if (S.mar !== "apo") return; clearTimeout(RD_RS); RD_RS = setTimeout(apoDraw, 250); });
 
 /* Código de cores da CMT: EN 1492-1/-2 e ABNT NBR 15637-1/-2. Cinta plana leva uma listra por tonelada. */
 const CINTAS = [
@@ -1809,7 +2196,21 @@ const ACT = {
   gItem(a, el){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); itemModal(a, el.dataset.i); },
   tool(a){ S.gq = ""; S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
   marOpen(a){ S.gq = ""; S.tab = "mar"; S.mar = a; render(); scrollTo(0, 0); },
-  marBack(){ S.mar = null; render(); scrollTo(0, 0); },
+  marBack(){ S.mar = null; G = null; clearInterval(GT); render(); scrollTo(0, 0); },
+  jNivel(a){ jogoNovo(a); render(); scrollTo(0, 0); },
+  jAns(a){ jogoResp(a); },
+  jDica(){ if (!G || G.ans) return; G.dica = true; render(); },
+  jProx(){ jogoProx(); },
+  jSair(){ G = null; clearInterval(GT); render(); scrollTo(0, 0); },
+  jRetry(){ AM.jogoErr = ""; render(); },
+  apoLer(a, el){ closeModal(); const p = el && el.dataset.p ? +el.dataset.p : (lsGet("alm-apo-pg", {})[a] || 1); S.gq = ""; S.tab = "mar"; S.mar = "apo"; S.apo = {id:a, p, z:1, q:el && el.dataset.p ? APQ.q : ""}; render(); scrollTo(0, 0); },
+  apoLerQ(a, el){ closeModal(); S.apo.q = el.dataset.q; const y = scrollY; render(); scrollTo(0, y); apoIr(+a); },
+  apoVoltar(){ S.mar = "apostilas"; render(); scrollTo(0, 0); },
+  apoPg(a){ apoIr(S.apo.p + +a); },
+  apoZoom(a){ const z = [1, 1.5, 2, 3], i = Math.max(0, Math.min(z.length - 1, z.indexOf(S.apo.z || 1) + +a)); S.apo.z = z[i]; apoDraw(); },
+  apoBusca(){ apoBuscaModal(); },
+  apoPdf(){ apoPdfAbrir(); },
+  apoBaixar(a, el){ apoBaixar(a, el); },
   cintaCmt(a){ calcSet("cinta", {cmt:a}); const y = scrollY; render(); scrollTo(0, y); },
   toolBack(){ S.tool = null; render(); scrollTo(0, 0); },
   espMed(a){ const f = $("[data-calc=espias]"); calcSet("espias", Object.assign(formVals(f), {med:a})); render(); },
@@ -1893,6 +2294,8 @@ document.addEventListener("keydown", ev => {
   if (ev.key === "Enter" && ev.target.id === "f-newcol") { ev.preventDefault(); ACT.fieldAdd(); }
 });
 document.addEventListener("input", ev => {
+  if (ev.target.id === "apo-q") { apoQ(ev.target.value); return; }
+  if (ev.target.id === "rd-q") { clearTimeout(RDQ_T); const v = ev.target.value; RDQ_T = setTimeout(() => apoBuscaRun(v), 250); return; }
   if (ev.target.id === "g-q") { S.gq = ev.target.value; const r = $("#g-res"); r.hidden = !S.gq.trim(); r.innerHTML = S.gq.trim() ? gResults(S.gq) : ""; return; }
   const cf = ev.target.closest("[data-calc]");
   if (cf && cf.dataset.calc === "ter" && /^(atual|ent|p\d+)$/.test(ev.target.name)) { calcSet("ter", formVals(cf)); const y = scrollY; render(); scrollTo(0, y); return; }
