@@ -1731,7 +1731,7 @@ const TIPOS_TINTA = {
   out:{n:"Outra", c:"#9AAEC2", sub:""}
 };
 const tintasData = () => (S.content.tintas && S.content.tintas.data) || {itens:[]};
-let TN = {q:"", sec:null, mix:{a:4, b:1, modo:"total", v:4}};
+let TN = {q:"", sec:null, mix:{tipo:"kit", ea:"20", eb:"1,5", ka:1, kb:1, a:4, b:1, modo:"base", v:5}};
 function viewTintas(){
   const secs = [["comp", "Do que a tinta é feita"], ["tipos", "Alquídica, epóxi e poliuretano"], ["sobre", "O que pode ir sobre o quê"], ["defeitos", "Os perigos de pintar errado"], ["mistura", "Acertar tinta e catalisador"], ["seg", "Segurança"]];
   return `<button class="back" data-act="marBack">${ic("left")}Marinharia</button>
@@ -1761,9 +1761,9 @@ function tnCard(t){
   return `<div class="tn-card" style="--c:${T.c}"><div class="tn-card-h"><span class="pill" style="color:${T.c};border-color:${T.c}55">${esc(T.n)}</span>${isAdmin() ? `<button class="iconbtn sm" data-act="tnEdit" data-arg="${esc(t.id)}" aria-label="Editar">${ic("edit")}</button>` : ""}</div>
     <div class="tn-pair"><div><small>Tinta (base)</small><b class="num">${esc(t.num || "—")}</b><span>${esc(t.nome || "")}${t.cor ? " · " + esc(t.cor) : ""}</span></div>
     ${bi ? `<div class="tn-plus">+</div><div><small>Componente</small><b class="num">${esc(t.comp || "—")}</b><span>${esc(t.compNome || "")}</span></div>` : `<div class="tn-one"><small>Componente</small><span>Não leva: tinta de 1 componente.</span></div>`}</div>
-    <div class="tn-kv">${t.prop ? `<span><small>Proporção</small><b class="num">${esc(t.prop)}</b></span>` : ""}${t.pot ? `<span><small>Vida da mistura</small><b>${esc(t.pot)}</b></span>` : ""}${t.dil ? `<span><small>Diluente</small><b>${esc(t.dil)}</b></span>` : ""}</div>
+    <div class="tn-kv">${t.prop ? `<span><small>Proporção</small><b class="num">${esc(t.prop)}</b></span>` : ""}${t.embA ? `<span><small>Embalagens</small><b class="num">${esc(t.embA)} L${t.embB ? " + " + esc(t.embB) + " L" : ""}</b></span>` : ""}${t.pot ? `<span><small>Vida da mistura</small><b>${esc(t.pot)}</b></span>` : ""}${t.dil ? `<span><small>Diluente</small><b>${esc(t.dil)}</b></span>` : ""}</div>
     ${t.uso ? `<div class="sub"><b style="color:var(--ink)">Onde usar:</b> ${esc(t.uso)}</div>` : ""}${t.obs ? `<div class="sub">${esc(t.obs)}</div>` : ""}
-    ${t.prop && /^\s*\d+([.,]\d+)?\s*:\s*\d+([.,]\d+)?\s*$/.test(t.prop) ? `<button class="btn ghost sm" data-act="tnUsarProp" data-arg="${esc(t.prop)}" style="align-self:flex-start">${ic("calc")}Calcular a mistura com ${esc(t.prop)}</button>` : ""}</div>`;
+    ${t.prop && /^\s*\d+([.,]\d+)?\s*:\s*\d+([.,]\d+)?\s*$/.test(t.prop) ? `<button class="btn ghost sm" data-act="tnUsarProp" data-arg="${esc(t.prop + (t.embA && t.embB ? "|" + t.embA + "|" + t.embB : ""))}" style="align-self:flex-start">${ic("calc")}Calcular a mistura com ${esc(t.prop)}</button>` : ""}</div>`;
 }
 function tnModal(id){
   const t = (tintasData().itens || []).find(x => x.id === id) || {tipo:"epo"};
@@ -1772,7 +1772,8 @@ function tnModal(id){
     <div class="field"><label for="tn-tipo">Tipo</label><select id="tn-tipo" name="tipo" class="input">${Object.entries(TIPOS_TINTA).map(([k, v]) => `<option value="${k}" ${t.tipo === k ? "selected" : ""}>${v.n}</option>`).join("")}</select></div>
     <div class="fields2">${f("num", "Numeração da tinta (NEB)", "", t.num)}${f("nome", "Nome da tinta", "Ex.: Epóxi alta espessura", t.nome)}</div>
     <div class="fields2">${f("comp", "Numeração do componente", "Deixe vazio se não leva", t.comp)}${f("compNome", "Nome do componente", "Ex.: Agente de cura", t.compNome)}</div>
-    <div class="fields2">${f("prop", "Proporção (base:componente)", "Ex.: 4:1", t.prop)}${f("cor", "Cor", "", t.cor)}</div>
+    <div class="fields2">${f("prop", "Proporção (base:componente)", "Ex.: 1:1 (embalagens)", t.prop)}${f("cor", "Cor", "", t.cor)}</div>
+    <div class="fields2">${f("embA", "Embalagem da base (L)", "Ex.: 20", t.embA)}${f("embB", "Embalagem do componente (L)", "Ex.: 1,5", t.embB)}</div>
     <div class="fields2">${f("pot", "Vida da mistura (pot life)", "Ex.: 6 h a 25 °C", t.pot)}${f("dil", "Diluente", "", t.dil)}</div>
     ${f("uso", "Onde usar", "Ex.: convés, porão, costado", t.uso)}${f("obs", "Observação", "", t.obs)}
     <div class="row" style="flex-wrap:wrap"><button class="btn primary">${ic("check")}Salvar</button>${id ? `<button type="button" class="btn ghost danger" data-act="tnDel" data-arg="${esc(id)}">${ic("trash")}Apagar</button>` : ""}</div></form>`);
@@ -1782,7 +1783,7 @@ function tnSalvar(form){
   if (!String(v.num || "").trim() && !String(v.nome || "").trim()) { toast("Preencha a numeração ou o nome"); return; }
   if (!S.content.tintas) S.content.tintas = {key:"tintas", audience:"todos", data:{itens:[]}};
   const L = S.content.tintas.data.itens = S.content.tintas.data.itens || [];
-  const rec = {id:id || "t" + Date.now().toString(36)}; ["tipo", "num", "nome", "comp", "compNome", "prop", "cor", "pot", "dil", "uso", "obs"].forEach(k => { const x = String(v[k] || "").trim(); if (x) rec[k] = x; });
+  const rec = {id:id || "t" + Date.now().toString(36)}; ["tipo", "num", "nome", "comp", "compNome", "prop", "embA", "embB", "cor", "pot", "dil", "uso", "obs"].forEach(k => { const x = String(v[k] || "").trim(); if (x) rec[k] = x; });
   const i = L.findIndex(x => x.id === id); if (i >= 0) L[i] = rec; else L.push(rec);
   putContent("tintas"); closeModal(); render(); toast("Tinta salva");
 }
@@ -1839,17 +1840,22 @@ function tnDefeitos(){
   return tnSec("defeitos", "Pintar errado sai caro", "Os perigos de pintar errado", `<div class="tn-defs">${D.map(([n, c, e]) => `<div class="tn-def"><b>${n}</b><div><small>Causa</small><span>${c}</span></div><div><small>O que acontece</small><span>${e}</span></div></div>`).join("")}</div>
     <div class="note warn">${ic("alert")}<span>Retrabalho de pintura errada quase sempre é <b>raspar até a chapa e começar de novo</b>. Cinco minutos conferindo a numeração da lata e o esquema de pintura economizam dias de faina.</span></div>`);
 }
+function tnL(x){ return x < 1 ? `${nf(x * 1000, 0)} mL` : `${nf(x, 2)} L`; }
 function tnMistura(){
-  const m = TN.mix, a = pnum(m.a), b = pnum(m.b), v = pnum(m.v);
-  let out = `<div class="big-res"><small>Mistura</small><span>—</span><em>Preencha a proporção e a quantidade.</em></div>`;
+  const m = TN.mix, kit = m.tipo === "kit", v = pnum(m.v);
+  /* kit: a proporção é em embalagens (1 balde de 20 L : 1 lata de 1,5 L); em volume vira 20 : 1,5 */
+  const a = kit ? pnum(m.ka) * pnum(m.ea) : pnum(m.a), b = kit ? pnum(m.kb) * pnum(m.eb) : pnum(m.b);
+  let out = `<div class="big-res"><small>Mistura</small><span>—</span><em>${kit ? "Preencha o tamanho das embalagens e a quantidade." : "Preencha a proporção e a quantidade."}</em></div>`;
   if (a > 0 && b > 0 && v > 0) {
     const A = m.modo === "total" ? v * a / (a + b) : v, B = A * b / a;
-    out = `<div class="big-res"><small>${m.modo === "total" ? `Para ${nf(v, 2)} L de tinta pronta` : `Para ${nf(v, 2)} L de base`}</small><span>${nf(A, 2)} L + ${nf(B, 2)} L</span><em>base + componente · ${nf(A + B, 2)} L no total · proporção ${nf(a, 2)}:${nf(b, 2)} em volume</em></div>`;
+    const rv = a >= b ? `${nf(a / b, 2)} : 1` : `1 : ${nf(b / a, 2)}`;
+    out = `<div class="big-res"><small>${m.modo === "total" ? `Para ${nf(v, 2)} L de tinta pronta` : `Para ${nf(v, 2)} L de base`}</small><span>${tnL(A)} + ${tnL(B)}</span><em>base + componente · ${tnL(A + B)} no total · em volume dá ${rv}</em></div>`
+      + (kit ? `<div class="sub" style="font-size:12.5px">Kit inteiro: ${nf(pnum(m.ka), 2)} × ${nf(pnum(m.ea), 2)} L de base + ${nf(pnum(m.kb), 2)} × ${nf(pnum(m.eb), 2)} L de componente = ${tnL(a + b)}. Cada 1 L de base leva ${tnL(b / a)} de componente.</div>` : "");
   }
   const passos = [
     ["Confira a dupla", "A numeração da tinta e a do componente têm que bater (use o localizador). Confira também a validade e se é o mesmo fabricante."],
     ["Mexa a base sozinha", "O pigmento assenta no fundo da lata. Homogeneíze a base antes de juntar o componente."],
-    ["Junte na proporção certa", "Use a proporção da ficha técnica, em volume, com recipiente graduado. Kit completo? Junte as duas latas inteiras."],
+    ["Junte na proporção certa", "Atenção: “1:1” quase sempre quer dizer 1 embalagem de base para 1 de componente, não o mesmo volume. Um balde de 20 L com uma lata de 1,5 L é 1:1 em embalagens, mas em volume é 20 para 1,5. Kit completo? Junte o balde e a lata inteiros. Mistura parcial? Use a calculadora e um recipiente graduado."],
     ["Misture bem", "Uns 2 a 3 minutos com misturador, raspando fundo e laterais. Se a ficha pedir tempo de indução, espere antes de aplicar."],
     ["Anote a hora", "A mistura tem vida útil (pot life). Prepare só o que vai usar nesse tempo. Passou, descarte: não “salva” com diluente."],
     ["Dilua só com o diluente certo", "Só se precisar e no máximo o que a ficha permite."]
@@ -1857,10 +1863,15 @@ function tnMistura(){
   return tnSec("mistura", "Bicomponentes", "Acertar tinta e catalisador", `<ol class="steps tn-steps">${passos.map(([n, d], i) => `<li><span class="num">${i + 1}</span><div><b>${n}</b><span class="sub">${d}</span></div></li>`).join("")}</ol>
     <div class="note bad">${ic("alert")}<span><b>Nunca</b> ponha catalisador “a mais” para secar mais rápido, nem “a menos” para render mais. Fora da proporção, a tinta fica quebradiça ou não cura. E não troque o componente de uma tinta pelo de outra, nem de outro fabricante.</span></div>
     <form class="card col tn-mix" data-tn="mix" autocomplete="off"><b class="tn-h">${ic("calc")}Calculadora da mistura</b>
-      <div class="fields3"><div class="field"><label for="tn-a">Base (partes)</label><input id="tn-a" name="a" class="input num" inputmode="decimal" value="${esc(String(m.a))}"></div><div class="field"><label for="tn-b">Componente (partes)</label><input id="tn-b" name="b" class="input num" inputmode="decimal" value="${esc(String(m.b))}"></div><div class="field"><label for="tn-v">${m.modo === "total" ? "Quero preparar (L)" : "Tenho de base (L)"}</label><input id="tn-v" name="v" class="input num" inputmode="decimal" value="${esc(String(m.v))}"></div></div>
-      <div class="seg" role="group" aria-label="O que você sabe"><button type="button" data-act="tnModo" data-arg="total" aria-pressed="${m.modo === "total"}">Quanto quero no total</button><button type="button" data-act="tnModo" data-arg="base" aria-pressed="${m.modo === "base"}">Quanto tenho de base</button></div>
+      <div class="seg" role="group" aria-label="Como a proporção é dada"><button type="button" data-act="tnTipo" data-arg="kit" aria-pressed="${kit}">Pelas embalagens (kit)</button><button type="button" data-act="tnTipo" data-arg="vol" aria-pressed="${!kit}">Pela ficha, em volume</button></div>
+      ${kit ? `<div class="fields2">${tnF("ea", "Balde da base (L)", m.ea)}${tnF("eb", "Lata do componente (L)", m.eb)}</div>
+      <div class="fields3">${tnF("ka", "Baldes de base", m.ka)}${tnF("kb", "Latas de componente", m.kb)}${tnF("v", m.modo === "total" ? "Quero preparar (L)" : "Vou usar de base (L)", m.v)}</div>
+      <p class="sub" style="font-size:12.5px;margin:0">Proporção 1:1 do kit = 1 balde + 1 lata. Confira o volume escrito em cada embalagem.</p>`
+      : `<div class="fields3">${tnF("a", "Base (partes)", m.a)}${tnF("b", "Componente (partes)", m.b)}${tnF("v", m.modo === "total" ? "Quero preparar (L)" : "Tenho de base (L)", m.v)}</div>`}
+      <div class="seg" role="group" aria-label="O que você sabe"><button type="button" data-act="tnModo" data-arg="base" aria-pressed="${m.modo === "base"}">Quanto vou usar de base</button><button type="button" data-act="tnModo" data-arg="total" aria-pressed="${m.modo === "total"}">Quanto quero no total</button></div>
       <div id="tn-out">${out}</div></form>`);
 }
+function tnF(n, l, v){ return `<div class="field"><label for="tn-${n}">${l}</label><input id="tn-${n}" name="${n}" class="input num" inputmode="decimal" value="${esc(String(v ?? ""))}"></div>`; }
 function tnSeg(){
   const S2 = [
     ["Ventilação", "Solvente pesa mais que o ar e se acumula embaixo. Compartimento fechado é espaço confinado: só com ventilação forçada, medição de gases e autorização."],
@@ -1872,7 +1883,7 @@ function tnSeg(){
   return tnSec("seg", "Antes de abrir a lata", "Segurança", `<div class="tn-parts">${S2.map(([n, d]) => `<div class="tn-part"><span class="tn-dot" style="background:var(--warn)"></span><div><b>${n}</b><span class="sub">${d}</span></div></div>`).join("")}</div>`);
 }
 function tnMixPaint(form){
-  const v = formVals(form); Object.assign(TN.mix, {a:v.a, b:v.b, v:v.v});
+  const v = formVals(form); ["a", "b", "v", "ea", "eb", "ka", "kb"].forEach(k => { if (k in v) TN.mix[k] = v[k]; });
   const o = $("#tn-out"); if (!o) return;
   const tmp = document.createElement("div"); tmp.innerHTML = tnMistura(); const n = tmp.querySelector("#tn-out"); if (n) o.innerHTML = n.innerHTML;
 }
@@ -2479,8 +2490,9 @@ const ACT = {
   tnAbrir(a){ S.gq = ""; S.tab = "mar"; S.mar = "tintas"; TN.q = a; render(); scrollTo(0, 0); },
   tnEdit(a){ tnModal(a); },
   tnDel(a){ if (!confirm("Apagar esta tinta da tabela?")) return; const L = tintasData().itens; const i = L.findIndex(x => x.id === a); if (i >= 0) L.splice(i, 1); putContent("tintas"); closeModal(); render(); toast("Tinta apagada"); },
+  tnTipo(a){ TN.mix.tipo = a; const y = scrollY; render(); scrollTo(0, y); },
   tnModo(a){ TN.mix.modo = a; const y = scrollY; render(); scrollTo(0, y); },
-  tnUsarProp(a){ const [x, y] = a.split(":").map(v => v.trim()); Object.assign(TN.mix, {a:x, b:y}); const sy = scrollY; render(); scrollTo(0, sy); const el = document.getElementById("tn-mistura"); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
+  tnUsarProp(a){ const [p, ea, eb] = a.split("|"), [x, y] = p.split(":").map(v => v.trim()); if (ea && eb) Object.assign(TN.mix, {tipo:"kit", ka:x, kb:y, ea, eb}); else Object.assign(TN.mix, {tipo:"vol", a:x, b:y}); const sy = scrollY; render(); scrollTo(0, sy); const el = document.getElementById("tn-mistura"); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
   jNivel(a){ jogoNovo(a); render(); scrollTo(0, 0); },
   jAns(a){ jogoResp(a); },
   jDica(){ if (!G || G.ans) return; G.dica = true; render(); },
