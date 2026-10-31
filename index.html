@@ -383,6 +383,10 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .j-op[disabled]{cursor:default;opacity:.6}
 .j-op.right{background:rgba(61,220,151,.16);border-color:var(--good);opacity:1;color:var(--ink)}
 .j-op.wrong{background:rgba(240,106,92,.16);border-color:var(--bad);opacity:1}
+.j-def{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:rgba(79,163,247,.1);border:1px solid rgba(79,163,247,.35);font-size:14.5px;line-height:1.5}.j-def>svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--blue)}.j-def .eyebrow{color:var(--blue)}
+.j-toggle{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1px solid var(--glass-b);background:var(--glass);border-radius:14px;padding:12px 14px;color:var(--ink)}.j-toggle>span:last-child{display:flex;flex-direction:column;gap:2px}
+.j-sw{flex:none;width:42px;height:24px;border-radius:99px;background:rgba(255,255,255,.15);position:relative;margin-top:2px;transition:background .2s}.j-sw::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.j-toggle[aria-pressed="true"] .j-sw{background:var(--good)}.j-toggle[aria-pressed="true"] .j-sw::after{transform:translateX(18px)}
 .j-type{display:flex;gap:8px}.j-type .input{flex:1}
 .j-fb{border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;line-height:1.5}
 .j-fb.ok{background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.4)}.j-fb.ok>div>b:first-child{color:var(--good)}
@@ -1337,7 +1341,19 @@ const NIVEIS = [
   {id:"sargento", n:"Sargento", sub:"Peças raras, turcos, transferência no mar e a charneira. 6 opções e 20 segundos.", max:4, q:12, op:6, t:20, cat:true, partes:true},
   {id:"mestre", n:"Mestre", sub:"Tudo, inclusive as partes do cadernal. Você digita o nome. 30 segundos.", max:5, q:15, op:0, t:30, cat:true, partes:true}
 ];
-const JREC = "alm-jogo";
+const JREC = "alm-jogo", JDEF = "alm-jogo-def";
+/* Esconde na definição o próprio nome da peça (e os outros nomes dela), para a definição ajudar sem entregar a resposta. */
+function jogoDefMask(q){
+  let t = q.d; const nt = norm(t);
+  if (nt.length !== t.length) return t;
+  const names = [q.n, ...(q.al || [])].map(norm).filter(x => x.length > 2).sort((a, b) => b.length - a.length);
+  const hide = new Array(t.length).fill(false);
+  const letra = c => !!c && /[a-z0-9]/.test(c);
+  for (const x of names) { let k = nt.indexOf(x); while (k >= 0) { if (!letra(nt[k - 1]) && !letra(nt[k + x.length])) for (let j = k; j < k + x.length; j++) hide[j] = true; k = nt.indexOf(x, k + 1); } }
+  let out = "", on = false;
+  for (let j = 0; j < t.length; j++) { if (hide[j]) { if (!on) { out += "____"; on = true; } } else { on = false; out += t[j]; } }
+  return out;
+}
 let G = null, GT = null;
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 async function jogoLoad(){
@@ -1397,7 +1413,7 @@ function jogoProx(){
   if (G.i + 1 >= G.qs.length) {
     G.fim = true; const pct = Math.round(G.pts / G.qs.length * 100);
     const rec = lsGet(JREC, {}); if (!rec[G.L.id] || pct > rec[G.L.id]) { rec[G.L.id] = pct; lsSet(JREC, rec); G.recorde = true; }
-  } else { G.i++; G.ans = null; G.dica = false; }
+  } else { G.i++; G.ans = null; G.dica = false; G.def = false; }
   render(); scrollTo(0, 0); jogoTimer();
 }
 const estrelas = pct => pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0;
@@ -1412,7 +1428,9 @@ function viewJogo(){
   if (!G) {
     const rec = lsGet(JREC, {});
     return back + head + `<p class="sub" style="font-size:15px">Aparece a figura do equipamento e você diz o nome. As figuras vêm das apostilas (Arte Naval, Mestrança, Fainas Marinheiras Especiais). Comece de Marinheiro e vá subindo até Mestre.</p>
-      <div class="niveis">${NIVEIS.map((L, k) => { const r = rec[L.id]; const n = jogoPool(L).length; return `<button class="nivel" data-act="jNivel" data-arg="${L.id}"><span class="nivel-i">${divisa(k + 1)}</span><span class="nivel-t"><b>${L.n}</b><span class="sub">${L.sub}</span><span class="nivel-m"><span class="pill">${L.q} perguntas</span><span class="pill">${L.op ? L.op + " opções" : "Digitar o nome"}</span>${L.t ? `<span class="pill">${L.t} s</span>` : ""}<span class="pill">${n} peças</span></span></span><span class="nivel-r">${r != null ? starRow(estrelas(r)) + `<span class="num sub">${r}%</span>` : `<span class="sub">Novo</span>`}</span></button>`; }).join("")}</div>`;
+      <p class="sub" style="font-size:13.5px">Cada partida sorteia as perguntas (10 a 15) do <b>banco de peças</b> do nível. O banco cresce a cada nível: o de Marinheiro tem só o básico e o de Mestre tem todas as peças das apostilas, mais as partes do cadernal e da patesca. Por isso cada partida sai diferente.</p>
+      <button class="j-toggle" data-act="jDefPref" aria-pressed="${!!lsGet(JDEF, false)}"><span class="j-sw"></span><span><b>Mostrar a definição antes de responder</b><span class="sub">A explicação da apostila aparece junto com a figura, com o nome escondido. Desligado, você ainda pode tocar em "Ver definição" em cada pergunta.</span></span></button>
+      <div class="niveis">${NIVEIS.map((L, k) => { const r = rec[L.id]; const n = jogoPool(L).length; return `<button class="nivel" data-act="jNivel" data-arg="${L.id}"><span class="nivel-i">${divisa(k + 1)}</span><span class="nivel-t"><b>${L.n}</b><span class="sub">${L.sub}</span><span class="nivel-m"><span class="pill">${L.q} perguntas</span><span class="pill">${L.op ? L.op + " opções" : "Digitar o nome"}</span>${L.t ? `<span class="pill">${L.t} s</span>` : ""}<span class="pill">banco de ${n} peças</span></span></span><span class="nivel-r">${r != null ? starRow(estrelas(r)) + `<span class="num sub">${r}%</span>` : `<span class="sub">Novo</span>`}</span></button>`; }).join("")}</div>`;
   }
   if (G.fim) {
     const pct = Math.round(G.pts / G.qs.length * 100), st = estrelas(pct), k = NIVEIS.indexOf(G.L), nx = NIVEIS[k + 1];
@@ -1425,6 +1443,8 @@ function viewJogo(){
   if (L.t && !a) setTimeout(jogoTimer, 0);
   const ops = q.ops || (G.dica ? (q.dops = q.dops || jogoOps(q, jogoPool(L), 4, true)) : null);
   const pergunta = q.tipo === "parte" ? q.q : "Qual é o nome deste equipamento?";
+  const verDef = !a && (lsGet(JDEF, false) || G.def);
+  const defBox = verDef ? `<div class="j-def">${ic("book")}<div><span class="eyebrow">Definição</span><p>${esc(jogoDefMask(q))}</p></div></div>` : !a ? `<button class="btn ghost sm" data-act="jDef" style="align-self:flex-start">${ic("book")}Ver definição</button>` : "";
   let resp;
   if (ops) resp = `<div class="j-ops${ops.length > 4 ? " six" : ""}">${ops.map(o => `<button class="j-op${a ? (o === q.n ? " right" : o === a.escolha ? " wrong" : "") : ""}" data-act="jAns" data-arg="${esc(o)}" ${a ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>`;
   else resp = `<form id="j-form" class="j-type" autocomplete="off"><input id="j-in" class="input" placeholder="Digite o nome" autocapitalize="none" spellcheck="false" ${a ? "disabled" : ""} value="${a ? esc(a.escolha || "") : ""}"><button class="btn primary" ${a ? "disabled" : ""}>Responder</button></form>${a ? "" : `<button class="btn ghost sm" data-act="jDica" style="align-self:flex-start">${ic("bulb")}Ver opções (vale meio ponto)</button>`}`;
@@ -1433,7 +1453,7 @@ function viewJogo(){
   return back + `<div class="j-top"><span class="pill accent">${esc(L.n)}</span><span class="num sub">${G.i + 1} / ${G.qs.length}</span><span class="num j-pts">${String(G.pts).replace(".", ",")} pts</span></div>
     <div class="bar j-prog"><i style="width:${G.i / G.qs.length * 100}%"></i></div>
     ${L.t && !a ? `<div class="j-timer"><i id="j-time" style="width:${Math.max(0, (G.fimT - Date.now()) / (L.t * 1000) * 100)}%"></i></div>` : ""}
-    <div class="card col j-card"><div class="j-img">${jImg(q)}</div><h2 class="j-q">${esc(pergunta)}</h2>${resp}${fb}</div>`;
+    <div class="card col j-card"><div class="j-img">${jImg(q)}</div><h2 class="j-q">${esc(pergunta)}</h2>${defBox}${resp}${fb}</div>`;
 }
 const jImg = q => `<span class="j-wrap"><img src="${AM.jogo.imgs[q.img]}" alt="Figura da pergunta">${q.tipo === "parte" ? `<i class="j-mark" style="left:${q.x * 100}%;top:${q.y * 100}%"></i>` : ""}</span>`;
 
@@ -2201,6 +2221,8 @@ const ACT = {
   jAns(a){ jogoResp(a); },
   jDica(){ if (!G || G.ans) return; G.dica = true; render(); },
   jProx(){ jogoProx(); },
+  jDef(){ if (!G || G.ans) return; G.def = true; render(); },
+  jDefPref(){ lsSet(JDEF, !lsGet(JDEF, false)); render(); },
   jSair(){ G = null; clearInterval(GT); render(); scrollTo(0, 0); },
   jRetry(){ AM.jogoErr = ""; render(); },
   apoLer(a, el){ closeModal(); const p = el && el.dataset.p ? +el.dataset.p : (lsGet("alm-apo-pg", {})[a] || 1); S.gq = ""; S.tab = "mar"; S.mar = "apo"; S.apo = {id:a, p, z:1, q:el && el.dataset.p ? APQ.q : ""}; render(); scrollTo(0, 0); },
