@@ -560,6 +560,46 @@ td.hl{color:var(--accent-ink);font-weight:700}
 .gate-foot{font-size:12.5px;color:var(--faint);margin-top:12px;line-height:1.5}
 @media (max-width:820px){.gate{align-items:flex-start}.gate-in{grid-template-columns:1fr;gap:20px}.gate-hero{text-align:center}.gate-hero img{margin:0 auto;width:72px;height:72px}.gate-hero p{font-size:15px}}
 .boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+/* Aliado */
+.al-abas{grid-template-columns:repeat(3,1fr);max-width:420px;margin-bottom:16px}
+.al-h2{font-family:var(--f-display);font-size:17px;font-weight:700}
+.al-board{width:100%;height:auto;display:block;border-radius:14px;box-shadow:var(--shadow);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.al-preview{max-width:420px;opacity:.9}
+.al-presets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.al-preset{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--glass-b);background:var(--surface2);color:var(--ink)}
+.al-preset[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.al-seats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.al-seat{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--glass-b);background:var(--glass);color:var(--ink)}
+.al-seat>span:nth-child(2){display:flex;flex-direction:column;flex:1;min-width:0}
+.al-placar{gap:16px;flex-wrap:wrap;align-items:center}
+.al-wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.al-boardwrap{max-width:640px;width:100%;margin:0 auto}
+.al-status{z-index:5;display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:var(--r);background:var(--surface);border:1px solid var(--glass-b);border-left:5px solid var(--cc);box-shadow:var(--shadow)}
+.al-vez{display:flex;align-items:center;gap:10px}
+.al-vez>div{display:flex;flex-direction:column;line-height:1.2}
+.al-vez b{font-family:var(--f-display);font-size:17px}
+.al-vez>.al-dados{margin-left:auto;display:flex;flex-direction:row;gap:8px}
+.al-dado{width:44px;height:44px;transition:opacity .2s}
+.al-dado.usado{opacity:.3}
+.al-dados.rolando .al-dado{animation:al-roll .45s ease-out}
+@keyframes al-roll{0%{transform:rotate(-200deg) scale(.6)}70%{transform:rotate(15deg) scale(1.08)}100%{transform:none}}
+.al-aviso{font-size:13.5px;color:var(--accent-ink);line-height:1.4}
+.al-acao{display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:640px;width:100%;margin:0 auto}
+.al-rolar{width:100%}
+.al-ops{display:flex;flex-wrap:wrap;gap:8px}
+.al-win{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;text-align:center}
+.al-win b{font-family:var(--f-display);font-size:19px;color:var(--accent-ink)}
+.al-pulse{animation:al-pulse 1.1s ease-in-out infinite}
+@keyframes al-pulse{50%{opacity:.35}}
+.al-side{display:flex;flex-direction:column;gap:12px}
+.al-times{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.al-time{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-b);font-size:13px;flex-wrap:wrap}
+.al-time .sub{font-size:12px;width:100%}
+.al-time.on{border-color:var(--accent)}
+.al-log summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:14px}
+.al-log ol{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--muted)}
+@media (min-width:1000px){.al-wrap{grid-template-columns:minmax(0,1fr) 300px;align-items:start}.al-status{grid-column:1/-1}.al-acao{grid-column:1}.al-side{grid-column:2;grid-row:2/span 2}}
+@media (prefers-reduced-motion:reduce){.al-pulse,.al-dados.rolando .al-dado{animation:none}}
 </style>
 </head>
 <body>
@@ -601,6 +641,7 @@ const ICONS = {
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8v4H8zM8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
   roller:'<rect x="3" y="3" width="15" height="6" rx="1.5"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
+  dice:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
   game:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
   rope:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
   sling:'<path d="M12 3v4M12 7c-3 0-7 5-8 13h16C19 12 15 7 12 7z"/><path d="M8 20c1-6 2.5-9 4-9s3 3 4 9"/>',
@@ -828,6 +869,7 @@ function render(){
   $("#view").innerHTML = top + body;
   if (S.gq && $("#g-apo")) gApo(S.gq);
   if (S.tab === "mar" && S.mar === "apo") apoDraw();
+  if (S.tab === "mar" && S.mar === "aliado" && window.aliadoDraw) aliadoDraw();
 }
 
 function viewPending(){
@@ -952,6 +994,7 @@ function gIndex(){
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
   });
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento e mistura com o componente", txt:"calculadora tinta balde pintura compartimento demão rendimento m2 mistura componente catalisador kit proporção epóxi", act:"tool", arg:"tinta"});
+  E.push({tipo:"Lazer", t:"Aliado", sub:"O ludo da Marinha, em duplas", txt:"aliado jogo ludo dados dupla tabuleiro lona paiol caveira pitoco sena ás morto peru sangrando lazer passatempo fluminense flamengo vasco botafogo", act:"marOpen", arg:"aliado"});
   E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
   E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso, ENGENALMARINST 60-01D", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar engenalmarinst 60-01d publicação pintura", act:"marOpen", arg:"apostilas"});
   E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Localizador, tipos, compatibilidade, mistura", txt:"tinta tintas pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
@@ -1381,6 +1424,7 @@ async function gerarPDF(lid){
 function viewMar(){
   if (S.mar === "cintas") return viewCintas();
   if (S.mar === "jogo") return viewJogo();
+  if (S.mar === "aliado" && window.viewAliado) return viewAliado();
   if (S.mar === "tintas") return viewTintas();
   if (S.mar === "esquemas") return viewEsquemas();
   if (S.mar === "apostilas") return viewApostilas();
@@ -1388,7 +1432,8 @@ function viewMar(){
   return `<div class="page-h"><span class="eyebrow">Fainas de convés</span><h1>Marinharia</h1><p class="sub" style="font-size:15px">Cabos, cintas, poleame e acessórios: as apostilas para consulta, um jogo para treinar os nomes e guias para usar com segurança.</p></div>
     <div class="grid">${marTiles()}</div>`;
 }
-const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
+const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="aliado"><div class="tile-i">${ic("dice")}</div><b>Aliado</b><div class="sub">O ludo da Marinha, em duplas e com dois dados. Joga sem internet, num celular só.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
   <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso e ENGENALMARINST 60-01D, com pesquisa.</div></button>
   <button class="tile" data-act="marOpen" data-arg="tintas"><div class="tile-i">${ic("roller")}</div><b>Tintas e pintura</b><div class="sub">Localizador de tinta e catalisador, alquídica, epóxi e PU, o que pode ir sobre o quê e como acertar a mistura.</div></button>
   <button class="tile" data-act="marOpen" data-arg="esquemas"><div class="tile-i">${ic("layers")}</div><b>Esquemas de pintura</b><div class="sub">Costado, convoo, convés, tanques, paióis: o preparo e a ordem das tintas, pela ENGENALMARINST 60-01D.</div></button>
@@ -2930,5 +2975,6 @@ document.addEventListener("input", ev => {
 if (!hasToken()) showGate();
 if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
+<script src="aliado.js"></script>
 </body>
 </html>
