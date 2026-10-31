@@ -350,6 +350,47 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
   .apps-home .app-icon{width:40px;height:40px;border-radius:11px}
 }
 /* marinharia */
+/* tintas */
+#tn-form .fields2{grid-template-columns:repeat(2,minmax(0,1fr))}#tn-form .field{min-width:0}
+@media (max-width:480px){#tn-form .fields2{grid-template-columns:1fr}}
+.tn-h{font-family:var(--f-display);font-size:17px;display:inline-flex;align-items:center;gap:8px}.tn-h svg{width:18px;height:18px;color:var(--accent)}
+.tn-loc{border-color:rgba(227,181,74,.35)}
+.tn-res{display:flex;flex-direction:column;gap:10px}
+.tn-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:14px 14px 14px 18px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--glass-b);overflow:hidden}
+.tn-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.tn-card-h{display:flex;align-items:center;gap:8px}.tn-card-h .iconbtn{margin-left:auto}
+.tn-pair{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center}
+.tn-pair>div{display:flex;flex-direction:column;gap:2px;min-width:0}.tn-pair small,.tn-kv small,.tn-def small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.tn-pair b{font-size:20px;color:var(--accent-ink);overflow-wrap:anywhere}.tn-pair span{font-size:13.5px;color:var(--muted)}
+.tn-plus{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--accent)}
+.tn-one{grid-column:2 / span 2}
+.tn-kv{display:flex;flex-wrap:wrap;gap:8px 18px}.tn-kv span{display:flex;flex-direction:column}
+.tn-sec{display:flex;flex-direction:column;gap:12px;scroll-margin-top:90px}.tn-sec h2{font-family:var(--f-display);font-size:21px}
+.tn-bar{display:flex;height:16px;border-radius:99px;overflow:hidden}.tn-bar i{flex:1}
+.tn-bar i:nth-child(1){flex:3}.tn-bar i:nth-child(2){flex:2}.tn-bar i:nth-child(3){flex:1.4}.tn-bar i:nth-child(4){flex:2.6}.tn-bar i:nth-child(5){flex:.5}
+.tn-parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.tn-part{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b)}.tn-part>div{display:flex;flex-direction:column;gap:3px}
+.tn-dot{flex:none;width:14px;height:14px;border-radius:50%;margin-top:4px}
+.tn-tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.tn-tipo{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:var(--r);border:1px solid var(--glass-b);border-top:4px solid var(--c);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015))}
+.tn-tipo>div{display:flex;flex-direction:column}.tn-tipo b{font-family:var(--f-display);font-size:19px;color:var(--c)}.tn-tipo p{font-size:14.5px;line-height:1.5}
+.tn-tipo dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:13.5px}.tn-tipo dt{color:var(--faint);font-weight:700}.tn-tipo dd{margin:0}
+.tn-mx{display:flex;flex-direction:column;gap:12px}
+.tn-mx-row{display:flex;flex-direction:column;gap:8px}.tn-mx-h{font-family:var(--f-display);font-size:16px}
+.tn-mx-cells{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tn-mx-cells>div{padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.45;display:flex;flex-direction:column;gap:4px}
+.tn-mx-cells span{display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px}.tn-mx-cells svg{width:16px;height:16px;flex:none}.tn-mx-cells em{font-style:normal;font-weight:600;color:var(--ink);opacity:.8;font-size:13px}.tn-mx-cells small{color:var(--ink);opacity:.85;font-size:13px}
+@media (max-width:640px){.tn-mx-cells{grid-template-columns:1fr}}
+.mx-ok{background:rgba(61,220,151,.12);border:1px solid rgba(61,220,151,.4)}.mx-ok span{color:var(--good)}
+.mx-no{background:rgba(240,106,92,.13);border:1px solid rgba(240,106,92,.45)}.mx-no span{color:var(--bad)}
+.mx-warn{background:rgba(242,177,74,.12);border:1px solid rgba(242,177,74,.4)}.mx-warn span{color:var(--warn)}
+.tn-defs{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.tn-def{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);border-left:4px solid var(--bad)}
+.tn-def b{font-family:var(--f-display);font-size:16px}.tn-def>div{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.45}
+.tn-steps li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--glass-b)}
+.tn-steps li>.num{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700}
+.tn-steps li>div{display:flex;flex-direction:column;gap:2px}
+@media (max-width:560px){.tn-pair{grid-template-columns:1fr}.tn-plus{display:none}.tn-one{grid-column:auto}.tn-mix .fields3{grid-template-columns:1fr 1fr}}
 /* jogo "Que peça é essa?" */
 .niveis{display:flex;flex-direction:column;gap:10px}
 .nivel{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;text-align:left;border:1px solid var(--glass-b);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.015));border-radius:var(--r);padding:14px 16px;color:var(--ink)}
@@ -689,6 +730,8 @@ function showGate(){
   </div>`;
 }
 document.addEventListener("submit", ev => {
+  if (ev.target.id === "tn-form") { ev.preventDefault(); tnSalvar(ev.target); return; }
+  if (ev.target.dataset && ev.target.dataset.tn === "mix") { ev.preventDefault(); return; }
   if (ev.target.id !== "j-form") return; ev.preventDefault();
   const v = $("#j-in").value; if (!v.trim()) { $("#j-in").focus(); return; } jogoResp(v);
   const n = $("#j-next"); if (n) n.focus();
@@ -872,6 +915,8 @@ function gIndex(){
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
   E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
   E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar", act:"marOpen", arg:"apostilas"});
+  E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Localizador, tipos, compatibilidade, mistura", txt:"tinta tintas pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
+  ((S.content.tintas && S.content.tintas.data.itens) || []).forEach(t => E.push({tipo:"Tintas", t:(t.num ? t.num + " · " : "") + (t.nome || "Tinta"), sub:(TIPOS_TINTA[t.tipo] || TIPOS_TINTA.out).n + (t.comp ? " · componente " + t.comp : ""), txt:[t.num, t.nome, t.comp, t.compNome, t.cor, t.uso, t.obs].join(" "), act:"tnAbrir", arg:t.num || t.nome || ""}));
   E.push({tipo:"Marinharia", t:"Cintas de elevação", sub:"Cores, etiqueta, fator 7:1, modos, inspeção", txt:"cinta cintas elevação içamento içar lingada cor cores lilás verde amarela cinza vermelha marrom azul laranja etiqueta cmt wll carga máxima trabalho fator segurança 7 enforcada cesto ângulo pernas inspeção descarte nbr 15637 en 1492 nr-11 poliéster tubular plana", act:"marOpen", arg:"cintas"});
   E.push({tipo:"Ferramentas", t:"Calculadora de espias", sub:"Bitola, diâmetro e carga de ruptura", txt:"calculadora espia espias cabo cabos bitola circunferência diâmetro polegada mm carga ruptura trabalho segurança nylon polietileno polipropileno poliéster kevlar aramida dyneema manilha sisal fibra vegetal aço amarração", act:"tool", arg:"espias"});
   E.push({tipo:"Ferramentas", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"tool", arg:"fin"});
@@ -1288,6 +1333,7 @@ async function gerarPDF(lid){
 function viewMar(){
   if (S.mar === "cintas") return viewCintas();
   if (S.mar === "jogo") return viewJogo();
+  if (S.mar === "tintas") return viewTintas();
   if (S.mar === "apostilas") return viewApostilas();
   if (S.mar === "apo" && S.apo) return viewLeitor();
   return `<div class="page-h"><span class="eyebrow">Fainas de convés</span><h1>Marinharia</h1><p class="sub" style="font-size:15px">Cabos, cintas, poleame e acessórios: as apostilas para consulta, um jogo para treinar os nomes e guias para usar com segurança.</p></div>
@@ -1295,6 +1341,7 @@ function viewMar(){
 }
 const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
   <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais e Manobras de Peso, com pesquisa.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="tintas"><div class="tile-i">${ic("roller")}</div><b>Tintas e pintura</b><div class="sub">Localizador de tinta e catalisador, alquídica, epóxi e PU, o que pode ir sobre o quê e como acertar a mistura.</div></button>
   <button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
   <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Bitola, diâmetro e carga de ruptura dos cabos por material.</div></button>`;
 
@@ -1673,6 +1720,162 @@ document.addEventListener("touchstart", ev => { if (ev.target.closest && ev.targ
 document.addEventListener("touchend", ev => { if (!RD_SW || S.mar !== "apo") return; const t = ev.changedTouches[0], dx = t.clientX - RD_SW.x, dy = t.clientY - RD_SW.y; RD_SW = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) apoIr(S.apo.p + (dx < 0 ? 1 : -1)); }, {passive:true});
 document.addEventListener("keydown", ev => { if (S.tab !== "mar" || S.mar !== "apo" || /input|select|textarea/i.test(ev.target.tagName) || $("#modal").innerHTML) return; if (ev.key === "ArrowRight") apoIr(S.apo.p + 1); if (ev.key === "ArrowLeft") apoIr(S.apo.p - 1); });
 let RD_RS = null; window.addEventListener("resize", () => { if (S.mar !== "apo") return; clearTimeout(RD_RS); RD_RS = setTimeout(apoDraw, 250); });
+
+/* ---------- Tintas e pintura ----------
+   Conhecimento geral de pintura naval (público), por isso fica no código. A tabela de tintas de bordo (numeração, componente, proporção)
+   é dado do navio: fica no Supabase, em alm_content "tintas" (audience todos), e só o encarregado edita. */
+const TIPOS_TINTA = {
+  alq:{n:"Alquídica", c:"#E8A33D", sub:"Esmalte sintético · 1 componente"},
+  epo:{n:"Epóxi", c:"#4FA3F7", sub:"2 componentes (base + agente de cura)"},
+  pu:{n:"Poliuretano (PU)", c:"#3DDC97", sub:"2 componentes (base + isocianato)"},
+  out:{n:"Outra", c:"#9AAEC2", sub:""}
+};
+const tintasData = () => (S.content.tintas && S.content.tintas.data) || {itens:[]};
+let TN = {q:"", sec:null, mix:{a:4, b:1, modo:"total", v:4}};
+function viewTintas(){
+  const secs = [["comp", "Do que a tinta é feita"], ["tipos", "Alquídica, epóxi e poliuretano"], ["sobre", "O que pode ir sobre o quê"], ["defeitos", "Os perigos de pintar errado"], ["mistura", "Acertar tinta e catalisador"], ["seg", "Segurança"]];
+  return `<button class="back" data-act="marBack">${ic("left")}Marinharia</button>
+    <div class="page-h"><span class="eyebrow">Marinharia · Pintura</span><h1>Tintas e pintura</h1><p class="sub" style="font-size:15px">A tinta certa, com o componente certo, no lugar certo. Encontre a tinta pela numeração, veja o que pode ir sobre o quê e acerte a mistura.</p></div>
+    ${tnLocalizador()}
+    <nav class="hmenu" aria-label="Partes do guia">${secs.map(([id, n]) => `<button data-act="jump" data-arg="tn-${id}">${n}</button>`).join("")}</nav>
+    ${tnComp()}${tnTipos()}${tnSobre()}${tnDefeitos()}${tnMistura()}${tnSeg()}
+    <p class="sub" style="font-size:12.5px">Regras gerais de pintura naval. Para cada tinta valem a ficha técnica do fabricante (proporção, vida útil da mistura, intervalo de repintura, diluente) e o esquema de pintura do navio.</p>`;
+}
+
+/* --- localizador --- */
+function tnLocalizador(){
+  const L = tintasData().itens || [], q = norm(TN.q).trim();
+  const hits = q ? L.filter(t => norm([t.num, t.nome, t.comp, t.compNome, t.cor, TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].join(" ")).includes(q)) : [];
+  return `<section class="card col tn-loc" id="tn-loc"><div class="row" style="flex-wrap:wrap"><div class="tile-i">${ic("search")}</div><div style="flex:1;min-width:180px"><b class="tn-h">Localizador de tintas</b><div class="sub">Digite a numeração (NEB) da tinta ou do componente e veja o par certo.</div></div>${isAdmin() ? `<button class="btn sm" data-act="tnNova">${ic("plus")}Adicionar tinta</button>` : ""}</div>
+    <div class="search">${ic("search")}<input id="tn-q" class="input" type="search" inputmode="search" placeholder="Numeração, nome ou cor" autocomplete="off" value="${esc(TN.q)}" aria-label="Procurar tinta"></div>
+    <div id="tn-res" class="tn-res">${tnRes(L, q, hits)}</div></section>`;
+}
+function tnRes(L, q, hits){
+  if (!L.length) return `<div class="note">${ic("info")}<span><b>A tabela de tintas de bordo ainda não foi carregada.</b> Assim que ela entrar, é só digitar a numeração da lata para ver o componente que bate com ela, a proporção da mistura e onde a tinta é usada.${isAdmin() ? " Você pode adicionar uma por uma em <b>Adicionar tinta</b> ou mandar a tabela inteira." : ""}</span></div>`;
+  if (!q) return `<div class="sub">${L.length} ${L.length === 1 ? "tinta cadastrada" : "tintas cadastradas"}. Digite para procurar.</div>`;
+  if (!hits.length) return `<div class="note warn">${ic("alert")}<span>Nenhuma tinta com “${esc(TN.q)}”. Confira a numeração na etiqueta da lata. Na dúvida, não misture: pergunte ao encarregado.</span></div>`;
+  return hits.slice(0, 30).map(tnCard).join("");
+}
+function tnCard(t){
+  const T = TIPOS_TINTA[t.tipo] || TIPOS_TINTA.out, bi = t.tipo === "epo" || t.tipo === "pu" || t.comp;
+  return `<div class="tn-card" style="--c:${T.c}"><div class="tn-card-h"><span class="pill" style="color:${T.c};border-color:${T.c}55">${esc(T.n)}</span>${isAdmin() ? `<button class="iconbtn sm" data-act="tnEdit" data-arg="${esc(t.id)}" aria-label="Editar">${ic("edit")}</button>` : ""}</div>
+    <div class="tn-pair"><div><small>Tinta (base)</small><b class="num">${esc(t.num || "—")}</b><span>${esc(t.nome || "")}${t.cor ? " · " + esc(t.cor) : ""}</span></div>
+    ${bi ? `<div class="tn-plus">+</div><div><small>Componente</small><b class="num">${esc(t.comp || "—")}</b><span>${esc(t.compNome || "")}</span></div>` : `<div class="tn-one"><small>Componente</small><span>Não leva: tinta de 1 componente.</span></div>`}</div>
+    <div class="tn-kv">${t.prop ? `<span><small>Proporção</small><b class="num">${esc(t.prop)}</b></span>` : ""}${t.pot ? `<span><small>Vida da mistura</small><b>${esc(t.pot)}</b></span>` : ""}${t.dil ? `<span><small>Diluente</small><b>${esc(t.dil)}</b></span>` : ""}</div>
+    ${t.uso ? `<div class="sub"><b style="color:var(--ink)">Onde usar:</b> ${esc(t.uso)}</div>` : ""}${t.obs ? `<div class="sub">${esc(t.obs)}</div>` : ""}
+    ${t.prop && /^\s*\d+([.,]\d+)?\s*:\s*\d+([.,]\d+)?\s*$/.test(t.prop) ? `<button class="btn ghost sm" data-act="tnUsarProp" data-arg="${esc(t.prop)}" style="align-self:flex-start">${ic("calc")}Calcular a mistura com ${esc(t.prop)}</button>` : ""}</div>`;
+}
+function tnModal(id){
+  const t = (tintasData().itens || []).find(x => x.id === id) || {tipo:"epo"};
+  const f = (n, l, ph, v) => `<div class="field"><label for="tn-${n}">${l}</label><input id="tn-${n}" name="${n}" class="input" maxlength="120" placeholder="${ph}" value="${esc(v || "")}"></div>`;
+  openModal(sheetHead(id ? "Editar tinta" : "Adicionar tinta", "Tabela de tintas de bordo") + `<form id="tn-form" class="col" data-id="${esc(id || "")}">
+    <div class="field"><label for="tn-tipo">Tipo</label><select id="tn-tipo" name="tipo" class="input">${Object.entries(TIPOS_TINTA).map(([k, v]) => `<option value="${k}" ${t.tipo === k ? "selected" : ""}>${v.n}</option>`).join("")}</select></div>
+    <div class="fields2">${f("num", "Numeração da tinta (NEB)", "", t.num)}${f("nome", "Nome da tinta", "Ex.: Epóxi alta espessura", t.nome)}</div>
+    <div class="fields2">${f("comp", "Numeração do componente", "Deixe vazio se não leva", t.comp)}${f("compNome", "Nome do componente", "Ex.: Agente de cura", t.compNome)}</div>
+    <div class="fields2">${f("prop", "Proporção (base:componente)", "Ex.: 4:1", t.prop)}${f("cor", "Cor", "", t.cor)}</div>
+    <div class="fields2">${f("pot", "Vida da mistura (pot life)", "Ex.: 6 h a 25 °C", t.pot)}${f("dil", "Diluente", "", t.dil)}</div>
+    ${f("uso", "Onde usar", "Ex.: convés, porão, costado", t.uso)}${f("obs", "Observação", "", t.obs)}
+    <div class="row" style="flex-wrap:wrap"><button class="btn primary">${ic("check")}Salvar</button>${id ? `<button type="button" class="btn ghost danger" data-act="tnDel" data-arg="${esc(id)}">${ic("trash")}Apagar</button>` : ""}</div></form>`);
+}
+function tnSalvar(form){
+  const v = formVals(form), id = form.dataset.id;
+  if (!String(v.num || "").trim() && !String(v.nome || "").trim()) { toast("Preencha a numeração ou o nome"); return; }
+  if (!S.content.tintas) S.content.tintas = {key:"tintas", audience:"todos", data:{itens:[]}};
+  const L = S.content.tintas.data.itens = S.content.tintas.data.itens || [];
+  const rec = {id:id || "t" + Date.now().toString(36)}; ["tipo", "num", "nome", "comp", "compNome", "prop", "cor", "pot", "dil", "uso", "obs"].forEach(k => { const x = String(v[k] || "").trim(); if (x) rec[k] = x; });
+  const i = L.findIndex(x => x.id === id); if (i >= 0) L[i] = rec; else L.push(rec);
+  putContent("tintas"); closeModal(); render(); toast("Tinta salva");
+}
+
+/* --- guia --- */
+const tnSec = (id, eb, h, body) => `<section class="tn-sec" id="tn-${id}"><span class="eyebrow">${eb}</span><h2>${h}</h2>${body}</section>`;
+function tnComp(){
+  const partes = [
+    ["Resina (ligante ou veículo)", "#C98F2A", "É a cola da tinta: forma a película e prende tudo na chapa. É ela que dá o nome à tinta (alquídica, epóxi, poliuretano) e decide a resistência à água, ao sol, ao óleo e ao atrito."],
+    ["Pigmento", "#4FA3F7", "Pó fino que dá a cor e cobre o fundo. Alguns também protegem: os anticorrosivos (zinco, fosfato de zinco, óxido de ferro) seguram a ferrugem; o alumínio lamelar faz barreira."],
+    ["Cargas", "#9AAEC2", "Pós minerais (talco, barita, mica) que dão corpo e espessura e diminuem o custo. Em excesso, a tinta perde brilho e resistência."],
+    ["Solvente", "#3DDC97", "Deixa a tinta líquida para aplicar e evapora depois. Por isso é inflamável e tóxico. Cada tinta tem o seu: diluente errado pode talhar a tinta ou impedir a cura."],
+    ["Aditivos", "#F06A5C", "Pequenas quantidades que ajudam: secantes, antimofo, antiescorrimento, antiespuma, nivelantes."]
+  ];
+  return tnSec("comp", "Composição", "Do que a tinta é feita", `<div class="tn-bar">${partes.map(([n, c]) => `<i style="background:${c}" title="${n}"></i>`).join("")}</div>
+    <div class="tn-parts">${partes.map(([n, c, d]) => `<div class="tn-part"><span class="tn-dot" style="background:${c}"></span><div><b>${n}</b><span class="sub">${d}</span></div></div>`).join("")}</div>
+    <div class="note">${ic("info")}<span><b>E o verniz?</b> Verniz é tinta sem pigmento: só resina e solvente. Por isso é transparente e protege a madeira sem esconder o veio. Já a <b>tinta de fundo (primer)</b> é feita para aderir e proteger a chapa, e o <b>acabamento</b> é feito para dar cor e aguentar o tempo.</span></div>`);
+}
+function tnTipos(){
+  const C = [
+    ["alq", "Alquídica", "Esmalte sintético", [["Componentes", "1 (vem pronta na lata)"], ["Como cura", "Seca reagindo com o oxigênio do ar"], ["Onde usar", "Áreas internas e secas, superestrutura, peças e manutenção do dia a dia"], ["Não usar", "Fundo, obras vivas, tanques, conveses de tráfego pesado, sobre zinco ou galvanizado"]], "Barata, fácil de aplicar e de retocar. Fica mole com solvente forte e não aguenta imersão nem produtos químicos."],
+    ["epo", "Epóxi", "Bicomponente", [["Componentes", "2: base + agente de cura (catalisador)"], ["Como cura", "Reação química entre as duas partes, não só secagem"], ["Onde usar", "Fundo anticorrosivo, obras vivas, tanques, porões, conveses, paióis"], ["Ponto fraco", "Calcina (fica esbranquiçada e perde a cor) no sol: por isso recebe PU por cima"]], "A mais resistente a água, óleo, produtos químicos e atrito. Exige a mistura certa, respeitar a vida da mistura e a temperatura mínima."],
+    ["pu", "Poliuretano", "Bicomponente", [["Componentes", "2: base + isocianato (endurecedor)"], ["Como cura", "Reação química; a umidade atrapalha"], ["Onde usar", "Acabamento externo: costado, superestrutura, mastros, sobre o epóxi"], ["Cuidado", "O isocianato faz mal às vias respiratórias: respirador obrigatório"]], "Guarda a cor e o brilho no sol por anos. Vai por cima do epóxi, formando o sistema mais comum dos navios: epóxi por baixo, PU por cima."]
+  ];
+  return tnSec("tipos", "Os três tipos de bordo", "Alquídica, epóxi e poliuretano", `<div class="tn-tipos">${C.map(([k, n, s, kv, d]) => `<div class="tn-tipo" style="--c:${TIPOS_TINTA[k].c}"><div><b>${n}</b><span class="sub">${s}</span></div><p>${d}</p><dl>${kv.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("")}</dl></div>`).join("")}</div>
+    <div class="note">${ic("bulb")}<span><b>Como saber o que já está na chapa?</b> Faça o <b>teste do solvente</b> num canto: esfregue um pano com thinner forte (ou acetona) por uns 30 segundos. Se a tinta amolecer, soltar cor no pano ou ficar pegajosa, é alquídica (ou outra de 1 componente). Se continuar dura, é epóxi ou poliuretano. Na dúvida, consulte o esquema de pintura do navio.</span></div>`);
+}
+function tnSobre(){
+  const T = ["alq", "epo", "pu"], N = {alq:"Alquídica", epo:"Epóxi", pu:"PU"};
+  const M = {
+    "alq>alq":["ok", "Depois de seca. Limpe e lixe o brilho."],
+    "epo>alq":["no", "O solvente forte do epóxi amolece a alquídica: enruga, levanta e descasca."],
+    "pu>alq":["no", "Mesmo problema: a alquídica de baixo enruga e levanta."],
+    "alq>epo":["warn", "A alquídica pega mal no epóxi curado e liso: descasca em placas. Em área molhada, forma bolhas. Só se o esquema do navio mandar, com lixamento e primer próprio."],
+    "epo>epo":["ok", "Dentro do intervalo de repintura da ficha técnica. Passou do prazo? Lixe antes."],
+    "pu>epo":["ok", "É o sistema padrão: epóxi protege, PU dá o acabamento."],
+    "alq>pu":["warn", "Aderência fraca: só com lixamento e se o esquema permitir."],
+    "epo>pu":["warn", "Só lixando bem. Normalmente não se volta para epóxi por cima de acabamento."],
+    "pu>pu":["ok", "Limpo e lixado de leve."]
+  };
+  const ico = {ok:"check", no:"x", warn:"alert"};
+  return tnSec("sobre", "Compatibilidade", "O que pode ir sobre o quê", `<p class="sub" style="font-size:14.5px">A regra de ouro: <b>epóxi e PU não vão por cima de alquídica.</b> O solvente forte deles amolece a alquídica, que enruga e solta.</p>
+    <div class="tn-mx">${T.map(a => `<div class="tn-mx-row"><b class="tn-mx-h">${N[a]} <span class="sub">por cima de…</span></b><div class="tn-mx-cells">${T.map(b => { const [st, d] = M[a + ">" + b]; return `<div class="mx-${st}"><span>${ic(ico[st])}${st === "ok" ? "Pode" : st === "no" ? "Não" : "Evite"}<em>sobre ${N[b]}</em></span><small>${d}</small></div>`; }).join("")}</div></div>`).join("")}</div>`);
+}
+function tnDefeitos(){
+  const D = [
+    ["Enrugamento e levantamento", "Epóxi ou PU por cima de alquídica, ou demão grossa de alquídica antes da de baixo secar.", "O solvente da tinta nova ataca a de baixo, que incha e enruga como pele de leite. Tem que raspar tudo até a camada boa."],
+    ["Bolhas (a tinta “estoura”)", "Tinta errada em área molhada (alquídica em porão, convés ou obras vivas), pintar sobre umidade, sal ou chapa quente, ou solvente preso entre demãos.", "A água ou o solvente empurra a película de dentro para fora. Quando a bolha estoura, a ferrugem entra."],
+    ["Descascamento em placas", "Alquídica sobre epóxi liso, superfície com graxa, sal ou poeira, ou repintura fora do intervalo sem lixar.", "A tinta nova não se agarra na de baixo e sai em lâminas."],
+    ["Tinta que não seca (pegajosa)", "Componente errado, proporção errada, esqueceu o componente, ou frio abaixo da temperatura mínima.", "A reação química não acontece direito. Não adianta esperar: tem que remover."],
+    ["Calcinação (pó branco)", "Epóxi exposto ao sol sem acabamento de PU.", "O sol degrada a resina e a cor some. Não é defeito da tinta, é o lugar errado para ela."],
+    ["Ferrugem por baixo", "Preparo de superfície fraco, espessura baixa ou primer errado.", "A tinta parece boa, mas a corrosão avança por baixo e estoura depois."]
+  ];
+  return tnSec("defeitos", "Pintar errado sai caro", "Os perigos de pintar errado", `<div class="tn-defs">${D.map(([n, c, e]) => `<div class="tn-def"><b>${n}</b><div><small>Causa</small><span>${c}</span></div><div><small>O que acontece</small><span>${e}</span></div></div>`).join("")}</div>
+    <div class="note warn">${ic("alert")}<span>Retrabalho de pintura errada quase sempre é <b>raspar até a chapa e começar de novo</b>. Cinco minutos conferindo a numeração da lata e o esquema de pintura economizam dias de faina.</span></div>`);
+}
+function tnMistura(){
+  const m = TN.mix, a = pnum(m.a), b = pnum(m.b), v = pnum(m.v);
+  let out = `<div class="big-res"><small>Mistura</small><span>—</span><em>Preencha a proporção e a quantidade.</em></div>`;
+  if (a > 0 && b > 0 && v > 0) {
+    const A = m.modo === "total" ? v * a / (a + b) : v, B = A * b / a;
+    out = `<div class="big-res"><small>${m.modo === "total" ? `Para ${nf(v, 2)} L de tinta pronta` : `Para ${nf(v, 2)} L de base`}</small><span>${nf(A, 2)} L + ${nf(B, 2)} L</span><em>base + componente · ${nf(A + B, 2)} L no total · proporção ${nf(a, 2)}:${nf(b, 2)} em volume</em></div>`;
+  }
+  const passos = [
+    ["Confira a dupla", "A numeração da tinta e a do componente têm que bater (use o localizador). Confira também a validade e se é o mesmo fabricante."],
+    ["Mexa a base sozinha", "O pigmento assenta no fundo da lata. Homogeneíze a base antes de juntar o componente."],
+    ["Junte na proporção certa", "Use a proporção da ficha técnica, em volume, com recipiente graduado. Kit completo? Junte as duas latas inteiras."],
+    ["Misture bem", "Uns 2 a 3 minutos com misturador, raspando fundo e laterais. Se a ficha pedir tempo de indução, espere antes de aplicar."],
+    ["Anote a hora", "A mistura tem vida útil (pot life). Prepare só o que vai usar nesse tempo. Passou, descarte: não “salva” com diluente."],
+    ["Dilua só com o diluente certo", "Só se precisar e no máximo o que a ficha permite."]
+  ];
+  return tnSec("mistura", "Bicomponentes", "Acertar tinta e catalisador", `<ol class="steps tn-steps">${passos.map(([n, d], i) => `<li><span class="num">${i + 1}</span><div><b>${n}</b><span class="sub">${d}</span></div></li>`).join("")}</ol>
+    <div class="note bad">${ic("alert")}<span><b>Nunca</b> ponha catalisador “a mais” para secar mais rápido, nem “a menos” para render mais. Fora da proporção, a tinta fica quebradiça ou não cura. E não troque o componente de uma tinta pelo de outra, nem de outro fabricante.</span></div>
+    <form class="card col tn-mix" data-tn="mix" autocomplete="off"><b class="tn-h">${ic("calc")}Calculadora da mistura</b>
+      <div class="fields3"><div class="field"><label for="tn-a">Base (partes)</label><input id="tn-a" name="a" class="input num" inputmode="decimal" value="${esc(String(m.a))}"></div><div class="field"><label for="tn-b">Componente (partes)</label><input id="tn-b" name="b" class="input num" inputmode="decimal" value="${esc(String(m.b))}"></div><div class="field"><label for="tn-v">${m.modo === "total" ? "Quero preparar (L)" : "Tenho de base (L)"}</label><input id="tn-v" name="v" class="input num" inputmode="decimal" value="${esc(String(m.v))}"></div></div>
+      <div class="seg" role="group" aria-label="O que você sabe"><button type="button" data-act="tnModo" data-arg="total" aria-pressed="${m.modo === "total"}">Quanto quero no total</button><button type="button" data-act="tnModo" data-arg="base" aria-pressed="${m.modo === "base"}">Quanto tenho de base</button></div>
+      <div id="tn-out">${out}</div></form>`);
+}
+function tnSeg(){
+  const S2 = [
+    ["Ventilação", "Solvente pesa mais que o ar e se acumula embaixo. Compartimento fechado é espaço confinado: só com ventilação forçada, medição de gases e autorização."],
+    ["Respirador", "Máscara com filtro para vapores orgânicos. Para PU (isocianato) e pistola airless, o respirador é obrigatório."],
+    ["Pele e olhos", "Luvas nitrílicas, óculos e roupa de manga comprida. Epóxi dá alergia na pele que não passa mais."],
+    ["Fogo", "Tinta e diluente são inflamáveis: nada de chama, solda ou faísca por perto. Panos sujos de tinta podem pegar fogo sozinhos: guarde em recipiente fechado com água."],
+    ["Paiol e descarte", "Latas fechadas, no paiol de tintas. Sobras, latas e solventes usados vão para o descarte de resíduos do navio, nunca para o mar."]
+  ];
+  return tnSec("seg", "Antes de abrir a lata", "Segurança", `<div class="tn-parts">${S2.map(([n, d]) => `<div class="tn-part"><span class="tn-dot" style="background:var(--warn)"></span><div><b>${n}</b><span class="sub">${d}</span></div></div>`).join("")}</div>`);
+}
+function tnMixPaint(form){
+  const v = formVals(form); Object.assign(TN.mix, {a:v.a, b:v.b, v:v.v});
+  const o = $("#tn-out"); if (!o) return;
+  const tmp = document.createElement("div"); tmp.innerHTML = tnMistura(); const n = tmp.querySelector("#tn-out"); if (n) o.innerHTML = n.innerHTML;
+}
 
 /* Código de cores da CMT: EN 1492-1/-2 e ABNT NBR 15637-1/-2. Cinta plana leva uma listra por tonelada. */
 const CINTAS = [
@@ -2272,6 +2475,12 @@ const ACT = {
   tool(a){ S.gq = ""; S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
   marOpen(a){ S.gq = ""; S.tab = "mar"; S.mar = a; render(); scrollTo(0, 0); },
   marBack(){ S.mar = null; G = null; clearInterval(GT); render(); scrollTo(0, 0); },
+  tnNova(){ tnModal(null); },
+  tnAbrir(a){ S.gq = ""; S.tab = "mar"; S.mar = "tintas"; TN.q = a; render(); scrollTo(0, 0); },
+  tnEdit(a){ tnModal(a); },
+  tnDel(a){ if (!confirm("Apagar esta tinta da tabela?")) return; const L = tintasData().itens; const i = L.findIndex(x => x.id === a); if (i >= 0) L.splice(i, 1); putContent("tintas"); closeModal(); render(); toast("Tinta apagada"); },
+  tnModo(a){ TN.mix.modo = a; const y = scrollY; render(); scrollTo(0, y); },
+  tnUsarProp(a){ const [x, y] = a.split(":").map(v => v.trim()); Object.assign(TN.mix, {a:x, b:y}); const sy = scrollY; render(); scrollTo(0, sy); const el = document.getElementById("tn-mistura"); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
   jNivel(a){ jogoNovo(a); render(); scrollTo(0, 0); },
   jAns(a){ jogoResp(a); },
   jDica(){ if (!G || G.ans) return; G.dica = true; render(); },
@@ -2375,6 +2584,8 @@ document.addEventListener("keydown", ev => {
 });
 document.addEventListener("input", ev => {
   if (ev.target.id === "apo-q") { apoQ(ev.target.value); return; }
+  if (ev.target.id === "tn-q") { TN.q = ev.target.value; const L = tintasData().itens || [], q = norm(TN.q).trim(); const r = $("#tn-res"); if (r) r.innerHTML = tnRes(L, q, q ? L.filter(t => norm([t.num, t.nome, t.comp, t.compNome, t.cor, TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].join(" ")).includes(q)) : []); return; }
+  if (ev.target.closest("[data-tn=mix]")) { tnMixPaint(ev.target.closest("[data-tn=mix]")); return; }
   if (ev.target.id === "rd-q") { clearTimeout(RDQ_T); const v = ev.target.value; RDQ_T = setTimeout(() => apoBuscaRun(v), 250); return; }
   if (ev.target.id === "g-q") { S.gq = ev.target.value; const r = $("#g-res"); r.hidden = !S.gq.trim(); r.innerHTML = S.gq.trim() ? gResults(S.gq) : ""; gApo(S.gq); return; }
   const cf = ev.target.closest("[data-calc]");
