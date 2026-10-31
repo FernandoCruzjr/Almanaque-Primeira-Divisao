@@ -961,6 +961,8 @@ function gResults(q){
 
 function stepsDone(id){ return lsGet(STEPS, {})[id] || []; }
 function modTile(m){
+  /* Publicações = as apostilas da Marinharia: o cartão leva direto para lá. */
+  if (m.id === "publicacoes") { const L = (APO() && APO().apostilas) || []; return `<button class="tile" data-act="marOpen" data-arg="apostilas"><div class="row"><div class="tile-i">${ic(m.icone || "book")}</div>${L.length ? `<span class="pill" style="margin-left:auto">${L.length} publicações</span>` : ""}</div><b>${esc(m.titulo)}</b><div class="sub">${L.length ? esc(L.map(a => a.titulo).join(", ")) + ". Com pesquisa no texto." : esc(m.resumo || "")}</div></button>`; }
   if (m.embreve) return `<button class="tile soon" data-act="mod" data-arg="${esc(m.id)}"><div class="row"><div class="tile-i">${ic(m.icone || "book")}</div><span class="pill" style="margin-left:auto">Em preparação</span></div><b>${esc(m.titulo)}</b><div class="sub">${esc(m.resumo || "")}</div></button>`;
   const p = modProgress(m);
   return `<button class="tile" data-act="mod" data-arg="${esc(m.id)}"><div class="row"><div class="tile-i">${ic(m.icone || "book")}</div>${p.pct === 100 ? `<span class="pill good" style="margin-left:auto">${ic("check").replace('<svg','<svg width="12" height="12"')}Lido</span>` : ""}</div><b>${esc(m.titulo)}</b><div class="sub">${esc(m.resumo || m.subtitulo || "")}</div><div class="foot"><div class="bar"><i style="width:${p.pct}%"></i></div><span class="num sub">${p.r}/${p.n}</span></div></button>`;
@@ -1537,7 +1539,7 @@ const jImg = q => `<span class="j-wrap"><img src="${AM.jogo.imgs[q.img]}" alt="F
 let APQ = {q:"", t:null, hits:null, busy:false, msg:""};
 function viewApostilas(){
   const A = APO();
-  const head = `<button class="back" data-act="marBack">${ic("left")}Marinharia</button><div class="page-h"><span class="eyebrow">Marinharia · Biblioteca</span><h1>Apostilas</h1><p class="sub" style="font-size:15px">Arte Naval e as apostilas do CIAA, sem a capa. Pesquise uma palavra em todas de uma vez ou abra uma para ler.</p></div>`;
+  const head = `<button class="back" data-act="marBack">${ic("left")}Marinharia</button><div class="page-h"><span class="eyebrow">Marinharia · Biblioteca</span><h1>Apostilas</h1><p class="sub" style="font-size:15px">Arte Naval, as apostilas do CIAA (sem a capa) e publicações como a ENGENALMARINST 60-01D. Pesquise uma palavra em todas de uma vez ou abra uma para ler.</p></div>`;
   if (!A) return head + `<div class="note">${ic("info")}<span>As apostilas ainda não chegaram a este aparelho. Abra o app com internet uma vez.</span></div>`;
   setTimeout(apoMarkOffline, 0); if (!AM.pruned) { AM.pruned = true; apoPrune(); }
   return head + `<div class="search">${ic("search")}<input id="apo-q" class="input" type="search" placeholder="Pesquisar nas apostilas (ex.: patesca, amarra, nó de escota)" autocomplete="off" value="${esc(APQ.q)}" aria-label="Pesquisar nas apostilas"></div>
@@ -2648,7 +2650,7 @@ const ACT = {
   finTab(a){ S.finTab = a; render(); },
   finEdit(){ finModal(); },
   finReset(){ if (!confirm("Voltar todos os valores aos da planilha de 2026?")) return; S.content.financeiro = {key:"financeiro", audience:"todos", data:clone(FIN_PADRAO)}; putContent("financeiro"); closeModal(); render(); toast("Valores da planilha restaurados"); },
-  mod(a){ S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
+  mod(a){ if (a === "publicacoes") return ACT.marOpen("apostilas"); S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
   modBack(){ S.mod = null; render(); },
   local(a){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); },
   localBack(){ S.local = null; S.sel = null; render(); },
