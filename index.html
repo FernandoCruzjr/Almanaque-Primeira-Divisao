@@ -933,7 +933,7 @@ function gIndex(){
     E.push({tipo:"Incumbências", t:l.nome, sub:"Local", txt:[l.nome, l.descricao, ...(l.checklists || []).map(c => [c.titulo, ...c.itens].join(" "))].join(" "), act:"local", arg:l.id});
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
   });
-  E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
+  E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento e mistura com o componente", txt:"calculadora tinta balde pintura compartimento demão rendimento m2 mistura componente catalisador kit proporção epóxi", act:"tool", arg:"tinta"});
   E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
   E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso, ENGENALMARINST 60-01D", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar engenalmarinst 60-01d publicação pintura", act:"marOpen", arg:"apostilas"});
   E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Localizador, tipos, compatibilidade, mistura", txt:"tinta tintas pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
@@ -1965,7 +1965,7 @@ function tnDefeitos(){
     <div class="note warn">${ic("alert")}<span>Retrabalho de pintura errada quase sempre é <b>raspar até a chapa e começar de novo</b>. Cinco minutos conferindo a numeração da lata e o esquema de pintura economizam dias de faina.</span></div>`);
 }
 function tnL(x){ return x < 1 ? `${nf(x * 1000, 0)} mL` : `${nf(x, 2)} L`; }
-function tnMistura(){
+function tnMixCard(){
   const m = TN.mix, kit = m.tipo === "kit", v = pnum(m.v);
   /* kit: a proporção é em embalagens (1 balde de 20 L : 1 lata de 1,5 L); em volume vira 20 : 1,5 */
   const a = kit ? pnum(m.ka) * pnum(m.ea) : pnum(m.a), b = kit ? pnum(m.kb) * pnum(m.eb) : pnum(m.b);
@@ -1976,6 +1976,16 @@ function tnMistura(){
     out = `<div class="big-res"><small>${m.modo === "total" ? `Para ${nf(v, 2)} L de tinta pronta` : `Para ${nf(v, 2)} L de base`}</small><span>${tnL(A)} + ${tnL(B)}</span><em>base + componente · ${tnL(A + B)} no total · em volume dá ${rv}</em></div>`
       + (kit ? `<div class="sub" style="font-size:12.5px">Kit inteiro: ${nf(pnum(m.ka), 2)} × ${nf(pnum(m.ea), 2)} L de base + ${nf(pnum(m.kb), 2)} × ${nf(pnum(m.eb), 2)} L de componente = ${tnL(a + b)}. Cada 1 L de base leva ${tnL(b / a)} de componente.</div>` : "");
   }
+  return `<form class="card col tn-mix" data-tn="mix" autocomplete="off"><b class="tn-h">${ic("calc")}Calculadora da mistura</b>
+      <div class="seg" role="group" aria-label="Como a proporção é dada"><button type="button" data-act="tnTipo" data-arg="kit" aria-pressed="${kit}">Pelas embalagens (kit)</button><button type="button" data-act="tnTipo" data-arg="vol" aria-pressed="${!kit}">Pela ficha, em volume</button></div>
+      ${kit ? `<div class="fields2">${tnF("ea", "Balde da base (L)", m.ea)}${tnF("eb", "Lata do componente (L)", m.eb)}</div>
+      <div class="fields3">${tnF("ka", "Baldes de base", m.ka)}${tnF("kb", "Latas de componente", m.kb)}${tnF("v", m.modo === "total" ? "Quero preparar (L)" : "Vou usar de base (L)", m.v)}</div>
+      <p class="sub" style="font-size:12.5px;margin:0">Proporção 1:1 do kit = 1 balde + 1 lata. Confira o volume escrito em cada embalagem.</p>`
+      : `<div class="fields3">${tnF("a", "Base (partes)", m.a)}${tnF("b", "Componente (partes)", m.b)}${tnF("v", m.modo === "total" ? "Quero preparar (L)" : "Tenho de base (L)", m.v)}</div>`}
+      <div class="seg" role="group" aria-label="O que você sabe"><button type="button" data-act="tnModo" data-arg="base" aria-pressed="${m.modo === "base"}">Quanto vou usar de base</button><button type="button" data-act="tnModo" data-arg="total" aria-pressed="${m.modo === "total"}">Quanto quero no total</button></div>
+      <div id="tn-out">${out}</div></form>`;
+}
+function tnMistura(){
   const passos = [
     ["Confira a dupla", "A numeração da tinta e a do componente têm que bater (use o localizador). Confira também a validade e se é o mesmo fabricante."],
     ["Mexa a base sozinha", "O pigmento assenta no fundo da lata. Homogeneíze a base antes de juntar o componente."],
@@ -1986,14 +1996,7 @@ function tnMistura(){
   ];
   return tnSec("mistura", "Bicomponentes", "Acertar tinta e catalisador", `<ol class="steps tn-steps">${passos.map(([n, d], i) => `<li><span class="num">${i + 1}</span><div><b>${n}</b><span class="sub">${d}</span></div></li>`).join("")}</ol>
     <div class="note bad">${ic("alert")}<span><b>Nunca</b> ponha catalisador “a mais” para secar mais rápido, nem “a menos” para render mais. Fora da proporção, a tinta fica quebradiça ou não cura. E não troque o componente de uma tinta pelo de outra, nem de outro fabricante.</span></div>
-    <form class="card col tn-mix" data-tn="mix" autocomplete="off"><b class="tn-h">${ic("calc")}Calculadora da mistura</b>
-      <div class="seg" role="group" aria-label="Como a proporção é dada"><button type="button" data-act="tnTipo" data-arg="kit" aria-pressed="${kit}">Pelas embalagens (kit)</button><button type="button" data-act="tnTipo" data-arg="vol" aria-pressed="${!kit}">Pela ficha, em volume</button></div>
-      ${kit ? `<div class="fields2">${tnF("ea", "Balde da base (L)", m.ea)}${tnF("eb", "Lata do componente (L)", m.eb)}</div>
-      <div class="fields3">${tnF("ka", "Baldes de base", m.ka)}${tnF("kb", "Latas de componente", m.kb)}${tnF("v", m.modo === "total" ? "Quero preparar (L)" : "Vou usar de base (L)", m.v)}</div>
-      <p class="sub" style="font-size:12.5px;margin:0">Proporção 1:1 do kit = 1 balde + 1 lata. Confira o volume escrito em cada embalagem.</p>`
-      : `<div class="fields3">${tnF("a", "Base (partes)", m.a)}${tnF("b", "Componente (partes)", m.b)}${tnF("v", m.modo === "total" ? "Quero preparar (L)" : "Tenho de base (L)", m.v)}</div>`}
-      <div class="seg" role="group" aria-label="O que você sabe"><button type="button" data-act="tnModo" data-arg="base" aria-pressed="${m.modo === "base"}">Quanto vou usar de base</button><button type="button" data-act="tnModo" data-arg="total" aria-pressed="${m.modo === "total"}">Quanto quero no total</button></div>
-      <div id="tn-out">${out}</div></form>`);
+    <button class="btn primary" data-act="tnCalcMix" style="align-self:flex-start">${ic("calc")}Abrir a calculadora de mistura</button>`);
 }
 function tnF(n, l, v){ return `<div class="field"><label for="tn-${n}">${l}</label><input id="tn-${n}" name="${n}" class="input num" inputmode="decimal" value="${esc(String(v ?? ""))}"></div>`; }
 function tnSeg(){
@@ -2009,7 +2012,7 @@ function tnSeg(){
 function tnMixPaint(form){
   const v = formVals(form); ["a", "b", "v", "ea", "eb", "ka", "kb"].forEach(k => { if (k in v) TN.mix[k] = v[k]; });
   const o = $("#tn-out"); if (!o) return;
-  const tmp = document.createElement("div"); tmp.innerHTML = tnMistura(); const n = tmp.querySelector("#tn-out"); if (n) o.innerHTML = n.innerHTML;
+  const tmp = document.createElement("div"); tmp.innerHTML = tnMixCard(); const n = tmp.querySelector("#tn-out"); if (n) o.innerHTML = n.innerHTML;
 }
 
 /* Código de cores da CMT: EN 1492-1/-2 e ABNT NBR 15637-1/-2. Cinta plana leva uma listra por tonelada. */
@@ -2249,7 +2252,7 @@ function viewCalc(){
   return `<div class="page-h"><span class="eyebrow">Ferramentas</span><h1>Calculadoras</h1><p class="sub" style="font-size:15px">Contas rápidas do dia a dia de bordo. O que você digita fica guardado só no seu aparelho.</p></div>
     <div class="grid">${calcTiles()}</div>`;
 }
-const calcTiles = () => `<button class="tile" data-act="tool" data-arg="tinta"><div class="tile-i">${ic("roller")}</div><b>Calculadora de tinta</b><div class="sub">Quantos baldes você vai usar para pintar um compartimento.</div></button>
+const calcTiles = () => `<button class="tile" data-act="tool" data-arg="tinta"><div class="tile-i">${ic("roller")}</div><b>Calculadora de tinta</b><div class="sub">Quantos baldes você vai usar para pintar um compartimento e a mistura da tinta com o componente.</div></button>
   <button class="tile" data-act="tool" data-arg="fin"><div class="tile-i">${ic("money")}</div><b>Calculadora financeira</b><div class="sub">Remuneração de praças: simulador, graduações, carreira e investimento.</div></button>
   <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Da circunferência para a bitola, o diâmetro e a carga de ruptura de cada material.</div></button>`;
 
@@ -2272,7 +2275,10 @@ function viewTinta(){
         ${inF("rend", "Rendimento de um balde, por demão", v.rend, {suf:"m²", ph:"veja na lata", hint:"Está no rótulo ou na ficha técnica da tinta (\"rende até … m² por demão\")."})}
       </form>
       <div class="card col calc-out" id="calc-out">${tintaOut(v)}</div>
-    </div>`;
+    </div>
+    <div class="sec-title" id="tn-mistura" style="scroll-margin-top:90px"><h2>Mistura de tinta e componente</h2></div>
+    <p class="sub" style="margin-top:-6px">Tinta de dois componentes (epóxi, PU): quanto de componente vai para a quantidade de base que você vai usar.</p>
+    ${tnMixCard()}`;
 }
 function tintaOut(v){
   const c = pnum(v.c), l = pnum(v.l), h = pnum(v.h);
@@ -2621,7 +2627,8 @@ const ACT = {
   esNovo(){ esModal(null); }, esEdit(a){ esModal(a); },
   esDel(a){ if (!confirm("Apagar este esquema de bordo?")) return; const D = esData(); D.bordo = (D.bordo || []).filter(x => x.id !== a); putContent("esquemas"); closeModal(); render(); toast("Esquema apagado"); },
   tnModo(a){ TN.mix.modo = a; const y = scrollY; render(); scrollTo(0, y); },
-  tnUsarProp(a){ const [p, ea, eb] = a.split("|"), [x, y] = p.split(":").map(v => v.trim()); if (ea && eb) Object.assign(TN.mix, {tipo:"kit", ka:x, kb:y, ea, eb}); else Object.assign(TN.mix, {tipo:"vol", a:x, b:y}); const sy = scrollY; render(); scrollTo(0, sy); const el = document.getElementById("tn-mistura"); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
+  tnUsarProp(a){ const [p, ea, eb] = a.split("|"), [x, y] = p.split(":").map(v => v.trim()); if (ea && eb) Object.assign(TN.mix, {tipo:"kit", ka:x, kb:y, ea, eb}); else Object.assign(TN.mix, {tipo:"vol", a:x, b:y}); ACT.tnCalcMix(); },
+  tnCalcMix(){ ACT.tool("tinta"); setTimeout(() => { const el = document.getElementById("tn-mistura"); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 50); },
   jNivel(a){ jogoNovo(a); render(); scrollTo(0, 0); },
   jAns(a){ jogoResp(a); },
   jDica(){ if (!G || G.ans) return; G.dica = true; render(); },
