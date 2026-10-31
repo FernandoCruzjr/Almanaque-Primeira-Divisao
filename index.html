@@ -424,6 +424,7 @@ const ICONS = {
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8v4H8zM8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
   roller:'<rect x="3" y="3" width="15" height="6" rx="1.5"/><path d="M18 6h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>',
+  rope:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
   money:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>', download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
@@ -752,6 +753,7 @@ function gIndex(){
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
   });
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento", txt:"calculadora tinta balde pintura compartimento demão rendimento m2", act:"tool", arg:"tinta"});
+  E.push({tipo:"Ferramentas", t:"Calculadora de espias", sub:"Bitola, diâmetro e carga de ruptura", txt:"calculadora espia espias cabo cabos bitola circunferência diâmetro polegada mm carga ruptura trabalho segurança nylon polietileno polipropileno poliéster kevlar aramida dyneema manilha sisal fibra vegetal aço amarração", act:"tool", arg:"espias"});
   E.push({tipo:"Ferramentas", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"tool", arg:"fin"});
   APPS.forEach(a => E.push({tipo:"Apps", t:a.nome, sub:a.tag, txt:[a.nome, a.tag, a.resumo, ...a.telas.map(x => x.t)].join(" "), act:"tab", arg:"apps"}));
   return E;
@@ -1268,11 +1270,13 @@ function viewApps(){
 function viewCalc(){
   if (S.tool === "tinta") return viewTinta();
   if (S.tool === "fin") return viewFin();
+  if (S.tool === "espias") return viewEspias();
   return `<div class="page-h"><span class="eyebrow">Ferramentas</span><h1>Calculadoras</h1><p class="sub" style="font-size:15px">Contas rápidas do dia a dia de bordo. O que você digita fica guardado só no seu aparelho.</p></div>
     <div class="grid">${calcTiles()}</div>`;
 }
 const calcTiles = () => `<button class="tile" data-act="tool" data-arg="tinta"><div class="tile-i">${ic("roller")}</div><b>Calculadora de tinta</b><div class="sub">Quantos baldes você vai usar para pintar um compartimento.</div></button>
-  <button class="tile" data-act="tool" data-arg="fin"><div class="tile-i">${ic("money")}</div><b>Calculadora financeira</b><div class="sub">Remuneração de praças: simulador, graduações, carreira e investimento.</div></button>`;
+  <button class="tile" data-act="tool" data-arg="fin"><div class="tile-i">${ic("money")}</div><b>Calculadora financeira</b><div class="sub">Remuneração de praças: simulador, graduações, carreira e investimento.</div></button>
+  <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Da circunferência para a bitola, o diâmetro e a carga de ruptura de cada material.</div></button>`;
 
 /* Tinta: área das superfícies escolhidas, menos o que não leva tinta, vezes as demãos, com uma margem de perda. */
 function viewTinta(){
@@ -1312,6 +1316,105 @@ function tintaOut(v){
       ${rend ? rl("Rendimento por balde", nf(rend) + " m²") : ""}</div>
     ${v.modo !== "area" && v.ant ? `<p class="sub" style="font-size:12.5px">Anteparas: perímetro (2 × comprimento + 2 × largura) × altura.</p>` : ""}`;
 }
+
+/* Espias: a Marinha mede o cabo pela circunferência (bitola, em polegadas). Resistência cresce com a área da seção, ou seja, com C².
+   Carga de ruptura estimada = k × C² (C em polegadas, k em lbf), regra de bolso de marinharia.
+   k calibrado nas tabelas de cabos de 3 pernas por diâmetro (Cordage Institute / tabelas de marinharia: 1" de diâmetro = sisal 7.200, manila 9.000, polipropileno 14.000, poliéster 18.500, nylon 24.600 lbf)
+   e, no aço, na tabela 6×19 IPS (1" = 83.600 lbf, alma de fibra; alma de aço ≈ +7,5%). Fibras de alto desempenho: catálogos de 12 pernas trançados. */
+const ESP_MAT = [
+  {id:"sisal", nome:"Sisal (fibra vegetal)", k:730, obs:"Perde força molhado e com o tempo; apodrece se guardado úmido."},
+  {id:"manila", nome:"Manilha (fibra vegetal)", k:900, obs:"Referência clássica: C² × 900 lbf. Molhada perde até ~10%."},
+  {id:"pe", nome:"Polietileno (PE comum)", k:1200, obs:"Flutua, barato, escorregadio; sensível ao sol."},
+  {id:"pp", nome:"Polipropileno", k:1400, obs:"Flutua; perde força com sol (UV) e aquecimento por atrito."},
+  {id:"pes", nome:"Poliéster", k:1900, obs:"Estica pouco, bom contra sol e abrasão; mantém a força molhado."},
+  {id:"nylon", nome:"Nylon (poliamida)", k:2500, obs:"Estica muito e absorve choque; molhado perde ~10–15%. Cuidado com o chicote (snap-back)."},
+  {id:"aramida", nome:"Kevlar / aramida", k:9000, obs:"Muito forte e quase não estica; sensível a dobras fechadas, atrito interno e UV. Varia muito pela construção."},
+  {id:"hmpe", nome:"Polietileno de alto desempenho (HMPE, Dyneema)", k:10000, obs:"Forte como aço com 1/7 do peso; flutua. Varia muito pela construção."},
+  {id:"aco_fc", nome:"Cabo de aço 6×19, alma de fibra", k:8500, obs:"Aço IPS (improved plow steel). Pernas e alma mudam muito a carga: veja o certificado."},
+  {id:"aco_iwrc", nome:"Cabo de aço 6×19/6×36, alma de aço", k:9100, obs:"Alma de aço (IWRC) ≈ 7,5% mais forte que a de fibra."}
+];
+const LBF_KGF = 0.45359237, LBF_KN = 0.0044482216;
+/* Aceita 3, 3,5, 3.5, 3 1/2, 3½, 1/2. */
+function pfrac(s){
+  s = String(s == null ? "" : s).trim().replace(/[½¼¾⅛⅜⅝⅞]/g, m => " " + ({"½":"1/2","¼":"1/4","¾":"3/4","⅛":"1/8","⅜":"3/8","⅝":"5/8","⅞":"7/8"})[m]).trim();
+  const m = s.match(/^(\d+(?:[.,]\d+)?)?\s*(?:(\d+)\s*\/\s*(\d+))?$/);
+  if (m && m[2]) return (m[1] ? pnum(m[1]) : 0) + (+m[3] ? m[2] / m[3] : 0);
+  return pnum(s);
+}
+/* Polegada em fração de 1/8 (como se fala no cais): 3,5 → 3½". */
+function polFr(x){
+  const e = Math.round(x * 8) / 8, i = Math.floor(e), f = Math.round((e - i) * 8);
+  const fr = {0:"", 1:"⅛", 2:"¼", 3:"⅜", 4:"½", 5:"⅝", 6:"¾", 7:"⅞"}[f];
+  return (i || !fr ? String(i) : "") + fr + "\"";
+}
+const tf = kgf => kgf >= 1000 ? nf(kgf / 1000, kgf >= 10000 ? 1 : 2) + " tf" : nf(kgf, 0) + " kgf";
+function viewEspias(){
+  const v = Object.assign({med:"circ", un:"pol", val:"", mat:"nylon", fs:"6"}, calcGet("espias"));
+  const circ = v.med !== "diam";
+  return `<button class="back" data-act="toolBack">${ic("left")}Calculadoras</button>
+    <div class="page-h"><span class="eyebrow">Ferramentas · Marinharia</span><h1>Calculadora de espias</h1><p class="sub" style="font-size:15px">Meça a circunferência do cabo (passe uma fita ou um barbante em volta) e veja a bitola, o diâmetro e a carga de ruptura estimada de cada material.</p></div>
+    <div class="calc-grid">
+      <form class="card col" data-calc="espias" onsubmit="return false">
+        <input type="hidden" name="med" value="${circ ? "circ" : "diam"}">
+        <div class="field"><label>O que você mediu</label><div class="seg"><button type="button" data-act="espMed" data-arg="circ" aria-pressed="${circ}">Circunferência</button><button type="button" data-act="espMed" data-arg="diam" aria-pressed="${!circ}">Diâmetro</button></div></div>
+        <div class="fields2">${inF("val", circ ? "Circunferência" : "Diâmetro", v.val, {ph:circ ? "ex.: 8" : "ex.: 64"})}
+          ${selF("un", "Unidade", ["pol", "cm", "mm"], v.un)}</div>
+        <span class="sub" style="font-size:12.5px;margin-top:-6px">Em polegadas pode escrever 3,5 ou 3 1/2.</span>
+        ${`<div class="field"><label for="c-mat">Material</label><select id="c-mat" class="input" name="mat">${ESP_MAT.map(m => `<option value="${m.id}" ${m.id === v.mat ? "selected" : ""}>${esc(m.nome)}</option>`).join("")}</select></div>`}
+        ${inF("fs", "Fator de segurança", v.fs, {suf:"÷", hint:"Carga de trabalho = ruptura ÷ fator. Padrão 6 para espias em uso; use mais para cabo velho, molhado ou com carga de choque."})}
+      </form>
+      <div class="card col calc-out" id="calc-out">${espiasOut(v)}</div>
+    </div>
+    <div class="card col" id="esp-tab">${espiasTab(v)}</div>
+    ${espiasRef()}
+    ${espiasExpl(v)}
+    <div class="note warn">${ic("info")}<span><b>Estimativa.</b> As cargas são regras de bolso de marinharia para cabo novo, seco e sem nós. Construção (3 pernas, 8 pernas, trançado), fabricante e estado do cabo mudam muito o valor. <b>O certificado do fabricante prevalece</b>, e as normas e ordens do navio valem sobre esta conta. Nós reduzem a resistência em 40–50%; costuras (mãozinhas), em 10–15%.</span></div>`;
+}
+function espMedidas(v){
+  const x = pfrac(v.val), un = v.un, circ = v.med !== "diam";
+  const pol = un === "pol" ? x : un === "cm" ? x / 2.54 : x / 25.4;
+  const C = circ ? pol : pol * Math.PI, d = C / Math.PI;
+  return {C, dPol:d, dMm:d * 25.4, cCm:C * 2.54, area:Math.PI * Math.pow(d * 25.4, 2) / 4};
+}
+function espCarga(m, C, fs){ const lbf = m.k * C * C; return {lbf, kgf:lbf * LBF_KGF, kN:lbf * LBF_KN, swl:lbf * LBF_KGF / fs}; }
+const espFs = v => Math.max(1, pnum(v.fs) || 6);
+function espiasOut(v){
+  const M = espMedidas(v), fs = espFs(v), m = ESP_MAT.find(x => x.id === v.mat) || ESP_MAT[0];
+  if (!(M.C > 0)) return `<div class="big-res"><small>Bitola</small><span>—</span><em>Digite a medida do cabo.</em></div>`;
+  const R = espCarga(m, M.C, fs);
+  return `<div class="big-res"><small>Bitola (circunferência)</small><span>${nf(M.C, 2)}"</span><em>≈ ${polFr(M.C)} · ${nf(M.cCm, 1)} cm de circunferência</em></div>
+    <div class="chips"><div class="chip-v"><small>Diâmetro</small><span>${nf(M.dMm, 1)} mm</span></div><div class="chip-v"><small>Diâmetro</small><span>${nf(M.dPol, 2)}"</span></div><div class="chip-v"><small>≈ em fração</small><span>${polFr(M.dPol)}</span></div></div>
+    <div class="col" style="gap:0"><div class="rl-h">${esc(m.nome)}</div>
+      ${rl("Carga de ruptura estimada", tf(R.kgf), "tot")}
+      ${rl("Em quilonewtons", nf(R.kN, 1) + " kN")}
+      ${rl("Em libras-força", nf(R.lbf, 0) + " lbf")}
+      ${rl(`Carga de trabalho (÷ ${nf(fs, 1)})`, tf(R.swl), "tot")}</div>
+    <p class="sub" style="font-size:12.5px">${esc(m.obs)}</p>
+    <p class="sub" style="font-size:12.5px">Conta: ${nf(m.k, 0)} × C² lbf, com C = ${nf(M.C, 2)}" (C² = ${nf(M.C * M.C, 2)}).</p>`;
+}
+function espiasTab(v){
+  const M = espMedidas(v), fs = espFs(v);
+  if (!(M.C > 0)) return `<div class="rl-h">Todos os materiais</div><p class="sub">Digite a medida para comparar a carga de ruptura de cada material com a mesma bitola.</p>`;
+  return `<div class="rl-h">Todos os materiais · bitola ${nf(M.C, 2)}" (${nf(M.dMm, 0)} mm de diâmetro)</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Material</th><th>Ruptura</th><th>Trabalho (÷ ${nf(fs, 1)})</th><th>× manilha</th></tr></thead><tbody>${ESP_MAT.map(m => { const R = espCarga(m, M.C, fs);
+      return `<tr><td>${esc(m.nome)}</td><td data-l="Ruptura" class="${m.id === v.mat ? "hl" : ""}">${tf(R.kgf)}</td><td data-l="Trabalho">${tf(R.swl)}</td><td data-l="× manilha">${nf(m.k / 900, 1)}×</td></tr>`; }).join("")}</tbody></table></div>`;
+}
+function espiasRef(){
+  const B = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 12];
+  const k = id => ESP_MAT.find(m => m.id === id).k;
+  return `<details class="card col"><summary style="cursor:pointer;font-weight:700">Tabela rápida de bitolas</summary>
+    <p class="sub" style="font-size:13px">Bitola é a circunferência em polegadas. Diâmetro nominal = circunferência ÷ π. Ruptura estimada, cabo novo.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Bitola</th><th>Diâmetro</th><th>Manilha</th><th>Polipropileno</th><th>Nylon</th><th>Aço (alma de aço)</th></tr></thead><tbody>${B.map(C => `<tr><td>${polFr(C)}</td><td data-l="Diâmetro">${nf(C / Math.PI * 25.4, 0)} mm</td>${["manila", "pp", "nylon", "aco_iwrc"].map((id, i) => `<td data-l="${["Manilha", "Polipropileno", "Nylon", "Aço"][i]}">${tf(k(id) * C * C * LBF_KGF)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></details>`;
+}
+function espiasExpl(v){
+  return `<details class="card col"><summary style="cursor:pointer;font-weight:700">Por que a Marinha mede pela circunferência?</summary>
+    <p>Na Marinha, <b>bitola</b> de cabo é a <b>circunferência em polegadas</b>. É tradição da marinharia inglesa, de onde vem boa parte da nossa: um cabo de 3 pernas não é um cilindro perfeito, então medir o diâmetro com paquímetro dá valores diferentes conforme a posição. Já passar uma fita ou um barbante em volta dá sempre a mesma medida, e dá para fazer no convés, com o cabo em uso. O comércio e os fabricantes usam o diâmetro em milímetros, então é bom saber converter: <b>diâmetro = circunferência ÷ π</b> (≈ 3,14). Uma espia de 8" tem cerca de 65 mm de diâmetro.</p>
+    <p><b>A relação C².</b> A força de um cabo depende da área da seção (quanto material tem no corte), e área cresce com o quadrado da medida. Por isso a regra de bolso é <b>carga = k × C²</b>: dobrar a bitola dá <b>4 vezes</b> a resistência (2² = 4), e triplicar dá 9 vezes. O contrário também vale: um cabo com metade da bitola aguenta só um quarto. O <b>k</b> muda com o material: manilha ≈ 900, nylon ≈ 2.500, aço ≈ 9.000 (C em polegadas, carga em libras-força).</p>
+    <p><b>E a bitola de fio elétrico?</b> No fio elétrico, a bitola é a <b>área da seção em mm²</b> (1,5 · 2,5 · 4 · 6 mm²…), não a circunferência nem o diâmetro. É a mesma ideia: a corrente que o fio conduz depende da área de cobre, assim como a força do cabo depende da área de fibra. Um fio de 2,5 mm² tem só 1,8 mm de diâmetro. Para comparar, a área nominal da seção do cabo medido aparece abaixo.</p>
+    <div class="chips" id="esp-area">${espArea(v)}</div>
+    <p class="sub" style="font-size:12.5px">Referências: regra C² da marinharia (manilha ≈ C² × 900 lbf); tabelas de ruptura de cabos de 3 pernas por diâmetro (sisal, manilha, polipropileno, poliéster, nylon) do Cordage Institute e manuais de marinharia; tabela de cabo de aço 6×19 IPS (Engineering ToolBox); catálogos de fabricantes de cabos HMPE e aramida (12 pernas). Fator de segurança de 4 a 6 para cabos de fibra, conforme manuais de marinharia.</p></details>`;
+}
+const espArea = v => { const M = espMedidas(v); return M.C > 0 ? `<div class="chip-v"><small>Seção do cabo medido</small><span>${nf(M.area, 0)} mm²</span></div><div class="chip-v"><small>= quantos fios de 2,5 mm²</small><span>${nf(M.area / 2.5, 0)}</span></div>` : ""; };
 
 /* Financeira: replica as abas Simulador, Por graduação, Carreira e Educação financeira da planilha. */
 const FIN_TABS = [["sim", "Simulador"], ["grad", "Por graduação"], ["car", "Carreira"], ["inv", "Investir"], ["ter", "Quanto deveria ter"]];
@@ -1440,6 +1543,7 @@ function terOut(F, v){
 function calcUpdate(f){
   const k = f.dataset.calc, v = formVals(f), out = $("#calc-out"); calcSet(k, v); if (!out) return;
   if (k === "tinta") out.innerHTML = tintaOut(v);
+  else if (k === "espias") { out.innerHTML = espiasOut(v); const t = $("#esp-tab"); if (t) t.innerHTML = espiasTab(v); const a = $("#esp-area"); if (a) a.innerHTML = espArea(v); }
   else if (k === "sim") out.innerHTML = simOut(fin(), v);
   else if (k === "inv") out.innerHTML = invOut(fin(), v);
   else if (k === "ter") out.innerHTML = terOut(fin(), v);
@@ -1529,6 +1633,7 @@ const ACT = {
   gItem(a, el){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); itemModal(a, el.dataset.i); },
   tool(a){ S.gq = ""; S.tab = "calc"; S.tool = a; render(); scrollTo(0, 0); },
   toolBack(){ S.tool = null; render(); scrollTo(0, 0); },
+  espMed(a){ const f = $("[data-calc=espias]"); calcSet("espias", Object.assign(formVals(f), {med:a})); render(); },
   tintaModo(a){ const f = $("[data-calc=tinta]"); calcSet("tinta", Object.assign(formVals(f), {modo:a})); render(); },
   appUrl(a){ const app = APPS.find(x => x.id === a); const v = prompt(`Endereço do ${app.nome} (começa com https://)`, appUrl(app)); if (v == null) return; const u = v.trim();
     if (u && !/^https:\/\/[^\s]+$/.test(u)) { toast("O endereço precisa começar com https://"); return; }
