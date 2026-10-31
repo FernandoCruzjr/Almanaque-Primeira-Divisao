@@ -414,7 +414,7 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .rd-tools .iconbtn{font-size:20px;font-weight:700}
 .rd-pg{display:flex;align-items:center;gap:6px}.rd-pg .input{width:64px;min-height:40px;padding:6px 8px;text-align:center}
 #rd-cap{min-height:40px;padding:6px 10px;max-width:190px;font-size:14px}
-.rd-q{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.rd-q svg{width:16px;height:16px}.rd-q .btn{margin-left:auto}
+.rd-q{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.rd-q .btn{margin-left:auto}.rd-mk{flex:none;width:14px;height:14px;border-radius:3px;background:#FFD400}
 .rd-page{position:relative;background:#fff;border-radius:10px;overflow:auto;min-height:60vh;-webkit-overflow-scrolling:touch}
 .rd-page canvas{display:block;margin:0 auto}
 .rd-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#425466;font-weight:600;padding:20px;text-align:center}
@@ -1582,11 +1582,31 @@ function viewLeitor(){
         <button class="iconbtn" data-act="apoZoom" data-arg="-1" aria-label="Diminuir">−</button><button class="iconbtn" data-act="apoZoom" data-arg="1" aria-label="Aumentar">+</button>
         <button class="iconbtn" data-act="apoBusca" aria-label="Pesquisar nesta apostila">${ic("search")}</button><button class="iconbtn" data-act="apoPdf" aria-label="Abrir o PDF no aparelho">${ic("download")}</button></div>
     </div>
-    ${R.q ? `<div class="rd-q">${ic("search")}<span>Busca: <b>${esc(R.q)}</b></span><button class="btn ghost sm" data-act="apoBusca">Outros resultados</button></div>` : ""}
+    ${R.q ? `<div class="rd-q"><span class="rd-mk"></span><span>Busca: <b>${esc(R.q)}</b> <span class="sub" id="rd-n"></span></span><button class="btn ghost sm" data-act="apoBusca">Outros resultados</button><button class="iconbtn" data-act="apoLimpa" aria-label="Tirar as marcações">${ic("x")}</button></div>` : ""}
     <div class="rd-page" id="rd-page"><canvas id="rd-cv"></canvas><div class="rd-load" id="rd-load">Abrindo…</div></div>
     <div class="rd-foot"><button class="btn" data-act="apoPg" data-arg="-1">${ic("left")}Anterior</button><span class="num sub" id="rd-lbl">${R.p} / ${a.paginas}</span><button class="btn" data-act="apoPg" data-arg="1">Próxima${ic("chev")}</button></div>`;
 }
 let RD_TOK = 0;
+/* Marca em amarelo, na página desenhada, as palavras da busca (posição tirada do texto do PDF). */
+async function apoMarcar(page, vp, cv, q){
+  const terms = apoTerms(q); if (!terms.length) return 0;
+  let n = 0;
+  try {
+    const tc = await page.getTextContent(), ctx = cv.getContext("2d"), U = AM.lib.Util;
+    /* largura proporcional do trecho (fonte parecida com a das apostilas), melhor que contar letras */
+    const m = document.createElement("canvas").getContext("2d"); m.font = "100px Arial, Helvetica, sans-serif"; const mt = x => m.measureText(x).width;
+    ctx.save(); ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = "rgba(255,212,0,.6)";
+    for (const it of tc.items) {
+      if (!it.str) continue;
+      const nt = norm(it.str); if (nt.length !== it.str.length) continue;
+      const tr = U.transform(vp.transform, it.transform), fh = Math.hypot(tr[2], tr[3]), w = it.width * vp.scale;
+      for (const t of terms) { let k = nt.indexOf(t); while (k >= 0) { const tot = mt(it.str) || 1, xa = tr[4] + w * mt(it.str.slice(0, k)) / tot, xb = tr[4] + w * mt(it.str.slice(0, k + t.length)) / tot; ctx.fillRect(xa - 1, tr[5] - fh * .9, xb - xa + 2, fh * 1.2); n++; k = nt.indexOf(t, k + t.length); } }
+    }
+    ctx.restore();
+  } catch (e) { console.warn(e); }
+  const el = $("#rd-n"); if (el) el.textContent = n ? n + (n === 1 ? " marcação nesta página" : " marcações nesta página") : "nada marcado nesta página";
+  return n;
+}
 async function apoDraw(){
   const R = S.apo; if (!R || S.mar !== "apo") return;
   const tok = ++RD_TOK, ld = $("#rd-load"), box = $("#rd-page"), cv = $("#rd-cv"); if (!box || !cv) return;
@@ -1598,6 +1618,8 @@ async function apoDraw(){
     const vp = page.getViewport({scale:sc * dpr});
     const off = document.createElement("canvas"); off.width = Math.floor(vp.width); off.height = Math.floor(vp.height);
     await page.render({canvasContext:off.getContext("2d"), viewport:vp}).promise;
+    if (tok !== RD_TOK) return;
+    if (R.q) await apoMarcar(page, vp, off, R.q);
     if (tok !== RD_TOK) return;
     const c = $("#rd-cv"); if (!c) return;
     c.width = off.width; c.height = off.height; c.getContext("2d").drawImage(off, 0, 0); c.style.width = w + "px";
@@ -2266,6 +2288,7 @@ const ACT = {
   apoPg(a){ apoIr(S.apo.p + +a); },
   apoZoom(a){ const z = [1, 1.5, 2, 3], i = Math.max(0, Math.min(z.length - 1, z.indexOf(S.apo.z || 1) + +a)); S.apo.z = z[i]; apoDraw(); },
   apoBusca(){ apoBuscaModal(); },
+  apoLimpa(){ S.apo.q = ""; const y = scrollY; render(); scrollTo(0, y); },
   apoPdf(){ apoPdfAbrir(); },
   apoBaixar(a, el){ apoBaixar(a, el); },
   cintaCmt(a){ calcSet("cinta", {cmt:a}); const y = scrollY; render(); scrollTo(0, y); },
