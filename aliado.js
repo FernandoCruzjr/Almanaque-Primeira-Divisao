@@ -124,7 +124,12 @@ function legal(G){
       const n = units[i]; for (const k of (n > 1 ? [1, n] : [1])) add({t:"move", from:i, to:i + steps, k, steps, dice}); }
   };
   if (G.single) mover([0], G.dice[0]);
-  else {
+  else if (paiol && G.canSplit && G.rem.some(di => G.dice[di] === 6 || (G.dbl && G.dice[di] === 1))){
+    /* Bucho: com pedra no paiol, a sena (ou o ás do par de ases) é obrigada a tirar pedra. */
+    const di = G.rem.find(d => G.dice[d] === 6 || (G.dbl && G.dice[d] === 1));
+    add({t:"exit", from:-1, to:0, k:1, steps:G.dice[di], dice:[di]});
+    return out;
+  } else {
     if (G.rem.length === 2) mover([0, 1], G.dice[0] + G.dice[1]);
     if (G.canSplit) for (const di of G.rem){
       const d = G.dice[di];
@@ -495,7 +500,7 @@ function jogoHTML(G){
 function regrasHTML(){
   const R = [
     ["O jogo", ["Quatro jogadores em duas duplas, cada um com quatro pedras. Os aliados ficam em cantos opostos: Flu com Fla e Vasco com Botafogo.", "Ganha a dupla em que um dos parceiros chega primeiro ao final com as suas quatro pedras.", "As pedras andam no sentido anti-horário: saem na casa azul do canto, dão a volta inteira por fora, entram pela casa M perto do próprio paiol, dão a volta inteira pelo caminho de dentro (passando pelas quatro caveiras) e entram no braço que chega ao centro."]],
-    ["Saída do paiol", ["Todas as pedras começam no paiol. Para sair, precisa tirar sena (6) em qualquer dado. Dois ases (1 e 1) ou doze (6 e 6) tiram duas pedras.", "O primeiro jogador a sair paga o prêmio: sai com uma pedra a mais (sai trepado).", "Se o primeiro a sair tirar dois ases ou doze, sai de pitoco (as quatro montadas) e quem paga o prêmio é o segundo jogador a sair."]],
+    ["Saída do paiol", ["Todas as pedras começam no paiol. Para sair, precisa tirar sena (6) em qualquer dado. Dois ases (1 e 1) ou doze (6 e 6) tiram duas pedras.", "Bucho: enquanto tiver pedra no paiol, a sena é obrigada a tirar pedra. Não dá pra usar a sena em outra jogada; o outro dado fica livre.", "O primeiro jogador a sair paga o prêmio: sai com uma pedra a mais (sai trepado).", "Se o primeiro a sair tirar dois ases ou doze, sai de pitoco (as quatro montadas) e quem paga o prêmio é o segundo jogador a sair."]],
     ["Jogando os dados", ["Anda-se a soma dos dois dados com uma pedra.", "Saindo sena em um dos dados, dá pra dividir: um dado para uma pedra e o outro para outra. Dois ases e doze também podem ser divididos.", "Quem tira dois ases ou doze joga os dados de novo."]],
     ["Matar", ["Cair na casa de uma pedra mata ela, que volta pro paiol. Pedras trepadas morrem todas juntas, e o aliado também pode matar o parceiro.", "Quem teve a pedra morta tá sangrando: fica uma rodada sem jogar. Se a morte foi com dois ases ou doze, ele não perde a vez, porque o matador já jogou de novo.", "Matando com um dado só (jogada dividida), a pedra que matou fica na casa e o outro dado vai para outra pedra. O mesmo vale para quem mata na porta do próprio paiol: só anda com a mesma pedra se não tiver outra jogada.", "A casa M é o morto: ninguém mata ali."]],
     ["Caveira", ["Caiu na caveira, volta pro paiol.", "Se estava de pitoco e caiu na caveira sem ter outra jogada, joga os dados de novo.", "Se foi para a caveira de propósito, tendo outra jogada, passa a vez, mesmo tendo tirado dois ases ou doze."]],
@@ -505,7 +510,7 @@ function regrasHTML(){
   return `<div class="col" style="gap:14px">${R.map(([t, l]) => `<div class="card col" style="gap:8px"><h2 class="al-h2">${t}</h2><ul class="ul">${l.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`;
 }
 function giriasHTML(){
-  const G = [["Paiol", "O quadrado no início do jogo onde ficam todas as pedras."], ["Ás e Sena", "Os números 1 e 6 dos dados. Para sair do paiol é preciso tirar sena ou dois ases."], ["Peru", "Quem assiste e fica dando palpite. Dizem que o peru não tem pátria: não torce para ninguém."], ["Paioleiro", "O jogador que sempre morre e volta pro paiol."], ["Polícia", "Quando o parceiro está bom de jogo e fica jogando só para matar os adversários."], ["Matador", "Excelente polícia."], ["Sair trepado", "Sair com duas ou três pedras na mesma casa."], ["Pitoco", "Sair com as quatro pedras na mesma casa, ou juntar as quatro durante o jogo."], ["Tá sangrando", "Quem acabou de morrer e fica uma rodada sem jogar."], ["Intoxicar", "Adiantar algumas pedras agrupadas e deixar uma no início."], ["Médico", "Quem esquece de matar a pedra do adversário. Quem dispensa é o médico!"], ["Morto", "A casa M: ali ninguém mata."], ["Jogada de Mestre", "De pitoco na casa antes da chegada, tirar sena e ás e ganhar direto."]];
+  const G = [["Paiol", "O quadrado no início do jogo onde ficam todas as pedras."], ["Ás e Sena", "Os números 1 e 6 dos dados. Para sair do paiol é preciso tirar sena ou dois ases."], ["Peru", "Quem assiste e fica dando palpite. Dizem que o peru não tem pátria: não torce para ninguém."], ["Paioleiro", "O jogador que sempre morre e volta pro paiol."], ["Polícia", "Quando o parceiro está bom de jogo e fica jogando só para matar os adversários."], ["Matador", "Excelente polícia."], ["Sair trepado", "Sair com duas ou três pedras na mesma casa."], ["Pitoco", "Sair com as quatro pedras na mesma casa, ou juntar as quatro durante o jogo."], ["Tá sangrando", "Quem acabou de morrer e fica uma rodada sem jogar."], ["Intoxicar", "Adiantar algumas pedras agrupadas e deixar uma no início."], ["Médico", "Quem esquece de matar a pedra do adversário. Quem dispensa é o médico!"], ["Bucho", "As pedras que ainda estão no paiol. Saiu sena, é obrigado a pagar o bucho: tirar uma pedra."], ["Morto", "A casa M: ali ninguém mata."], ["Jogada de Mestre", "De pitoco na casa antes da chegada, tirar sena e ás e ganhar direto."]];
   return `<div class="col" style="gap:14px"><div class="card col" style="gap:10px"><p class="sub" style="font-size:15px">Uma partida de Aliado pode durar de 10 minutos a uma hora, com muita gritaria e gíria, igual ao truco gaúcho. As principais:</p>
     <div class="mcards">${G.map(([t, d]) => `<div class="mcard"><b>${t}</b><p>${esc(d)}</p></div>`).join("")}</div></div></div>`;
 }
