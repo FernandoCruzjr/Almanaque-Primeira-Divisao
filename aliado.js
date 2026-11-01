@@ -121,7 +121,7 @@ function legal(G){
   const add = o => { const k = [o.t, o.from, o.to, o.k, o.dice.length].join("|"); if (!seen.has(k)){ seen.add(k); out.push(o); } };
   const mover = (dice, steps) => {
     for (const u in units){ const i = +u; if (i + steps > LAST) continue;
-      const n = units[i]; for (const k of (n > 1 ? [1, n] : [1])) add({t:"move", from:i, to:i + steps, k, steps, dice}); }
+      add({t:"move", from:i, to:i + steps, k:units[i], steps, dice}); } // pedras montadas andam sempre juntas
   };
   if (G.single) mover([0], G.dice[0]);
   else if (paiol && G.canSplit && G.rem.some(di => G.dice[di] === 6 || (G.dbl && G.dice[di] === 1))){
@@ -414,7 +414,7 @@ function rotuloOp(G, o){
   if (o.t === "exit") return `Tirar pedra do paiol (${o.steps === 6 ? "sena" : "ás"})`;
   const n = G.pos[p].filter(i => i === o.from).length;
   let t = `Andar ${o.steps}${o.dice.length === 2 ? " (soma)" : ""}`;
-  if (n > 1) t += o.k > 1 ? ` · as ${o.k} juntas` : " · só 1 pedra";
+  if (n > 1) t += ` · as ${n} juntas`;
   const alvo = key(p, o.to);
   if (SKULLS.has(o.to)) t += " · caveira!";
   else if (!SAFE.has(alvo)) for (let q = 0; q < 4; q++) if (q !== p && G.pos[q].some(i => i >= 0 && key(q, i) === alvo)) t += q % 2 === p % 2 ? " · mata o aliado!" : " · mata!";
@@ -502,7 +502,7 @@ function regrasHTML(){
     ["O jogo", ["Quatro jogadores em duas duplas, cada um com quatro pedras. Os aliados ficam em cantos opostos: Flu com Fla e Vasco com Botafogo.", "Ganha a dupla em que um dos parceiros chega primeiro ao final com as suas quatro pedras.", "As pedras andam no sentido anti-horário: saem na casa azul do canto, dão a volta inteira por fora, entram pela casa M perto do próprio paiol, dão a volta inteira pelo caminho de dentro (passando pelas quatro caveiras) e entram no braço que chega ao centro."]],
     ["Saída do paiol", ["Todas as pedras começam no paiol. Para sair, precisa tirar sena (6) em qualquer dado. Dois ases (1 e 1) ou doze (6 e 6) tiram duas pedras.", "Bucho: enquanto tiver pedra no paiol, a sena é obrigada a tirar pedra. Não dá pra usar a sena em outra jogada; o outro dado fica livre.", "O primeiro jogador a sair paga o prêmio: sai com uma pedra a mais (sai trepado).", "Se o primeiro a sair tirar dois ases ou doze, sai de pitoco (as quatro montadas) e quem paga o prêmio é o segundo jogador a sair."]],
     ["Jogando os dados", ["Anda-se a soma dos dois dados com uma pedra.", "Saindo sena em um dos dados, dá pra dividir: um dado para uma pedra e o outro para outra. Dois ases e doze também podem ser divididos.", "Quem tira dois ases ou doze joga os dados de novo."]],
-    ["Matar", ["Cair na casa de uma pedra mata ela, que volta pro paiol. Pedras trepadas morrem todas juntas, e o aliado também pode matar o parceiro.", "Quem teve a pedra morta tá sangrando: fica uma rodada sem jogar. Se a morte foi com dois ases ou doze, ele não perde a vez, porque o matador já jogou de novo.", "Matando com um dado só (jogada dividida), a pedra que matou fica na casa e o outro dado vai para outra pedra. O mesmo vale para quem mata na porta do próprio paiol: só anda com a mesma pedra se não tiver outra jogada.", "A casa M é o morto: ninguém mata ali."]],
+    ["Matar", ["Cair na casa de uma pedra mata ela, que volta pro paiol. Pedras trepadas (montadas) andam sempre juntas até o final e só se separam se morrerem: morrem todas juntas, e o aliado também pode matar o parceiro.", "Quem teve a pedra morta tá sangrando: fica uma rodada sem jogar. Se a morte foi com dois ases ou doze, ele não perde a vez, porque o matador já jogou de novo.", "Matando com um dado só (jogada dividida), a pedra que matou fica na casa e o outro dado vai para outra pedra. O mesmo vale para quem mata na porta do próprio paiol: só anda com a mesma pedra se não tiver outra jogada.", "A casa M é o morto: ninguém mata ali."]],
     ["Caveira", ["Caiu na caveira, volta pro paiol.", "Se estava de pitoco e caiu na caveira sem ter outra jogada, joga os dados de novo.", "Se foi para a caveira de propósito, tendo outra jogada, passa a vez, mesmo tendo tirado dois ases ou doze."]],
     ["Chegada", ["Nas últimas seis casas (a bandeira de chegada) joga-se com um dado só, quando as quatro pedras estão lá.", "Com as quatro pedras na última casa, precisa tirar o ás (1) para ganhar.", "Jogada de Mestre: de pitoco na última casa antes da bandeira de chegada, quem tira sena e ás ganha na hora."]],
     ["No app", ["O app faz o papel do juiz: confere os dados, as casas e as regras. As regras de pôr a mão na pedra e dos perus ficam para a lona de verdade.", "O tabuleiro tem as cores dos clubes nos cantos em vez dos escudos."]]
