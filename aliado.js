@@ -52,25 +52,33 @@ const RING = (() => {
   for (const [dr, dc, n] of seg) for (let i = 0; i < n; i++) { out.push([r, c]); r += dr; c += dc; }
   return out;
 })();
-/* Caminho do Fluminense: sai na porta (a casa azul do canto, (3,0)), dá a volta toda, entra no M, desce e entra no braço até o centro. */
+/* Caminho do Fluminense (riscado pelo Fernando): sai na casa azul do canto (3,0), dá a volta toda por fora, entra no M,
+   desce até a caveira, dá a volta inteira pelo caminho de dentro (passando pelas outras três caveiras e pelas casinhas
+   vermelhas de ligação) e entra no braço de cima à esquerda até o centro. */
 const PORTA = 3; // índice no anel da casa de saída do paiol
 const PATH0 = (() => {
   const p = [];
   for (let i = PORTA; i <= 72; i++) p.push(RING[i % 72]);
   p.push([4, 3]);                                   // M: o "morto", ninguém mata ali
   for (let r = 5; r <= 13; r++) p.push([r, 3]);     // termina na caveira (13,3)
-  p.push([13, 4], [13, 5]);                         // (13,5): última casa antes da bandeira de chegada
-  p.push([13, 6], [13, 7], [13, 8], [13, 9], [12, 9], [11, 9]); // bandeira de chegada: as últimas 6
+  p.push([13, 4], [13, 5], [14, 5]);
+  for (let c = 5; c <= 13; c++) p.push([15, c]);    // caveira em (15,13)
+  p.push([14, 13], [13, 13], [13, 14]);
+  for (let r = 13; r >= 5; r--) p.push([r, 15]);    // caveira em (5,15)
+  p.push([5, 14], [5, 13], [4, 13]);
+  for (let c = 13; c >= 5; c--) p.push([3, c]);     // caveira em (3,5)
+  p.push([4, 5], [5, 5]);                           // (5,5): última casa antes da bandeira de chegada
+  p.push([6, 5], [7, 5], [8, 5], [9, 5], [9, 6], [9, 7]); // bandeira de chegada: as últimas 6
   return p;
 })();
 const PATHS = [0, 1, 2, 3].map(n => PATH0.map(rc => rotN(rc, n)));
-const LAST = PATH0.length - 1;  // 89
-const ARM = LAST - 5;           // 84: começo das últimas seis casas
-const MESTRE = ARM - 1;         // 83: casa da Jogada de Mestre
+const LAST = PATH0.length - 1;  // última casa
+const ARM = LAST - 5;           // começo das últimas seis casas (só do dono)
+const MESTRE = ARM - 1;         // casa da Jogada de Mestre
 const MORTO = 73 - PORTA;       // casa M
-const SKULL = MORTO + 9;        // caveira de cada jogador
+const SKULLS = new Set(PATH0.map((rc, i) => GRID[rc[0]][rc[1]] === "S" ? i : -1).filter(i => i >= 0)); // as quatro caveiras no caminho
 const key = (p, i) => PATHS[p][i][0] * 19 + PATHS[p][i][1];
-const RINGIDX = PATHS.map(P => { const m = {}; for (let i = 0; i < MORTO; i++) m[P[i][0] * 19 + P[i][1]] = i; return m; });
+const RINGIDX = PATHS.map(P => { const m = {}; for (let i = 0; i < ARM; i++) m[P[i][0] * 19 + P[i][1]] = i; return m; });
 const SAFE = new Set(PATHS.map((P, p) => key(p, MORTO)));
 
 /* ---------- Motor ---------- */
@@ -130,7 +138,8 @@ function legal(G){
 
 function aplicar(G, o){
   const p = G.turn, P = G.pos[p], ops = legal(G);
-  const voluntario = o.to === SKULL && ops.some(x => x.to !== SKULL);
+  const caveira = SKULLS.has(o.to) && o.t === "move";
+  const voluntario = caveira && ops.some(x => !(x.t === "move" && SKULLS.has(x.to)));
   let n = o.k, txt = "";
   if (o.t === "exit"){
     const naBandeira = P.filter(i => i < 0).length;
@@ -148,18 +157,18 @@ function aplicar(G, o){
   }
   G.rem = G.rem.filter(d => !o.dice.includes(d));
   const ev = {mortos:[], caveira:false, voluntario:false, n};
-  if (o.to === SKULL){
-    const quantas = P.filter(i => i === SKULL).length;
-    for (let j = 0; j < 4; j++) if (P[j] === SKULL) P[j] = -1;
+  if (caveira){
+    const quantas = P.filter(i => i === o.to).length;
+    for (let j = 0; j < 4; j++) if (P[j] === o.to) P[j] = -1;
     ev.caveira = true;
     if (voluntario){ ev.voluntario = true; G.rem = []; G.suicide = true; txt = `${nome(p)} foi pra caveira de propósito: volta pro paiol e passa a vez.`; }
     else if (quantas === 4){ G.extra = true; txt = `${nome(p)} caiu de pitoco na caveira: tudo pro paiol, mas joga de novo.`; }
     else txt = `${nome(p)} caiu na caveira: ${quantas > 1 ? "as pedras voltam" : "a pedra volta"} pro paiol.`;
-  } else if (o.to < MORTO && !SAFE.has(key(p, o.to))){
+  } else if (!SAFE.has(key(p, o.to))){
     const alvo = key(p, o.to);
     for (let q = 0; q < 4; q++){ if (q === p) continue;
       let morreu = 0;
-      G.pos[q].forEach((i, j) => { if (i >= 0 && i < MORTO && key(q, i) === alvo){ G.pos[q][j] = -1; morreu++; } });
+      G.pos[q].forEach((i, j) => { if (i >= 0 && key(q, i) === alvo){ G.pos[q][j] = -1; morreu++; } });
       if (morreu){ ev.mortos.push([q, morreu]); if (!G.dbl) G.sangra[q] = 1; }
     }
     if (ev.mortos.length){
@@ -210,13 +219,13 @@ function avaliar(G, p){
   /* Risco: pedras no anel que um adversário alcança na próxima jogada. */
   for (let q = 0; q < 4; q++){
     const sinal = q % 2 === time ? 1 : -1;
-    const units = {}; G.pos[q].forEach(i => { if (i >= 0 && i < MORTO) units[i] = (units[i] || 0) + 1; });
+    const units = {}; G.pos[q].forEach(i => { if (i >= 0 && i < ARM) units[i] = (units[i] || 0) + 1; });
     for (const u in units){
       const i = +u, cel = key(q, i); if (SAFE.has(cel)) continue;
       let risco = 0;
       for (let r = 0; r < 4; r++){ if (r % 2 === q % 2) continue;
         const alvo = RINGIDX[r][cel]; if (alvo == null) continue;
-        G.pos[r].forEach(j => { if (j >= 0 && j < MORTO){ const d = alvo - j; if (d >= 1 && d <= 12) risco += CHANCE[d]; } });
+        G.pos[r].forEach(j => { if (j >= 0 && j < ARM){ const d = alvo - j; if (d >= 1 && d <= 12) risco += CHANCE[d]; } });
         if (alvo === 0 && G.pos[r].some(j => j < 0)) risco += .3;
       }
       s -= sinal * Math.min(.9, risco) * (12 + i) * units[u] * .9;
@@ -244,7 +253,7 @@ function melhorPlano(G){
   return best ? best.seq : [];
 }
 
-const ENGINE = {GRID, PATHS, RING, LAST, ARM, MESTRE, MORTO, SKULL, CLUBES, novo, rolar, legal, aplicar, fimVez, melhorPlano, key};
+const ENGINE = {GRID, PATHS, RING, LAST, ARM, MESTRE, MORTO, SKULLS, CLUBES, novo, rolar, legal, aplicar, fimVez, melhorPlano, key};
 if (typeof module !== "undefined") module.exports = ENGINE;
 if (typeof window === "undefined") return;
 window.ALIADO = ENGINE;
@@ -401,9 +410,9 @@ function rotuloOp(G, o){
   const n = G.pos[p].filter(i => i === o.from).length;
   let t = `Andar ${o.steps}${o.dice.length === 2 ? " (soma)" : ""}`;
   if (n > 1) t += o.k > 1 ? ` · as ${o.k} juntas` : " · só 1 pedra";
-  const alvo = o.to < MORTO ? key(p, o.to) : -1;
-  if (o.to === SKULL) t += " · caveira!";
-  else if (alvo >= 0 && !SAFE.has(alvo)) for (let q = 0; q < 4; q++) if (q !== p && G.pos[q].some(i => i >= 0 && i < MORTO && key(q, i) === alvo)) t += q % 2 === p % 2 ? " · mata o aliado!" : " · mata!";
+  const alvo = key(p, o.to);
+  if (SKULLS.has(o.to)) t += " · caveira!";
+  else if (!SAFE.has(alvo)) for (let q = 0; q < 4; q++) if (q !== p && G.pos[q].some(i => i >= 0 && key(q, i) === alvo)) t += q % 2 === p % 2 ? " · mata o aliado!" : " · mata!";
   if (o.to === LAST) t += " · chegada";
   return t;
 }
@@ -485,7 +494,7 @@ function jogoHTML(G){
 
 function regrasHTML(){
   const R = [
-    ["O jogo", ["Quatro jogadores em duas duplas, cada um com quatro pedras. Os aliados ficam em cantos opostos: Flu com Fla e Vasco com Botafogo.", "Ganha a dupla em que um dos parceiros chega primeiro ao final com as suas quatro pedras.", "As pedras andam no sentido anti-horário: dão a volta inteira por fora, entram pela casa M perto do próprio paiol e seguem até o centro."]],
+    ["O jogo", ["Quatro jogadores em duas duplas, cada um com quatro pedras. Os aliados ficam em cantos opostos: Flu com Fla e Vasco com Botafogo.", "Ganha a dupla em que um dos parceiros chega primeiro ao final com as suas quatro pedras.", "As pedras andam no sentido anti-horário: saem na casa azul do canto, dão a volta inteira por fora, entram pela casa M perto do próprio paiol, dão a volta inteira pelo caminho de dentro (passando pelas quatro caveiras) e entram no braço que chega ao centro."]],
     ["Saída do paiol", ["Todas as pedras começam no paiol. Para sair, precisa tirar sena (6) em qualquer dado. Dois ases (1 e 1) ou doze (6 e 6) tiram duas pedras.", "O primeiro jogador a sair paga o prêmio: sai com uma pedra a mais (sai trepado).", "Se o primeiro a sair tirar dois ases ou doze, sai de pitoco (as quatro montadas) e quem paga o prêmio é o segundo jogador a sair."]],
     ["Jogando os dados", ["Anda-se a soma dos dois dados com uma pedra.", "Saindo sena em um dos dados, dá pra dividir: um dado para uma pedra e o outro para outra. Dois ases e doze também podem ser divididos.", "Quem tira dois ases ou doze joga os dados de novo."]],
     ["Matar", ["Cair na casa de uma pedra mata ela, que volta pro paiol. Pedras trepadas morrem todas juntas, e o aliado também pode matar o parceiro.", "Quem teve a pedra morta tá sangrando: fica uma rodada sem jogar. Se a morte foi com dois ases ou doze, ele não perde a vez, porque o matador já jogou de novo.", "Matando com um dado só (jogada dividida), a pedra que matou fica na casa e o outro dado vai para outra pedra. O mesmo vale para quem mata na porta do próprio paiol: só anda com a mesma pedra se não tiver outra jogada.", "A casa M é o morto: ninguém mata ali."]],
