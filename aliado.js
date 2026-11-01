@@ -251,7 +251,12 @@ window.ALIADO = ENGINE;
 
 /* ======================= Interface ======================= */
 const SAVE = "alm-aliado", STATS = "alm-aliado-placar";
-const AL = {G:null, aba:"jogar", sel:null, timer:null, setup:null, anim:null};
+const AL = {G:null, aba:"jogar", sel:null, timer:null, setup:null, anim:null, busy:false, vel:"normal", zoom:false};
+/* Velocidade: tempo de cada pulo de casa e quanto o computador espera entre as jogadas. */
+const VEL = {devagar:{n:"Devagar", hop:420, pausa:1.7}, normal:{n:"Normal", hop:210, pausa:1}, rapido:{n:"Rápido", hop:85, pausa:.45}};
+try { const v = JSON.parse(localStorage.getItem("alm-aliado-vel") || "null"); if (v && VEL[v.vel]) { AL.vel = v.vel; AL.zoom = !!v.zoom; } } catch (e) {}
+const salvarPref = () => { try { localStorage.setItem("alm-aliado-vel", JSON.stringify({vel:AL.vel, zoom:AL.zoom})); } catch (e) {} };
+const R_PEDRA = 5.6;
 const g$ = s => document.querySelector(s);
 const humano = (G, p) => G.seats[p] === "h";
 function salvar(){ try { localStorage.setItem(SAVE, JSON.stringify(AL.G)); } catch (e) {} }
@@ -294,6 +299,42 @@ function cantoSVG(p, x, y, w){
 const CANTO = [[0, 0], [16, 0], [16, 16], [0, 16]]; // [linha, coluna] do canto de cada jogador
 const CS = 20; // tamanho da casa no SVG
 
+const pilhaSVG = (x, y, n) => `<g pointer-events="none"><circle cx="${x + 5.2}" cy="${y - 5.2}" r="3.9" fill="#E3B54A" stroke="#1E1503" stroke-width=".7"/><text x="${x + 5.2}" y="${y - 3.5}" text-anchor="middle" font-size="5.4" font-weight="800" fill="#1E1503" font-family="system-ui">${n}</text></g>`;
+const centro = rc => [rc[1] * CS + CS / 2, rc[0] * CS + CS / 2];
+
+/* Com o tabuleiro ampliado, rola de lado para deixar a casa à vista. */
+function focar(rc, suave){
+  const wrap = g$(".al-boardwrap.al-zoom"); if (!wrap) return;
+  const svg = wrap.querySelector("svg"); if (!svg) return;
+  const k = svg.clientWidth / (CS * 19 + 12), x = (rc[1] * CS + CS / 2 + 6) * k;
+  wrap.scrollTo({left:Math.max(0, x - wrap.clientWidth / 2), behavior:suave ? "smooth" : "auto"});
+}
+/* Anima a pedra pulando casa por casa e só depois aplica a jogada. */
+function animar(o, feito){
+  const G = AL.G, p = G.turn, v = VEL[AL.vel];
+  const wrap = g$(".al-boardwrap");
+  if (!wrap || !g$("#al-root")) return feito();
+  const casas = o.t === "exit" ? [PATHS[p][0]] : Array.from({length:o.to - o.from}, (_, k) => PATHS[p][o.from + 1 + k]);
+  const n = o.t === "exit" ? 1 : o.k;
+  const t = clone(G); let m = 0;
+  for (let j = 0; j < 4 && m < n; j++) if (t.pos[p][j] === o.from){ t.pos[p][j] = -99; m++; }
+  const [r0, c0] = CANTO[p];
+  const [x0, y0] = o.t === "exit" ? [(c0 + 1.5) * CS, (r0 + 1.5) * CS] : centro(PATHS[p][o.from]);
+  AL.busy = true; AL.sel = null;
+  const sx = wrap.scrollLeft;
+  wrap.innerHTML = tabuleiroSVG(t, {mover:{p, n, x:x0, y:y0, ms:v.hop}});
+  wrap.scrollLeft = sx;
+  let i = 0;
+  const passo = () => {
+    if (i >= casas.length){ setTimeout(() => { AL.busy = false; feito(); }, v.hop * .6); return; }
+    const el = document.getElementById("al-mover"), [x, y] = centro(casas[i++]);
+    if (el) el.style.transform = `translate(${x}px,${y}px)`;
+    focar(casas[i - 1], true);
+    setTimeout(passo, v.hop);
+  };
+  requestAnimationFrame(() => requestAnimationFrame(passo));
+}
+
 function tabuleiroSVG(G, opts){
   const H = CS * 19;
   let s = `<svg class="al-board" viewBox="-6 -6 ${H + 12} ${H + 12}" role="img" aria-label="Tabuleiro do Aliado">`;
@@ -301,7 +342,7 @@ function tabuleiroSVG(G, opts){
   for (let r = 0; r < 19; r++) for (let c = 0; c < 19; c++){
     const ch = GRID[r][c]; if (ch === ".") continue;
     const x = c * CS, y = r * CS;
-    s += `<rect x="${x + 1}" y="${y + 1}" width="${CS - 2}" height="${CS - 2}" rx="2.5" fill="${COR[ch]}" stroke="${ch === "W" ? "#C9C2B0" : "rgba(0,0,0,.15)"}" stroke-width=".8"/>`;
+    s += `<rect x="${x + .5}" y="${y + .5}" width="${CS - 1}" height="${CS - 1}" rx="2" fill="${COR[ch]}" stroke="${ch === "W" ? "#C9C2B0" : "rgba(0,0,0,.15)"}" stroke-width=".8"/>`;
     if (ch === "M") s += `<text x="${x + CS / 2}" y="${y + CS / 2 + 4.6}" text-anchor="middle" font-size="13" font-weight="800" font-family="Montserrat,system-ui,sans-serif" fill="#111">M</text>`;
     if (ch === "S") s += caveira(x + CS / 2, y + CS / 2, CS);
   }
@@ -314,11 +355,12 @@ function tabuleiroSVG(G, opts){
   if (!G) return s + "</svg>";
 
   /* Pedras no tabuleiro, agrupadas por casa. */
-  const vez = G.turn, H2 = humano(G, vez) && G.phase === "move";
+  const anim = opts && opts.mover;
+  const vez = G.turn, H2 = !anim && humano(G, vez) && G.phase === "move";
   const ops = H2 ? legal(G) : [];
   const movem = new Set(ops.filter(o => o.t === "move").map(o => o.from));
   const sai = ops.some(o => o.t === "exit");
-  const sel = AL.sel;
+  const sel = anim ? null : AL.sel;
   /* Destinos da pedra escolhida. */
   if (sel != null){
     const alvos = {};
@@ -332,19 +374,21 @@ function tabuleiroSVG(G, opts){
     const cont = {}; G.pos[p].forEach(i => { cont[i] = (cont[i] || 0) + 1; });
     for (const u in cont){
       const i = +u, n = cont[u];
+      if (i < -1) continue; // pedra escondida enquanto anda
       if (i < 0){
         const [r0, c0] = CANTO[p], slots = [[.85, .85], [2.15, .85], [.85, 2.15], [2.15, 2.15]];
-        for (let k = 0; k < n; k++){ const [dx, dy] = slots[k]; s += pedraSVG(p, (c0 + dx) * CS, (r0 + dy) * CS, 6.6); }
+        for (let k = 0; k < n; k++){ const [dx, dy] = slots[k]; s += pedraSVG(p, (c0 + dx) * CS, (r0 + dy) * CS, 6.2); }
         if (p === vez && sai) s += `<rect data-act="alSel" data-arg="-1" x="${c0 * CS + 2}" y="${r0 * CS + 2}" width="${3 * CS - 4}" height="${3 * CS - 4}" rx="9" fill="transparent" stroke="${sel === -1 ? "#E3B54A" : "#fff"}" stroke-width="${sel === -1 ? 3.4 : 2.2}" class="al-pulse" style="cursor:pointer"/>`;
         continue;
       }
       const [r, c] = PATHS[p][i], x = c * CS + CS / 2, y = r * CS + CS / 2;
       const pode = p === vez && movem.has(i);
-      s += pedraSVG(p, x, y, 7.2, pode ? `data-act="alSel" data-arg="${i}" style="cursor:pointer"` : "");
-      if (pode) s += `<circle cx="${x}" cy="${y}" r="9.6" fill="none" stroke="${sel === i ? "#E3B54A" : "#fff"}" stroke-width="${sel === i ? 2.6 : 1.6}" class="al-pulse" pointer-events="none"/>`;
-      if (n > 1) s += `<g pointer-events="none"><circle cx="${x + 6.5}" cy="${y - 6.5}" r="4.6" fill="#E3B54A" stroke="#1E1503" stroke-width=".8"/><text x="${x + 6.5}" y="${y - 4.6}" text-anchor="middle" font-size="6.2" font-weight="800" fill="#1E1503" font-family="system-ui">${n}</text></g>`;
+      s += pedraSVG(p, x, y, R_PEDRA, pode ? `data-act="alSel" data-arg="${i}" style="cursor:pointer"` : "");
+      if (pode) s += `<circle cx="${x}" cy="${y}" r="${R_PEDRA + 2.2}" fill="none" stroke="${sel === i ? "#E3B54A" : "#fff"}" stroke-width="${sel === i ? 2.6 : 1.6}" class="al-pulse" pointer-events="none"/>`;
+      if (n > 1) s += pilhaSVG(x, y, n);
     }
   }
+  if (anim){ const m = opts.mover; s += `<g id="al-mover" style="transform:translate(${m.x}px,${m.y}px);transition:transform ${m.ms}ms ease-in-out" pointer-events="none"><g class="al-hop" style="animation-duration:${m.ms}ms">${pedraSVG(m.p, 0, 0, R_PEDRA + .6)}${m.n > 1 ? pilhaSVG(0, 0, m.n) : ""}</g></g>`; }
   return s + "</svg>";
 }
 
@@ -379,6 +423,11 @@ function draw(){
   const G = AL.G;
   if (!G || AL.setup) { root.innerHTML = setupHTML(); return; }
   root.innerHTML = jogoHTML(G);
+  if (AL.zoom){
+    const P = G.pos[G.turn], noTab = P.filter(i => i >= 0);
+    const alvo = AL.sel != null && AL.sel >= 0 ? PATHS[G.turn][AL.sel] : noTab.length ? PATHS[G.turn][Math.max(...noTab)] : [CANTO[G.turn][0] + 1, CANTO[G.turn][1] + 1];
+    focar(alvo, false);
+  }
   agendar();
 }
 
@@ -423,8 +472,9 @@ function jogoHTML(G){
       <div class="al-vez"><svg viewBox="0 0 30 30" width="34" height="34">${pedraSVG(p, 15, 14, 11)}</svg><div><span class="eyebrow">${G.phase === "over" ? "Fim de jogo" : "Vez do"}</span><b>${G.phase === "over" ? DUPLA[G.winner] : c.nome}</b><span class="sub">${G.phase === "over" ? "" : `Dupla ${DUPLA[p % 2]}${hum ? "" : " · computador"}`}</span></div>${dados}</div>
       ${G.aviso && G.phase !== "over" ? `<div class="al-aviso">${esc(G.aviso)}</div>` : ""}
     </div>
-    <div class="al-boardwrap">${tabuleiroSVG(G)}</div>
+    <div class="al-boardwrap${AL.zoom ? " al-zoom" : ""}">${tabuleiroSVG(G)}</div>
     <div class="al-acao">${acao}</div>
+    <div class="al-ctrl"><div class="seg al-vel" role="group" aria-label="Velocidade das jogadas">${Object.entries(VEL).map(([k, v]) => `<button type="button" data-act="alVel" data-arg="${k}" aria-pressed="${AL.vel === k}">${v.n}</button>`).join("")}</div><button class="btn ghost sm" data-act="alZoom" aria-pressed="${AL.zoom}">${ic("search")}${AL.zoom ? "Tabuleiro normal" : "Ampliar tabuleiro"}</button></div>
     <div class="al-side">
       <div class="al-times">${CLUBES.map((cc, q) => { const P = G.pos[q]; const fora = P.filter(i => i >= 0).length, cheg = P.filter(i => i >= ARM).length; return `<div class="al-time${q === p && G.phase !== "over" ? " on" : ""}"><svg viewBox="0 0 30 30" width="22" height="22">${pedraSVG(q, 15, 14, 11)}</svg><b>${cc.curto}</b><span class="sub">${4 - fora} no paiol · ${cheg} na chegada${G.sangra[q] ? " · sangrando" : ""}</span></div>`; }).join("")}</div>
       <details class="al-log"><summary>O que aconteceu</summary><ol>${G.log.slice(0, 14).map(t => `<li>${esc(t)}</li>`).join("")}</ol></details>
@@ -454,15 +504,16 @@ function giriasHTML(){
 /* ---------- Ritmo da partida ---------- */
 function pararTimer(){ if (AL.timer){ clearTimeout(AL.timer); AL.timer = null; } }
 function agendar(){
-  const G = AL.G; if (!G || AL.timer || G.phase === "over" || AL.aba !== "jogar" || AL.setup) return;
+  const G = AL.G; if (!G || AL.timer || AL.busy || G.phase === "over" || AL.aba !== "jogar" || AL.setup) return;
+  const k = VEL[AL.vel].pausa;
   const p = G.turn, hum = humano(G, p);
   let f = null, ms = 0;
-  if (G.phase === "pass" || G.phase === "end") { f = () => { fimVez(G); AL.sel = null; }; ms = G.phase === "pass" ? 1500 : (hum ? 700 : 900); }
-  else if (!hum && G.phase === "roll") { f = () => rolarAnim(); ms = 700; }
-  else if (!hum && G.phase === "move") { f = () => { const seq = melhorPlano(G); if (seq.length) aplicar(G, seq[0]); else G.phase = "end"; }; ms = 850; }
+  if (G.phase === "pass" || G.phase === "end") { f = () => { fimVez(G); AL.sel = null; }; ms = (G.phase === "pass" ? 1500 : (hum ? 500 : 700)) * k; }
+  else if (!hum && G.phase === "roll") { f = () => rolarAnim(); ms = 700 * k; }
+  else if (!hum && G.phase === "move") { f = () => { const seq = melhorPlano(G); if (!seq.length){ G.phase = "end"; return; } animar(seq[0], () => { aplicar(G, seq[0]); fim(); }); return "async"; }; ms = 750 * k; }
   else if (hum && G.phase === "move") { const ops = legal(G); const fontes = new Set(ops.map(o => o.t === "exit" ? -1 : o.from)); if (fontes.size === 1 && AL.sel == null){ AL.sel = [...fontes][0]; return draw(); } }
   if (!f) return;
-  AL.timer = setTimeout(() => { AL.timer = null; if (!g$("#al-root")) return; f(); fim(); }, ms);
+  AL.timer = setTimeout(() => { AL.timer = null; if (!g$("#al-root")) return; if (f() !== "async") fim(); }, ms);
 }
 function fim(){
   const G = AL.G;
@@ -483,9 +534,11 @@ Object.assign(ACT, {
   alVolta(){ AL.setup = null; draw(); },
   alSetup(){ pararTimer(); AL.setup = {preset:"", seats:AL.G ? AL.G.seats.slice() : PRESETS[0][3].slice()}; AL.setup.preset = (PRESETS.find(x => x[3].join() === AL.setup.seats.join()) || [""])[0]; draw(); scrollTo(0, 0); },
   alRevanche(){ pararTimer(); AL.G = novo(AL.G.seats.slice()); AL.sel = null; log(AL.G, "Revanche! O Fluminense joga primeiro."); salvar(); draw(); },
-  alRolar(){ const G = AL.G; if (!G || G.phase !== "roll" || !humano(G, G.turn)) return; pararTimer(); rolarAnim(); fim(); },
-  alSel(a){ AL.sel = a === "" || a == null ? null : +a; draw(); },
-  alJoga(a){ const G = AL.G; if (!G || G.phase !== "move" || !humano(G, G.turn)) return; const o = legal(G)[+a]; if (!o) return; aplicar(G, o); AL.sel = null; fim(); }
+  alRolar(){ const G = AL.G; if (!G || AL.busy || G.phase !== "roll" || !humano(G, G.turn)) return; pararTimer(); rolarAnim(); fim(); },
+  alVel(a){ if (VEL[a]) { AL.vel = a; salvarPref(); if (!AL.busy) draw(); } },
+  alZoom(){ AL.zoom = !AL.zoom; salvarPref(); if (!AL.busy) draw(); },
+  alSel(a){ if (AL.busy) return; AL.sel = a === "" || a == null ? null : +a; draw(); },
+  alJoga(a){ const G = AL.G; if (!G || G.phase !== "move" || !humano(G, G.turn)) return; if (AL.busy) return; const o = legal(G)[+a]; if (!o) return; animar(o, () => { aplicar(G, o); AL.sel = null; fim(); }); }
 });
 
 window.viewAliado = viewAliado;
